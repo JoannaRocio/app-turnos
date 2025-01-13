@@ -1,0 +1,9 @@
+npx create-react-app turnos-app
+cd turnos-app
+npm install react-router-dom react-hook-form
+npm install typescript @types/react @types/react-dom
+npm install @svgr/webpack
+npm install @types/react @types/react-dom
+npm install typescript@4.9.5
+npm install sass
+npm install
