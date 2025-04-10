@@ -90,7 +90,7 @@ const Login: React.FC = () => {
                   />
                 </div>
 
-                <a href="">¿Olvidaste tu contraseña?</a>
+                <a href="/password-recovery">¿Olvidaste tu contraseña?</a>
 
                 <button type="submit" className="submit-button">
                   Ingresar
