@@ -1,5 +1,116 @@
+@import "~bootstrap/scss/bootstrap";
+
+:root {
+  // PRIMARY
+  --color-primary-light: #3A4C65;
+  --color-primary-dark: #0F1B33;
+  --color-primary-hover: #253659;  
+  --color-primary-disabled: #5C708A;
+
+  // SECONDARY
+  --color-secondary-light: #5F7D99;
+  --color-secondary-dark: #2B4558;
+  --color-secondary-hover: #4E6F89;
+  --color-secondary-disabled: #8FA3B8;
+
+  // TERTIARY
+  --color-tertiary-light: #94A7C5;
+  --color-tertiary-dark: #5A7391;
+  --color-tertiary-hover: #8599B8;
+  --color-tertiary-disabled: #B0C1D6;
+
+  // NEUTRAL
+  --color-neutral-light: #1C2435;
+  --color-neutral-dark: #090E19;
+  --color-neutral-hover: #141A2A;
+  --color-neutral-disabled: #3F4554;
+
+  // WHITE(BEIGE)
+  --color-white-light: #FFFFFF;
+  --color-white-dark: #D4CFBB;
+  --color-white-hover: #F8F5EA;
+  --color-white-disabled: #E7E3CF;
+
+  // BLACK
+
+  --color-black: #0d1321;
+}
+
+html {
+  font-size: 10px; /* 1rem = 10px */
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.6rem; /* Tamaño base = 16px */
+  line-height: 1.5;
+  color: var( --color-black); /* Texto principal en color primario */
+
+
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark), var(--color-tertiary-light));
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    color: var(--color-neutral-light);
+  
+}
+
+h1 {
+  font-size: 4.8rem; /* 48px */
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 3.6rem; /* 36px */
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 2.8rem; /* 28px */
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+h4 {
+  font-size: 2.2rem; /* 22px */
+  font-weight: 500;
+}
+
+h5 {
+  font-size: 1.8rem; /* 18px */
+  font-weight: 400;
+}
+
+h6 {
+  font-size: 1.6rem; /* 16px */
+  font-weight: 400;
+}
+
+p {
+  font-size: 1.6rem; /* 16px */
+  line-height: 1.6;
+}
+
+small {
+  font-size: 1.4rem; /* 14px */
+  color: #748cab; /* Color neutral */
+}
+
+a {
+  color:var(--color-secondary-dark);
+}
+
 .App {
   text-align: center;
+  min-height: 100vh; // Asegura que ocupe toda la altura de la pantalla
+  display: flex;
+  justify-content: center; // Centra horizontalmente
+  align-items: center; // Centra verticalmente
+  // background-color: var(--color-secondary-dark);
 }
 
 .App-logo {
