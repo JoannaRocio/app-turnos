@@ -18,26 +18,25 @@ function App() {
     <>
       <header>
         {location.pathname !== '/login' && location.pathname !== '/password-recovery' &&
-        location.pathname !== '/reset-password'
+        location.pathname !== '/reset-password' && location.pathname !== '*'
          && <Header />}
       </header>
       
       <div className="App">
-        <Routes>
-          <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />} />
-         
-          <Route path="/login" element={<Login />} />
-          <Route path="/cambiar-contraseña" element={<PasswordRecovery />} />
-          
-          {/* Ruta protegida */}
-          <Route path="/home" element={
-            isAuthenticated ? <Home /> : <Navigate to="/login" replace />
-          } />
+      <Routes>
+        {/* Rutas públicas */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/password-recovery" element={<PasswordRecovery />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-          <Route path="*" element={<NotFound />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+        {/* Ruta protegida */}
+        <Route path="/home" element={
+          isAuthenticated ? <Home /> : <Navigate to="/login" replace />
+        } />
 
-        </Routes>
+        {/* Ruta no encontrada */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       </div>
     </>
   );
