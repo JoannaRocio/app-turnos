@@ -1,5 +1,5 @@
 .container-login {
-    max-width: 400px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 2rem;
 
@@ -51,6 +51,7 @@
       cursor: pointer;
       font-size: 1.6rem;
       margin-top: 1rem;
+      transition: 0.5s;
   
       &:hover {
         background-color: #0056b3;

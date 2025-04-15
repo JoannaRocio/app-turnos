@@ -1,8 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import './Header.scss';
+import { Link, useNavigate } from 'react-router-dom';
+import './HeaderComponent.scss';
+import AuthService from '../../services/AuthService';
 
-const Header: React.FC = () => {
+const HeaderComponent: React.FC = () => {
+
+  const navigate = useNavigate();
+  
+  const handleLogOut = () => {
+    AuthService.logout()
+    navigate("/login")
+  }
+
   return (
     <header className="container-header">
       <div className="container d-flex justify-content-between align-items-center">
@@ -30,10 +39,10 @@ const Header: React.FC = () => {
         </nav>
 
         {/* Botón de Login */}
-        <Link to="/" className="btn btn-light btn-header">Cerrar sesión</Link>
+        <button onClick={(e) => handleLogOut()} className="btn btn-light btn-header">Cerrar sesión</button>
       </div>
     </header>
   );
 };
 
-export default Header;
+export default HeaderComponent;

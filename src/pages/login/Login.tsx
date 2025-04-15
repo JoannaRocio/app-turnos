@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Login.scss"; // Importa los estilos
 import { useNavigate } from 'react-router-dom';
+import AuthService from "../../services/AuthService";
 
 const Login: React.FC = () => {
   const [username, setUser] = useState<string>("");
@@ -10,50 +11,23 @@ const Login: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Validación básica
+  
     if (!username || !password) {
       setError("Por favor, completa todos los campos.");
       return;
     }
-
-    if (!username) {
-      setError("El usuario no es válido.");
-      return;
-    }
-
-    const response = await fetch("http://localhost:8080/api/v1/user/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-    
-    // Verifica si la respuesta es exitosa antes de procesarla
-    // if (!response.ok) {
-    //     console.error(`Error: ${response.status} - ${response.statusText}`);
-    // } else {
-    //     const data = await response.json(); // Convertir a JSON una sola vez
-    //     console.log(data);
-    // }
-
-    const data = await response.json();
-    console.log(data);
-
-    if (data.status == true) {
-        // const token = await response.text();
-        // localStorage.setItem("token", token);
-        alert(data.message);
-        navigate("/home");
+  
+    const data = await AuthService.login(username, password);
+  
+    if (data.status === true) {
+      AuthService.saveToken(data.token); // suponiendo que tu backend devuelve el token como data.token
+      alert(data.message);
+      navigate("/home");
     } else {
-        alert(data.message);
+      alert(data.message);
     }
-
-    // Lógica para el login
-    // console.log("Email:", email);
-    // console.log("Password:", password);
-
-    setError(""); // Reinicia el mensaje de error
-    // alert("Inicio de sesión exitoso");
+  
+    setError("");
   };
 
   return (
@@ -62,8 +36,8 @@ const Login: React.FC = () => {
         <div className="col-12 container-formLogin">
 
           <div className="row">
-            <div className="col">
-              <h2>Iniciar sesión</h2>
+            <div className="col pb-4">
+              <h3>Iniciar sesión</h3>
             </div>
           </div>
 

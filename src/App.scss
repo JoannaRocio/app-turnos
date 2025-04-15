@@ -34,6 +34,8 @@
   // BLACK
 
   --color-black: #0d1321;
+  --color-blue: #004bfb;
+  --color-blue-dark:#003dca;
 }
 
 html {
@@ -44,16 +46,13 @@ body {
   font-family: 'Outfit', sans-serif;
   font-size: 1.6rem; /* Tamaño base = 16px */
   line-height: 1.5;
-  color: var( --color-black); /* Texto principal en color primario */
 
-
-    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark), var(--color-tertiary-light));
-    background-size: cover;
-    background-repeat: no-repeat;
-    min-height: 100vh;
-    margin: 0;
-    font-family: 'Outfit', sans-serif;
-    color: var(--color-neutral-light);
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark), var(--color-tertiary-light));
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-neutral-light);
   
 }
 
@@ -101,16 +100,20 @@ small {
 }
 
 a {
-  color:var(--color-secondary-dark);
+  color: var(--color-blue);
+  transition: 0.5s;
+  
+  &:hover {
+    color: var(--color-blue-dark);
+  }
 }
 
 .App {
   text-align: center;
   min-height: 100vh; // Asegura que ocupe toda la altura de la pantalla
-  display: flex;
   justify-content: center; // Centra horizontalmente
   align-items: center; // Centra verticalmente
-  // background-color: var(--color-secondary-dark);
+  align-content: center;
 }
 
 .App-logo {
@@ -137,6 +140,10 @@ a {
 
 .App-link {
   color: #61dafb;
+}
+
+.App-title {
+  color: var(--color-white-light);
 }
 
 @keyframes App-logo-spin {

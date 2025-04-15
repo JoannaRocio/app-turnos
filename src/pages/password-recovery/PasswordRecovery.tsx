@@ -1,86 +1,87 @@
 import React, { useState } from "react";
 import "./PasswordRecovery.scss"; // Importa los estilos
 import { useNavigate } from 'react-router-dom';
+import PasswordRecoveryService from "../../services/PasswordRecoveryService";
 
 const PasswordRecovery: React.FC = () => {
-    const [username, setUser] = useState<string>("");
-    const [error, setError] = useState<string>("");
+    const [email, setEmail] = useState<string>("")
+    const [error, setError] = useState<string>("")
+    const [success, setSuccess] = useState<string>("")
+
+    // useEffect(() => {
+    //   const params = new URLSearchParams(location.search);
+    //   const tokenFromURL = params.get("token");
+    //   if (tokenFromURL) {
+    //     setToken(tokenFromURL);
+    //   } else {
+    //     setError("Token inválido o faltante.");
+    //   }
+    // }, [location]);
+
 
     const handlePasswordRecovery = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-    
+        e.preventDefault()
+        setError("");
+        setSuccess("");
         // Validación básica
         // if (!username) {
         //   setError("Por favor, completa todos los campos.");
         //   return;
         // }
     
-        if (!username) {
-          setError("El usuario no es válido.");
-          return;
+        if (!email) {
+          setSuccess("")
+          setError("Por favor, completar el campo vacío.")
+          return
         }
-    
-        // const response = await fetch("http://localhost:8080/api/v1/user/login", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify({ username })
-        // });
-        
-        // Verifica si la respuesta es exitosa antes de procesarla
-        // if (!response.ok) {
-        //     console.error(`Error: ${response.status} - ${response.statusText}`);
-        // } else {
-        //     const data = await response.json(); // Convertir a JSON una sola vez
-        //     console.log(data);
-        // }
-    
-        // const data = await response.json();
-        // console.log(data);
-    
-        // if (data.status == true) {
-        //     // const token = await response.text();
-        //     // localStorage.setItem("token", token);
-        //     alert(data.message);
-        //     navigate("/home");
-        // } else {
-        //     alert(data.message);
-        // }
+
+        const data = await PasswordRecoveryService.password_recovery(email);
+
+        if (data != null) {
+          setError("")
+          setSuccess("Un email ha sido enviado a su correo. Por favor, revise su casilla.");
+        }
+        else {
+          setSuccess("")
+          setError("Email inválido.");
+        }
     }
     
 
     return(
-        <section className="container container-login ">
+      <section className="container container-login ">
         <div className="row justify-content-center">
           <div className="col-12 container-formLogin">
   
             <div className="row">
-              <div className="col">
-                <h2>Recuperar contraseña</h2>
+              <div className="col pb-4">
+                <h3>Recuperar contraseña</h3>
               </div>
             </div>
   
             <div className="row">
               <div className="col">
                 {error && <p className="error-message">{error}</p>}
+                {success && <p className="success-message">{success}</p>}
+
                 <form onSubmit={handlePasswordRecovery}>
                   <div className="form-group">
                     <label htmlFor="user">Email:</label>
                     <input
                       type="text"
                       id="user"
-                      value={username}
-                      onChange={(e) => setUser(e.target.value)}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-                  <a href="/login">Iniciar sesión</a>
+                  <a href="/login">Volver</a>
   
                   <button type="submit" className="submit-button">
-                    Ingresar
+                    Enviar
                   </button>
                 </form>
               </div>
             </div>
-  
           </div>
         </div>
       </section>

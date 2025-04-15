@@ -1,0 +1,22 @@
+.calendar-wrapper {
+    max-width: 350px;
+    margin: auto;
+    border-radius: 10px;
+    overflow: hidden;
+  
+    .react-calendar {
+      border: none;
+      font-family: inherit;
+    }
+  
+    .react-calendar__tile--now {
+      background: #e0f7fa;
+      color: #00796b;
+    }
+  
+    .react-calendar__tile--active {
+      background: #00796b;
+      color: white;
+    }
+  }
+  

@@ -5,7 +5,12 @@
     color: var(--color-white-dark);
 }
 
-.btn-header {
+.btn-light {
     padding: 1rem;
     font-size: 1.5rem;
+    transition: 0.5s;
+
+    &:hover {
+        // background-color: red;
+    }
 }
