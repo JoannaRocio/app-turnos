@@ -20,31 +20,32 @@ const PasswordRecovery: React.FC = () => {
 
 
     const handlePasswordRecovery = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setError("");
-        setSuccess("");
-        // Validación básica
-        // if (!username) {
-        //   setError("Por favor, completa todos los campos.");
-        //   return;
-        // }
-    
-        if (!email) {
-          setSuccess("")
-          setError("Por favor, completar el campo vacío.")
-          return
-        }
+      e.preventDefault()
+      setError("");
+      setSuccess("");
+      // Validación básica
+      // if (!username) {
+      //   setError("Por favor, completa todos los campos.");
+      //   return;
+      // }
+  
+      if (!email) {
+        setSuccess("")
+        setError("Por favor, completar el campo vacío.")
+        return
+      }
 
-        const data = await PasswordRecoveryService.password_recovery(email);
+      const data = await PasswordRecoveryService.password_recovery(email);
 
-        if (data != null) {
-          setError("")
-          setSuccess("Un email ha sido enviado a su correo. Por favor, revise su casilla.");
-        }
-        else {
-          setSuccess("")
-          setError("Email inválido.");
-        }
+      console.log(data, 'dataa')
+      if (data.status === true) {
+        setError("")
+        setSuccess(data.message);
+      }
+      else {
+        setSuccess("")
+        setError("Email incorrecto.");
+      }
     }
     
 

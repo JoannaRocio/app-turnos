@@ -6,12 +6,16 @@ import AuthService from "../../services/AuthService";
 const Login: React.FC = () => {
   const [username, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>("")
+  // const [success, setSuccess] = useState<string>("")
+  
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+    setError("")
+    // setSuccess("")
+
     if (!username || !password) {
       setError("Por favor, completa todos los campos.");
       return;
@@ -20,14 +24,14 @@ const Login: React.FC = () => {
     const data = await AuthService.login(username, password);
   
     if (data.status === true) {
-      AuthService.saveToken(data.token); // suponiendo que tu backend devuelve el token como data.token
-      alert(data.message);
+      AuthService.saveToken(data.token);
+      // console.log(data.message, 'mensage')
+      // setSuccess(data.message);
       navigate("/home");
     } else {
-      alert(data.message);
+      setError(data.message);
     }
   
-    setError("");
   };
 
   return (
@@ -44,6 +48,8 @@ const Login: React.FC = () => {
           <div className="row">
             <div className="col">
               {error && <p className="error-message">{error}</p>}
+              {/* {success && <p className="success-message">{success}</p>} */}
+
               <form onSubmit={handleLogin}>
                 <div className="form-group">
                   <label htmlFor="user">Usuario:</label>

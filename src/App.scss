@@ -36,6 +36,9 @@
   --color-black: #0d1321;
   --color-blue: #004bfb;
   --color-blue-dark:#003dca;
+  --color-red:#d62121;
+  --color-green:#2ebe4d;
+
 }
 
 html {
@@ -146,6 +149,14 @@ a {
   color: var(--color-white-light);
 }
 
+.error-message {
+  color: var(--color-red);
+}
+
+.success-message {
+  color: var(--color-green);
+
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

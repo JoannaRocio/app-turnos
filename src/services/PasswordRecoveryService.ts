@@ -1,4 +1,5 @@
 class PasswordRecoveryService {
+  
   static password_recovery(email: string) {
     return fetch("http://localhost:8080/api/enviar", {
       method: "POST",
