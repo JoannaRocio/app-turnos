@@ -1,31 +1,23 @@
-// src/components/AppointmentsPage.tsx
 import React, { useState } from "react";
-import CalendarComponent from "../../components/CalendarComponent/CalendarComponent";
 import AppointmentsComponent from "../../components/AppointmentsComponent/AppointmentsComponent";
+import PatientsComponent from "../../components/Patients/PatientsPage";
 import { patientsMock } from "../../mocks/PatientsMock";
+import { useComponente } from "../../context/ContextComponent";
 
-const AppointmentsPage: React.FC = () => {
-//   const [selectedDate, setSelectedDate] = useState("2025-04-14");
-//   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    console.log(selectedDate)
-  };
+const Home: React.FC = () => {
+  const { componenteActivo } = useComponente();
 
   return (
-    <div>
-        {/* <CalendarComponent onDateSelect={setSelectedDate} /> */}
-        <div>
-          <h2>Seleccioná una fecha:</h2>
-          <CalendarComponent onDateSelect={handleDateSelect} />
-        </div>
-        
-        <AppointmentsComponent selectedDate={selectedDate} appointments={patientsMock} />
+    <div className="container mt-4">
+      <h2>Inicio</h2>
 
+      {componenteActivo === "pacientes" && <PatientsComponent patients={patientsMock} />}
+      {componenteActivo === "agenda-turnos" && (
+        <AppointmentsComponent selectedDate={new Date()} appointments={patientsMock} />
+      )}
     </div>
   );
 };
 
-export default AppointmentsPage;
+export default Home;
+

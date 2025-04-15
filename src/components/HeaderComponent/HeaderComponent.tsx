@@ -1,45 +1,44 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './HeaderComponent.scss';
-import AuthService from '../../services/AuthService';
+// src/components/HeaderComponent/HeaderComponent.tsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "./HeaderComponent.scss";
+import AuthService from "../../services/AuthService";
+import { useComponente } from "../../context/ContextComponent";
+import { useAuth } from "../../context/ContextAuth";
 
 const HeaderComponent: React.FC = () => {
-
   const navigate = useNavigate();
-  
+  const { componenteActivo, setComponenteActivo } = useComponente();
+  const { logout } = useAuth();
+
   const handleLogOut = () => {
-    AuthService.logout()
-    navigate("/login")
-  }
+    logout();
+    navigate("/Inicio-sesion");
+  };
 
   return (
     <header className="container-header">
       <div className="container d-flex justify-content-between align-items-center">
-        {/* Logo */}
-        <Link to="/" className="text-white text-decoration-none">
-          <h2>Turnos APP</h2>
-        </Link>
+        <h2 className="text-white">Turnos APP</h2>
 
-        {/* Navegación */}
         <nav>
           <ul className="nav">
             <li className="nav-item">
-              <Link className="nav-link text-white" to="/Turnos">Agenda de turnos</Link>
+              <button className={`nav-link btn text-white ${componenteActivo === "agenda-turnos" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("agenda-turnos")}>
+                Agenda de turnos
+              </button>
             </li>
             <li className="nav-item">
-              <Link className="nav-link text-white" to="/acerca">Pacientes</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link text-white" to="/acerca">Profesionales</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link text-white" to="/acerca">Sistema</Link>
+              <button className={`nav-link btn text-white ${componenteActivo === "pacientes" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("pacientes")}>
+                Pacientes
+              </button>
             </li>
           </ul>
         </nav>
 
-        {/* Botón de Login */}
-        <button onClick={(e) => handleLogOut()} className="btn btn-light btn-header">Cerrar sesión</button>
+        <button onClick={handleLogOut} className="btn btn-light">
+          Cerrar sesión
+        </button>
       </div>
     </header>
   );

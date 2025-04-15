@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Login.scss"; // Importa los estilos
 import { useNavigate } from 'react-router-dom';
 import AuthService from "../../services/AuthService";
+import { useAuth } from "../../context/ContextAuth";
 
 const Login: React.FC = () => {
   const [username, setUser] = useState<string>("");
@@ -10,7 +11,8 @@ const Login: React.FC = () => {
   // const [success, setSuccess] = useState<string>("")
   
   const navigate = useNavigate();
-
+  const { login } = useAuth();
+  
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("")
@@ -25,9 +27,9 @@ const Login: React.FC = () => {
   
     if (data.status === true) {
       AuthService.saveToken(data.token);
-      // console.log(data.message, 'mensage')
-      // setSuccess(data.message);
-      navigate("/home");
+
+      login();
+      navigate("/Home");
     } else {
       setError(data.message);
     }
@@ -41,7 +43,7 @@ const Login: React.FC = () => {
 
           <div className="row">
             <div className="col pb-4">
-              <h3>Iniciar sesión</h3>
+              <h3 className="text-center">Iniciar sesión</h3>
             </div>
           </div>
 
@@ -70,7 +72,7 @@ const Login: React.FC = () => {
                   />
                 </div>
 
-                <a href="/password-recovery">¿Olvidaste tu contraseña?</a>
+                <a href="/Recuperar-contraseña">¿Olvidaste tu contraseña?</a>
 
                 <button type="submit" className="submit-button">
                   Ingresar

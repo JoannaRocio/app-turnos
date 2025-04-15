@@ -6,11 +6,14 @@
 }
 
 .btn-light {
-    padding: 1rem;
-    font-size: 1.5rem;
-    transition: 0.5s;
-
+    font-size: 1.4rem !important;
+    padding: .8rem !important;
+    transition: 0.5s !important;
+    background-color: var(--color-white-light) !important;
     &:hover {
-        // background-color: red;
+        // background-color: var(--color-white-hover) !important;
+        background-color: var(--color-tertiary-disabled) !important;
+        font-weight: 500;
+
     }
 }

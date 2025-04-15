@@ -1,46 +1,44 @@
-import './App.scss'; 
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import Login from './pages/login/Login';
-import Home from './pages/home/Home';
-import Header from './components/HeaderComponent/HeaderComponent';
-import PasswordRecovery from './pages/password-recovery/PasswordRecovery';
-import AuthService from './services/AuthService';
-import NotFound from './pages/not-found/NotFound';
-import ResetPassword from './pages/password-recovery/reset-password/ResetPassword';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import HeaderComponent from "./components/HeaderComponent/HeaderComponent";
+import Home from "./pages/home/Home";
+import { ComponenteProvider } from "./context/ContextComponent";
+import { AuthProvider, useAuth } from "./context/ContextAuth";
+import Login from "./pages/login/Login";
+import PasswordRecovery from "./pages/password-recovery/PasswordRecovery";
+import ResetPassword from "./pages/password-recovery/reset-password/ResetPassword";
+import './App.scss';
 
-function App() {
+function AppRoutes() {
+  const { isAuthenticated } = useAuth();
 
-  const location = useLocation();
-
-  const isAuthenticated = AuthService.isAuthenticated();
-  
   return (
     <>
-      <header>
-        {location.pathname !== '/login' && location.pathname !== '/password-recovery' &&
-        location.pathname !== '/cambiar-contrasena' && location.pathname !== '*'
-        && <Header />}
-      </header>
-      
-      <div className="App">
+    <div>
+      {isAuthenticated && <HeaderComponent />}
+
       <Routes>
-        {/* Rutas públicas */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/password-recovery" element={<PasswordRecovery />} />
-        {/* <Route path="/password-reset" element={<PasswordReset />} /> */}
+        <Route path="/Inicio-sesion" element={isAuthenticated ? <Navigate to="/Home"/> : <Login />} />
+        <Route path="/Recuperar-contraseña" element={<PasswordRecovery />} />
+        <Route path="/Cambiar-contrasena" element={<ResetPassword />} />
+        <Route path="/Home" element={isAuthenticated ? <Home /> : <Navigate to="/Inicio-sesion" replace />} />
 
-        <Route path="/cambiar-contrasena" element={<ResetPassword />} />
-
-        {/* Ruta protegida */}
-        <Route path="*" element={
-          isAuthenticated ? <Home /> : <Navigate to="/login" replace />
-        } />
-
-        {/* Ruta no encontrada */}
-        {/* <Route path="/*" element={<NotFound />} /> */}
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/Home" : "/Inicio-sesion"} />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       </div>
     </>
+  );
+}
+
+function App() {
+  return (
+    <ComponenteProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </ComponenteProvider>
   );
 }
 

@@ -23,12 +23,8 @@ const PasswordRecovery: React.FC = () => {
       e.preventDefault()
       setError("");
       setSuccess("");
-      // Validación básica
-      // if (!username) {
-      //   setError("Por favor, completa todos los campos.");
-      //   return;
-      // }
-  
+
+      
       if (!email) {
         setSuccess("")
         setError("Por favor, completar el campo vacío.")
@@ -37,14 +33,12 @@ const PasswordRecovery: React.FC = () => {
 
       const data = await PasswordRecoveryService.password_recovery(email);
 
-      console.log(data, 'dataa')
       if (data.status === true) {
-        setError("")
+        setError("");
         setSuccess(data.message);
-      }
-      else {
-        setSuccess("")
-        setError("Email incorrecto.");
+      } else {
+        setSuccess("");
+        setError(data.message); // ahora te muestra el mensaje "No existe un usuario con ese correo electrónico."
       }
     }
     
@@ -75,7 +69,7 @@ const PasswordRecovery: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-                  <a href="/login">Volver</a>
+                  <a href="/Inicio-sesion">Volver</a>
   
                   <button type="submit" className="submit-button">
                     Enviar

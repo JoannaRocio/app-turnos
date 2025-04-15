@@ -1,11 +1,19 @@
 class PasswordRecoveryService {
-  
-  static password_recovery(email: string) {
-    return fetch("http://localhost:8080/api/enviar", {
+
+  static async password_recovery(email: string) {
+    const response = await fetch("http://localhost:8080/api/enviar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ destinatario: email }),
-    }).then(res => res.json());
+    });
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      return { status: false, message: text };
+    }
+
+    return { status: true, message: text };
   }
 
   static reset_password(token: string, password: string) {

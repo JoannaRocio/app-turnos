@@ -13,9 +13,6 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    {/* Envolver la aplicación con Router */}
-    <Router>
       <App />
-    </Router>
   </React.StrictMode>
 );

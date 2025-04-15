@@ -3,10 +3,16 @@
     margin: 0 auto;
     padding: 2rem;
 
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     .container-formLogin {
       background-color: var(--color-white-light);
       padding: 4rem;
       border-radius: 2rem;
+      // justify-items: center;
     }
   
     h2 {

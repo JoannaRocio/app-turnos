@@ -78,7 +78,7 @@ const ResetPassword: React.FC = () => {
                       onChange={(e) => setPassword2(e.target.value)}
                     />
                   </div>
-                  <a href="/login">Volver al inicio de sesión</a>
+                  <a href="/Inicio-sesion">Volver al inicio de sesión</a>
   
                   <button type="submit" className="submit-button">
                     Guardar
