@@ -18,8 +18,8 @@ function App() {
     <>
       <header>
         {location.pathname !== '/login' && location.pathname !== '/password-recovery' &&
-        location.pathname !== '/reset-password' && location.pathname !== '*'
-         && <Header />}
+        location.pathname !== '/cambiar-contrasena' && location.pathname !== '*'
+        && <Header />}
       </header>
       
       <div className="App">
@@ -27,15 +27,17 @@ function App() {
         {/* Rutas públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/password-recovery" element={<PasswordRecovery />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* <Route path="/password-reset" element={<PasswordReset />} /> */}
+
+        <Route path="/cambiar-contrasena" element={<ResetPassword />} />
 
         {/* Ruta protegida */}
-        <Route path="/home" element={
+        <Route path="*" element={
           isAuthenticated ? <Home /> : <Navigate to="/login" replace />
         } />
 
         {/* Ruta no encontrada */}
-        <Route path="*" element={<NotFound />} />
+        {/* <Route path="/*" element={<NotFound />} /> */}
       </Routes>
       </div>
     </>

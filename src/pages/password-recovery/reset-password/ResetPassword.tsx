@@ -2,17 +2,23 @@ import React, { useState } from "react";
 import "../PasswordRecovery.scss"; // Importa los estilos
 import { useNavigate } from 'react-router-dom';
 import PasswordRecoveryService from "../../../services/PasswordRecoveryService";
+import { useSearchParams } from "react-router-dom";
 
 const ResetPassword: React.FC = () => {
     const [password, setPassword] = useState<string>("")
     const [password2, setPassword2] = useState<string>("")
     const [error, setError] = useState<string>("")
     const [success, setSuccess] = useState<string>("")
+    const [searchParams] = useSearchParams();
 
+    const token = searchParams.get("token");
 
     const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-    
+        if (!token) {
+          setError("Token inválido");
+          return;
+        }
         setError("");
         setSuccess("");
         
@@ -23,21 +29,17 @@ const ResetPassword: React.FC = () => {
           return
         }
 
-        if (!password !== !password2) {
-            setSuccess("")
-            setError("Las contraseñas deben ser iguales.")
-            return
-          }
-
-        const data = await PasswordRecoveryService.reset_password(password);
-
-        if (data != null) {
-          setError("")
-          setSuccess("La contraseña ha sido reestablecida.");
+        if (password !== password2) {
+          setSuccess("");
+          setError("Las contraseñas deben ser iguales.");
+          return;
         }
-        else {
-          setSuccess("")
-          setError("Contraseña inválida.");
+
+        try {
+          const response = await PasswordRecoveryService.reset_password(token, password);
+          setSuccess(response); // el backend devuelve un string tipo "Contraseña cambiada correctamente."
+        } catch (error) {
+          setError("Hubo un error al cambiar la contraseña.");
         }
     }
     
