@@ -9,7 +9,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="container mt-4">
-      <h2>Inicio</h2>
+      <h2 className="text-white">Inicio</h2>
 
       {componenteActivo === "pacientes" && <PatientsComponent patients={patientsMock} />}
       {componenteActivo === "agenda-turnos" && (

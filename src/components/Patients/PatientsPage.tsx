@@ -11,7 +11,7 @@ const PatientsComponent: React.FC<Props> = ({patients}) => {
 
     return (
         <section className="section-appointments">
-        <h3>Pacientes</h3>
+        <h3 className="text-white">Pacientes</h3>
         <table className="appointments-table">
             <thead>
             <tr>

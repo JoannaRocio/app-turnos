@@ -3,7 +3,7 @@ export interface Appointment {
     patientName: string;
     appointmentDate: string;
     reason: string;
-    dni: number;
+    dni: string;
     attended: boolean;
     socialSecurity: string;
     plan: string;
