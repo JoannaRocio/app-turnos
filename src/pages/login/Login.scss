@@ -1,8 +1,8 @@
 .container-login {
-    max-width: 500px;
+    max-width: 400px;
     margin: 0 auto;
     padding: 2rem;
-
+    min-width: 400px;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -13,6 +13,7 @@
       padding: 4rem;
       border-radius: 2rem;
       // justify-items: center;
+      min-width: 400px;
     }
   
     h2 {
@@ -62,6 +63,15 @@
       &:hover {
         background-color: #0056b3;
       }
+    }
+
+    .btn-show-password {
+      margin-left: 8px;
+      border: unset;
+      background: darkgray;
+      border-radius: 1rem;
+      /* width: 3rem; */
+      height: 3rem;
     }
   }
   

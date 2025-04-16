@@ -6,5 +6,6 @@ npm install @svgr/webpack
 npm install @types/react @types/react-dom
 npm install typescript@4.9.5
 npm install sass
+npm install react-icons@5.4.0
 
 npm install

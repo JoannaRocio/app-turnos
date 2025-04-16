@@ -46,7 +46,7 @@ const PasswordRecovery: React.FC = () => {
     return(
       <section className="container container-login ">
         <div className="row justify-content-center">
-          <div className="col-12 container-formLogin">
+          <div className="col-12 col-md-6 container-formLogin">
   
             <div className="row">
               <div className="col pb-4">
@@ -69,8 +69,10 @@ const PasswordRecovery: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-                  <a href="/Inicio-sesion">Volver</a>
-  
+                  <div className="text-center">
+                    <a href="/Inicio-sesion">Volver al inicio de sesión</a>
+                  </div>
+                  
                   <button type="submit" className="submit-button">
                     Enviar
                   </button>

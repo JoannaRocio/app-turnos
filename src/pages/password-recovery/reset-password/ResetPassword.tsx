@@ -3,6 +3,7 @@ import "../PasswordRecovery.scss"; // Importa los estilos
 import { useNavigate } from 'react-router-dom';
 import PasswordRecoveryService from "../../../services/PasswordRecoveryService";
 import { useSearchParams } from "react-router-dom";
+import { IoMdEye, IoMdEyeOff} from "react-icons/io";
 
 const ResetPassword: React.FC = () => {
     const [password, setPassword] = useState<string>("")
@@ -10,6 +11,9 @@ const ResetPassword: React.FC = () => {
     const [error, setError] = useState<string>("")
     const [success, setSuccess] = useState<string>("")
     const [searchParams] = useSearchParams();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+
 
     const token = searchParams.get("token");
 
@@ -39,7 +43,7 @@ const ResetPassword: React.FC = () => {
           const response = await PasswordRecoveryService.reset_password(token, password);
           setSuccess(response); // el backend devuelve un string tipo "Contraseña cambiada correctamente."
         } catch (error) {
-          setError("Hubo un error al cambiar la contraseña.");
+          setError("El tiempo para cambiar la contraseña ha expirado.");
         }
     }
     
@@ -61,24 +65,45 @@ const ResetPassword: React.FC = () => {
                 {success && <p className="success-message">{success}</p>}
 
                 <form onSubmit={handleResetPassword}>
-                  <div className="form-group">
-                    <label htmlFor="user">Contraseña nueva:</label>
-                    <input
-                      type="text"
-                      id="user"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
+                    <div className="form-group">
+                      <label htmlFor="password">Contraseña nueva:</label>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          id="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="btn-show-password"
+                        >
+                          {showPassword ? <IoMdEye size={20}/> : <IoMdEyeOff size={20} />}
+                        </button>
+                      </div>
 
-                    <label htmlFor="user">Repetir contraseña:</label>
-                    <input
-                      type="text"
-                      id="user"
-                      value={password2}
-                      onChange={(e) => setPassword2(e.target.value)}
-                    />
+                      <label htmlFor="user">Repetir contraseña:</label>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <input
+                          type={showPassword2 ? "text" : "password"}
+                          id="password2"
+                          value={password2}
+                          onChange={(e) => setPassword2(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword2((prev) => !prev)}
+                          className="btn-show-password"
+                        >
+                          {showPassword2 ? <IoMdEye size={20}/> : <IoMdEyeOff size={20} />}
+                        </button>
+                      </div>
                   </div>
-                  <a href="/Inicio-sesion">Volver al inicio de sesión</a>
+
+                  <div className="text-center">
+                    <a href="/Inicio-sesion">Volver al inicio de sesión</a>
+                  </div>
   
                   <button type="submit" className="submit-button">
                     Guardar

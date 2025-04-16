@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import "./Login.scss"; // Importa los estilos
+import "./Login.scss";
 import { useNavigate } from 'react-router-dom';
 import AuthService from "../../services/AuthService";
 import { useAuth } from "../../context/ContextAuth";
+import { IoMdEye, IoMdEyeOff} from "react-icons/io";
 
 const Login: React.FC = () => {
   const [username, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("")
-  // const [success, setSuccess] = useState<string>("")
+  const [showPassword, setShowPassword] = useState(false);
   
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -37,7 +38,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <section className="container container-login ">
+    <section className="container-login ">
       <div className="row justify-content-center">
         <div className="col-12 container-formLogin">
 
@@ -62,14 +63,24 @@ const Login: React.FC = () => {
                     onChange={(e) => setUser(e.target.value)}
                   />
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="password">Contraseña:</label>
-                  <input
-                    type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="btn-show-password"
+                    >
+                      {showPassword ? <IoMdEye size={20}/> : <IoMdEyeOff size={20} />}
+                    </button>
+                  </div>
                 </div>
 
                 <a href="/Recuperar-contraseña">¿Olvidaste tu contraseña?</a>

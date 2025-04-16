@@ -13,7 +13,7 @@ function AppRoutes() {
 
   return (
     <>
-    <div>
+
       {isAuthenticated && <HeaderComponent />}
 
       <Routes>
@@ -25,7 +25,7 @@ function AppRoutes() {
         <Route path="/" element={<Navigate to={isAuthenticated ? "/Home" : "/Inicio-sesion"} />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      </div>
+
     </>
   );
 }
