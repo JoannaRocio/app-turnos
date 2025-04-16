@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./AppointmentsComponent.scss";
 import { Appointment } from "../../interfaces/Appointment";
 import { patientsMock } from "../../mocks/PatientsMock";
+import { IoIosCrop, IoIosCube, IoIosRemove, IoIosRemoveCircle, IoIosRemoveCircleOutline } from "react-icons/io";
+import ConfirmModal from "../ConfirmModal/ConfirmModalComponent";
 
 interface Props {
   selectedDate: Date;
@@ -28,14 +30,30 @@ const AppointmentsComponent: React.FC<Props> = ({ selectedDate, appointments }) 
   const [isEditMode, setIsEditMode] = useState(false);
   const [nameSearch, setNameSearch] = useState("");
   const [dniSearch, setDniSearch] = useState("");
-  
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [apptToDelete, setApptToDelete] = useState<{
+    patientName: string;
+    date: string;
+    time: string;
+  } | null>(null);
+
+  const handleDelete = (appt: any, time: string) => {
+    // setApptToDelete();
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = (appt: any, time: string) => {
+    // setApptToDelete();
+    setShowConfirm(true);
+  };    
+
   const [newAppointment, setNewAppointment] = useState({
     patientId: "",
     time: "",
     reason: "",
     notes: ""
   });
-
+  
   const filteredPatientsByName = patientsMock.filter((p) =>
     p.patientName.toLowerCase().includes(nameSearch.toLowerCase())
   );
@@ -109,8 +127,18 @@ const AppointmentsComponent: React.FC<Props> = ({ selectedDate, appointments }) 
     closeModal();
   };
 
+  const handleDeleteAppointment = (time: string) => {
+    console.log(time)
+    // Lógica para eliminar el turno
+    // Por ejemplo, actualizar el estado que contiene la lista de turnos
+  };
+
+  function handleDeleteConfirmed(apptToDelete: { patientName: string; date: string; time: string; }) {
+    throw new Error("Function not implemented.");
+  }
+
   return (
-    <section className="section-appointments">
+    <section>
       <h3 className="text-white">
         Agenda de Turnos - {selectedDate.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
       </h3>
@@ -127,11 +155,16 @@ const AppointmentsComponent: React.FC<Props> = ({ selectedDate, appointments }) 
             <th>Teléfono</th>
             <th>Motivo</th>
             <th>Notas</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {timeSlots.map((time, index) => {
             const appt = getAppointmentForTime(time);
+            function handleDeleteConfirmed(apptToDelete: { patientName: string; date: string; time: string; }) {
+              throw new Error("Function not implemented.");
+            }
+
             return (
               <tr
                 key={index}
@@ -148,10 +181,39 @@ const AppointmentsComponent: React.FC<Props> = ({ selectedDate, appointments }) 
                 <td>{appt?.phone || "-"}</td>
                 <td>{appt?.reason || "-"}</td>
                 <td>{appt?.notes || "-"}</td>
+                <td>
+                  {appt && (
+                    <span
+                      className="d-flex justify-content-center btn-delete"
+                      title="Eliminar turno"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        confirmDelete(appt, time);
+                      }}
+                    >
+                      <IoIosRemoveCircleOutline color="red" size={22} />
+                    </span>
+                  )}
+                </td>
               </tr>
-            );
-          })}
+            )})}
         </tbody>
+
+        <ConfirmModal
+          isOpen={showConfirm}
+          title="Confirmar eliminación"
+          message={`¿Estás segura que deseas eliminar el turno de "${apptToDelete?.patientName}"?`}
+          onConfirm={() => {
+            if (apptToDelete) {
+              handleDeleteConfirmed(apptToDelete);
+            }
+          }}
+          onCancel={() => {
+            setShowConfirm(false);
+            setApptToDelete(null);
+          }}
+        />
+
       </table>
 
       {isModalOpen && (
