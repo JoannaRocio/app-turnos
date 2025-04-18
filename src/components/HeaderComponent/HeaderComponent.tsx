@@ -33,6 +33,11 @@ const HeaderComponent: React.FC = () => {
                 Pacientes
               </button>
             </li>
+            <li className="nav-item">
+              <button className={`nav-link btn text-white ${componenteActivo === "profesionales" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("profesionales")}>
+                Profesionales
+              </button>
+            </li>
           </ul>
         </nav>
 

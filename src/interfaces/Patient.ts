@@ -1,12 +1,10 @@
 export interface Patient {
     id: number;
-    patientName: string;
-    appointmentDate: string;
-    reason: string;
-    dni: string;
-    attended: boolean;
+    fullName: string;
+    documentNumber: string;
+    phone: string;
     socialSecurity: string;
     plan: string;
-    phone: string;
     notes: string;
-}
+  }
+  

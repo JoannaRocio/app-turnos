@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./AppointmentsComponent.scss";
 import { Appointment } from "../../interfaces/Appointment";
-import { patientsMock } from "../../mocks/PatientsMock";
+// import { patientsMock } from "../../mocks/PatientsMock";
 import { IoIosCrop, IoIosCube, IoIosRemove, IoIosRemoveCircle, IoIosRemoveCircleOutline } from "react-icons/io";
 import ConfirmModal from "../ConfirmModal/ConfirmModalComponent";
 
@@ -54,17 +54,17 @@ const AppointmentsComponent: React.FC<Props> = ({ selectedDate, appointments }) 
     notes: ""
   });
   
-  const filteredPatientsByName = patientsMock.filter((p) =>
+  const filteredPatientsByName = appointments.filter((p) =>
     p.patientName.toLowerCase().includes(nameSearch.toLowerCase())
   );
   
-  const filteredPatientsByDni = patientsMock.filter((p) =>
+  const filteredPatientsByDni = appointments.filter((p) =>
     p.dni.includes(dniSearch)
   );
 
   useEffect(() => {
-    const matchByName = patientsMock.find(p => p.patientName === nameSearch);
-    const matchByDni = patientsMock.find(p => p.dni === dniSearch);
+    const matchByName = appointments.find(p => p.patientName === nameSearch);
+    const matchByDni = appointments.find(p => p.dni === dniSearch);
   
     if (matchByName) {
       setNewAppointment(prev => ({ ...prev, id: matchByName.id }));

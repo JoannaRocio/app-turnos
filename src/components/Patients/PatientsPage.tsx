@@ -3,10 +3,6 @@ import { Patient } from "../../interfaces/Patient";
 import "./PatientsPage.scss";
 import PatientModalComponent from "../PatientModal/PatientModalComponent";
 
-interface Props {
-    patients: Patient[];
-}
-
 const PatientsComponent: React.FC<{ patients: Patient[] }> = ({ patients }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
@@ -25,8 +21,8 @@ const PatientsComponent: React.FC<{ patients: Patient[] }> = ({ patients }) => {
     };
 
     const filteredPatients = patients.filter((patient) => {
-    const nameMatch = patient.patientName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const dniMatch = patient.dni?.toString().includes(searchTerm);
+    const nameMatch = patient.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const dniMatch = patient.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
     });
 
@@ -56,8 +52,8 @@ const PatientsComponent: React.FC<{ patients: Patient[] }> = ({ patients }) => {
             <tbody>
                 {filteredPatients.map((patient, index) => (
                 <tr key={index} onClick={() => handleRowClick(patient)} className="clickable-row">
-                    <td>{patient?.patientName || "-"}</td>
-                    <td>{patient?.dni || "-"}</td>
+                    <td>{patient.fullName || "-"}</td>
+                    <td>{patient.documentNumber || "-"}</td>
                     <td>{patient?.socialSecurity || "-"}</td>
                     <td>{patient?.plan || "-"}</td>
                     <td>{patient?.phone || "-"}</td>

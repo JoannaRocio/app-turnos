@@ -18,9 +18,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-    console.log("entró")
   if (!isOpen) return null;
-    console.log("salio")
   return (
     <div className="confirm-overlay">
       <div className="confirm-box">

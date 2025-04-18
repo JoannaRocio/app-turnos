@@ -30,14 +30,14 @@ const PatientModalComponent = ({
             <h4>Editar paciente</h4>
             <input
               type="text"
-              value={form.patientName}
-              onChange={(e) => setForm({ ...form, patientName: e.target.value })}
+              value={form.fullName}
+              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
               placeholder="Nombre"
             />
             <input
               type="text"
-              value={form.dni}
-              onChange={(e) => setForm({ ...form, dni: e.target.value })}
+              value={form.documentNumber}
+              onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
               placeholder="DNI"
             />
             <input
