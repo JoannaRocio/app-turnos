@@ -21,16 +21,59 @@ class PatientService {
     const rawData = await response.json();
 
     const mapped: Patient[] = rawData.map((item: any) => ({
-        // id: item.id,
-        patientName: item.fullName,
-        dni: item.documentNumber,
-        phone: item.phone ?? "-",
-        socialSecurity: item.healthInsurance ?? "-",
-        plan: item.insurancePlan ?? "-",
-        notes: item.note ?? "-",
-      }));
+      id: item.id,
+      patientName: item.fullName,
+      documentType: item.documentType,
+      documentNumber: item.documentNumber,
+      phone: item.phone ?? "-",
+      socialSecurity: item.healthInsurance ?? "-",
+      plan: item.insurancePlan ?? "-",
+      notes: item.note ?? "-",
+    }));
 
     return mapped;
+  }
+
+  static async createPatient(data: any): Promise<Patient> {
+    const token = AuthService.getToken();
+  
+    const response = await fetch(this.BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(data),
+    });
+  
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error creando paciente: ${errorText}`);
+    }
+  
+    return await response.json();
+  }
+  
+  static async updatePatient(id: number, data: any): Promise<Patient> {
+    const token = AuthService.getToken();
+    console.log(id, data)
+    const response = await fetch(`${this.BASE_URL}/${id}`, {
+
+    // const response = await fetch(`${this.BASE_URL}/api/patients/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error actualizando paciente: ${errorText}`);
+    }
+
+    return await response.json();
   }
 }
 

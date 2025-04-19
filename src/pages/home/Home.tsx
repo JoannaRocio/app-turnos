@@ -25,7 +25,8 @@ const Home: React.FC = () => {
         const parsedPatients = data.map((patient: any) => ({
           id: patient.id,
           fullName: patient.patientName,
-          documentNumber: patient.dni,
+          documentType: patient.documentType,
+          documentNumber: patient.documentNumber,
           phone: patient.phone,
           socialSecurity: patient.socialSecurity,
           plan: patient.plan,
@@ -34,7 +35,6 @@ const Home: React.FC = () => {
         setPatients(parsedPatients);
       })
       .catch((err) => console.error("Error al traer pacientes:", err));
-    
     }
 
     // if (componenteActivo === "profesionales") {

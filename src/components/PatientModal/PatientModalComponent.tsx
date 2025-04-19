@@ -1,22 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Patient } from "../../interfaces/Patient";
 import "./PatientModalComponent.scss";
 
-// Esto sería tu modal reutilizable o uno simple:
-const PatientModalComponent = ({
+interface PatientModalComponentProps {
+  isOpen: boolean;
+  onClose: () => void;
+  patient: Partial<Patient> | null;
+  onSave: (updated: Partial<Patient>) => void;
+}
+
+const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
   isOpen,
   onClose,
   patient,
   onSave,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  patient: Patient | null;
-  onSave: (updated: Patient) => void;
 }) => {
-  const [form, setForm] = useState<Patient | null>(patient);
+  // const [form, setForm] = useState<Patient | null>(patient);
+  const [form, setForm] = useState<Partial<Patient> | null>(patient);
 
-  React.useEffect(() => {
+
+  useEffect(() => {
     setForm(patient);
   }, [patient]);
 
@@ -24,10 +27,16 @@ const PatientModalComponent = ({
 
   return (
     <section>
-      <div className="modal-overlay">
-        <div className="modal modal-patient">
-          <form>
-            <h4>Editar paciente</h4>
+      <div className={`modal-overlay ${patient?.id ? "edit-mode" : ""}`}>
+        <div className={`modal modal-patient ${patient?.id ? "edit-mode" : ""}`}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSave(form);
+            }}
+          >
+            <h4>{patient?.id ? "Editar paciente" : "Alta de paciente"}</h4>
+
             <input
               type="text"
               value={form.fullName}
@@ -36,9 +45,15 @@ const PatientModalComponent = ({
             />
             <input
               type="text"
+              value={form.documentType}
+              onChange={(e) => setForm({ ...form, documentType: e.target.value })}
+              placeholder="Tipo documento"
+            />
+            <input
+              type="text"
               value={form.documentNumber}
               onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
-              placeholder="DNI"
+              placeholder="Número documento"
             />
             <input
               type="text"
@@ -64,8 +79,10 @@ const PatientModalComponent = ({
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
               placeholder="Notas"
             />
-            <button onClick={() => onSave(form)}>Guardar</button>
-            <button onClick={onClose}>Cancelar</button>
+            <div className="modal-buttons">
+              <button type="submit">Guardar</button>
+              <button type="button" onClick={onClose}>Cancelar</button>
+            </div>
           </form>
         </div>
       </div>
