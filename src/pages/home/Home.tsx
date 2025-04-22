@@ -44,7 +44,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="container mt-4">
+    <section>
       <h2 className="text-white">Inicio</h2>
 
       {componenteActivo === "pacientes" && (
@@ -55,7 +55,7 @@ const Home: React.FC = () => {
       {componenteActivo === "agenda-turnos" && (
         <AppointmentsComponent selectedDate={new Date()} appointments={appointmentsMock} />
       )}
-    </div>
+    </section>
   );
 };
 

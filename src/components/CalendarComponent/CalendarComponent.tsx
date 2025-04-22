@@ -10,20 +10,33 @@ interface Props {
 const CalendarComponent: React.FC<Props> = ({ onDateSelect }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
-  const handleChange = (value: Date) => {
-    if (value instanceof Date) {
-      setSelectedDate(value);
-      onDateSelect(value);
-    }
+  const handleChange = (date: Date) => {
+    setSelectedDate(date);
+    onDateSelect(date);
   };
-  
+
+  // Genera las fechas de referencia para los 4 calendarios
+  const generateMonthDates = (): Date[] => {
+    const dates = [];
+    const now = new Date();
+    for (let i = 0; i < 4; i++) {
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      dates.push(nextMonth);
+    }
+    return dates;
+  };
 
   return (
     <div className="calendar-wrapper">
-      <Calendar
-        onClickDay={handleChange}
-        value={selectedDate}
-      />
+      {generateMonthDates().map((date, index) => (
+        <div key={index} className="calendar-container">
+          <Calendar
+            onClickDay={handleChange}
+            value={selectedDate}
+            activeStartDate={date}
+          />
+        </div>
+      ))}
     </div>
   );
 };
