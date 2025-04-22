@@ -1,74 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Patient } from "../../interfaces/Patient";
 import "./PatientsPage.scss";
 import PatientModalComponent from "../PatientModal/PatientModalComponent";
 import PatientService from "../../services/PatientService";
 
-const PatientsComponent: React.FC<{ patients: Patient[] }> = ({ patients }) => {
+const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => void }> = ({ patients, reloadPatients }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedPatient, setSelectedPatient] = useState<Partial<Patient> | null>(null);
-
-    const [showEditModal, setShowEditModal] = useState(false);
+    // const [patient, setPatient] = useState<Patient[]>([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    // const [showEditModal, setShowEditModal] = useState(false);
 
     const handleRowClick = (patient: Patient) => {
     setSelectedPatient(patient);
-    setShowEditModal(true);
+    setModalOpen(true);
     };
 
-    // const handleSave = (updated: Patient) => {
-    // console.log("Guardar cambios en paciente:", updated);
-    // setShowEditModal(false);
-    // setSelectedPatient(null);
-    // // Aca podés llamar a tu API o actualizar el estado global si lo estás usando
-    // };
-
-    const filteredPatients = patients.filter((patient) => {
-    const nameMatch = patient.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const dniMatch = patient.documentNumber?.toString().includes(searchTerm);
+    const filteredPatients = patients.filter((p) => {
+    const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const dniMatch = p.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
     });
-
+    
     const handleSave = async (patientData: Partial<Patient>) => {
       try {
         if (patientData.id) {
-          // Modo edición
-          await PatientService.updatePatient(patientData.id, {
-            fullName: patientData.fullName,
-            documentType: patientData.documentType,
-            documentNumber: patientData.documentNumber,
-            phone: patientData.phone,
-            healthInsurance: patientData.socialSecurity,
-            insurancePlan: patientData.plan,
-            note: patientData.notes,
-          });
+          // await PatientService.updatePatient(patientData.id, { ... });
+          await PatientService.updatePatient(patientData.id, patientData);
+
           alert("Paciente actualizado con éxito");
         } else {
-          // Modo creación
-          await PatientService.createPatient({
-            fullName: patientData.fullName,
-            documentType: patientData.documentType,
-            documentNumber: patientData.documentNumber,
-            phone: patientData.phone,
-            healthInsurance: patientData.socialSecurity,
-            insurancePlan: patientData.plan,
-            note: patientData.notes,
-            registrationDate: new Date().toISOString().split("T")[0], // o null si tu back lo maneja
-          });
+          // await PatientService.createPatient({ ... });
+          console.log(patientData, 'patientdata')
+          await PatientService.createPatient(patientData);
+
           alert("Paciente creado con éxito");
         }
     
-        setShowEditModal(false);
+        await reloadPatients(); // <-- primero recargás
+        setModalOpen(false);    // <-- luego cerrás el modal
         setSelectedPatient(null);
-    
-        // Opcional: recargar pacientes desde el backend (si tenés forma)
-        // const updatedList = await PatientService.getAll();
-        // setPatients(updatedList); // si tenés acceso desde el padre
+        // setShowEditModal(false);
       } catch (error) {
-        console.error("Error al guardar el paciente", error);
-        alert("Hubo un error al guardar el paciente");
+        console.log("error al crear paciente. aa");
+        console.log(error)
       }
     };
-    
 
       const handleNewPatient = () => {
         const emptyPatient: Partial<Patient> = {
@@ -82,7 +59,7 @@ const PatientsComponent: React.FC<{ patients: Patient[] }> = ({ patients }) => {
           notes: "",
         };
         setSelectedPatient(emptyPatient);
-        setShowEditModal(true);
+        setModalOpen(true);
       };
 
     return (
@@ -128,10 +105,10 @@ const PatientsComponent: React.FC<{ patients: Patient[] }> = ({ patients }) => {
             </table>
 
             <PatientModalComponent
-            isOpen={showEditModal}
-            patient={selectedPatient}
-            onClose={() => setShowEditModal(false)}
-            onSave={handleSave}
+              isOpen={modalOpen}
+              onClose={() => setModalOpen(false)}
+              patient={selectedPatient}
+              onSave={handleSave}
             />
         </section>
     );

@@ -15,12 +15,31 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
   patient,
   onSave,
 }) => {
-  // const [form, setForm] = useState<Patient | null>(patient);
-  const [form, setForm] = useState<Partial<Patient> | null>(patient);
 
-
+  const [form, setForm] = useState<Partial<Patient>>({
+    fullName: "",
+    documentType: "",
+    documentNumber: "",
+    socialSecurity: "",
+    plan: "",
+    phone: "",
+    notes: "",
+  });
+  
   useEffect(() => {
-    setForm(patient);
+    if (patient) {
+      setForm(patient);
+    } else {
+      setForm({
+        fullName: "",
+        documentType: "",
+        documentNumber: "",
+        socialSecurity: "",
+        plan: "",
+        phone: "",
+        notes: "",
+      });
+    }
   }, [patient]);
 
   if (!isOpen || !form) return null;
@@ -80,7 +99,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
               placeholder="Notas"
             />
             <div className="modal-buttons">
-              <button type="submit">Guardar</button>
+              <button type="submit" disabled={!form.fullName || !form.documentNumber}>Guardar</button>
               <button type="button" onClick={onClose}>Cancelar</button>
             </div>
           </form>

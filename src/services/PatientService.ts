@@ -34,7 +34,7 @@ class PatientService {
     return mapped;
   }
 
-  static async createPatient(data: any): Promise<Patient> {
+  static async createPatient(data: any): Promise<void> {
     const token = AuthService.getToken();
   
     const response = await fetch(this.BASE_URL, {
@@ -46,20 +46,17 @@ class PatientService {
       body: JSON.stringify(data),
     });
   
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error creando paciente: ${errorText}`);
-    }
+    const responseText = await response.text();
   
-    return await response.json();
+    if (!response.ok) {
+      throw new Error(`Error creando paciente: ${responseText}`);
+    }
   }
   
   static async updatePatient(id: number, data: any): Promise<Patient> {
     const token = AuthService.getToken();
     console.log(id, data)
     const response = await fetch(`${this.BASE_URL}/${id}`, {
-
-    // const response = await fetch(`${this.BASE_URL}/api/patients/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
