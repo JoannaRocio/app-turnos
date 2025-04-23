@@ -16,33 +16,32 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
     setModalOpen(true);
     };
 
+    if (!patients) {
+      return <p className="text-white">Cargando pacientes...</p>;
+    }
     const filteredPatients = patients.filter((p) => {
-    const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const dniMatch = p.documentNumber?.toString().includes(searchTerm);
+    const nameMatch = p.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const dniMatch = p.document_number?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
-    });
+    })
     
     const handleSave = async (patientData: Partial<Patient>) => {
       try {
         if (patientData.id) {
-          // await PatientService.updatePatient(patientData.id, { ... });
           await PatientService.updatePatient(patientData.id, patientData);
 
           alert("Paciente actualizado con éxito");
         } else {
-          // await PatientService.createPatient({ ... });
-          console.log(patientData, 'patientdata')
           await PatientService.createPatient(patientData);
 
           alert("Paciente creado con éxito");
         }
     
-        await reloadPatients(); // <-- primero recargás
-        setModalOpen(false);    // <-- luego cerrás el modal
+        await reloadPatients();
+        setModalOpen(false);
         setSelectedPatient(null);
-        // setShowEditModal(false);
+
       } catch (error) {
-        console.log("error al crear paciente. aa");
         console.log(error)
       }
     };
@@ -50,19 +49,24 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
       const handleNewPatient = () => {
         const emptyPatient: Partial<Patient> = {
           id: 0, 
-          fullName: "",
-          documentType: "",
-          documentNumber: "",
+          full_name: "",
+          document_type: "",
+          document_number: "",
           phone: "",
-          socialSecurity: "",
-          plan: "",
-          notes: "",
+          health_insurance: "",
+          insurance_plan: "",
+          note: "",
         };
         setSelectedPatient(emptyPatient);
         setModalOpen(true);
       };
 
+      if (!patients || patients.length === 0) {
+        return <p className="text-white">No hay pacientes disponibles.</p>;
+      }
+
     return (
+
         <section>
             <div className="d-flex">
                 <h3 className="text-white">Pacientes</h3>
@@ -92,13 +96,13 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
             <tbody>
                 {filteredPatients.map((patient, index) => (
                 <tr key={index} onClick={() => handleRowClick(patient)} className="clickable-row">
-                    <td>{patient.fullName || "-"}</td>
-                    <td>{patient.documentType || "-"}</td>
-                    <td>{patient.documentNumber || "-"}</td>
-                    <td>{patient?.socialSecurity || "-"}</td>
-                    <td>{patient?.plan || "-"}</td>
+                    <td>{patient.full_name || "-"}</td>
+                    <td>{patient.document_type || "-"}</td>
+                    <td>{patient.document_number || "-"}</td>
+                    <td>{patient?.health_insurance || "-"}</td>
+                    <td>{patient?.insurance_plan || "-"}</td>
                     <td>{patient?.phone || "-"}</td>
-                    <td>{patient?.notes || "-"}</td>
+                    <td>{patient?.note || "-"}</td>
                 </tr>
                 ))}
             </tbody>

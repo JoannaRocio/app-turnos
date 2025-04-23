@@ -17,7 +17,6 @@ class PasswordRecoveryService {
   }
 
   static reset_password(token: string, password: string) {
-    console.log("Token:", token);
     return fetch(`http://localhost:8080/api/cambiar-contrasena?token=${token}&newPassword=${password}`, {
       method: "POST"
     }).then(res => {

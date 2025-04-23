@@ -17,13 +17,13 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
 }) => {
 
   const [form, setForm] = useState<Partial<Patient>>({
-    fullName: "",
-    documentType: "",
-    documentNumber: "",
-    socialSecurity: "",
-    plan: "",
+    full_name: "",
+    document_type: "",
+    document_number: "",
+    health_insurance: "",
+    insurance_plan: "",
     phone: "",
-    notes: "",
+    note: ""
   });
   
   useEffect(() => {
@@ -31,13 +31,13 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
       setForm(patient);
     } else {
       setForm({
-        fullName: "",
-        documentType: "",
-        documentNumber: "",
-        socialSecurity: "",
-        plan: "",
+        full_name: "",
+        document_type: "",
+        document_number: "",
+        health_insurance: "",
+        insurance_plan: "",
         phone: "",
-        notes: "",
+        note: ""
       });
     }
   }, [patient]);
@@ -58,32 +58,32 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
 
             <input
               type="text"
-              value={form.fullName}
-              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              value={form.full_name}
+              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
               placeholder="Nombre"
             />
             <input
               type="text"
-              value={form.documentType}
-              onChange={(e) => setForm({ ...form, documentType: e.target.value })}
+              value={form.document_type}
+              onChange={(e) => setForm({ ...form, document_type: e.target.value })}
               placeholder="Tipo documento"
             />
             <input
               type="text"
-              value={form.documentNumber}
-              onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
+              value={form.document_number}
+              onChange={(e) => setForm({ ...form, document_number: e.target.value })}
               placeholder="Número documento"
             />
             <input
               type="text"
-              value={form.socialSecurity}
-              onChange={(e) => setForm({ ...form, socialSecurity: e.target.value })}
+              value={form.health_insurance}
+              onChange={(e) => setForm({ ...form, health_insurance: e.target.value })}
               placeholder="Obra social"
             />
             <input
               type="text"
-              value={form.plan}
-              onChange={(e) => setForm({ ...form, plan: e.target.value })}
+              value={form.insurance_plan}
+              onChange={(e) => setForm({ ...form, insurance_plan: e.target.value })}
               placeholder="Plan"
             />
             <input
@@ -94,12 +94,12 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
             />
             <input
               type="text"
-              value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              value={form.note}
+              onChange={(e) => setForm({ ...form, note: e.target.value })}
               placeholder="Notas"
             />
             <div className="modal-buttons">
-              <button type="submit" disabled={!form.fullName || !form.documentNumber}>Guardar</button>
+              <button type="submit" disabled={!form.full_name || !form.document_number}>Guardar</button>
               <button type="button" onClick={onClose}>Cancelar</button>
             </div>
           </form>

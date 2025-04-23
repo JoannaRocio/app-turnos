@@ -1,8 +1,9 @@
 // ejemplo extendido de interfaz
 export interface Professional {
+    professionalId: number;
     professionalName: string;
     documentType: string;
-    dni: number;
+    professionalDni: number;
     phone: string;
     shiftStart: string; 
     shiftEnd: string;

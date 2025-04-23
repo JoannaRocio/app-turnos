@@ -27,9 +27,11 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[] }> = ({ p
 
     const filteredProfessional = professionals.filter((professional) => {
     const nameMatch = professional.professionalName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const dniMatch = professional.dni?.toString().includes(searchTerm);
+    const dniMatch = professional.professionalDni?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
     });
+
+    console.log(professionals,'en el componente')
 
     return (
         <section>
@@ -61,7 +63,7 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[] }> = ({ p
                     <tr key={index} onClick={() => handleRowClick(professional)} className="clickable-row">
                     <td>{professional?.professionalName || "-"}</td>
                     <td>{professional?.documentType || "-"}</td>
-                    <td>{professional?.dni || "-"}</td>
+                    <td>{professional?.professionalDni || "-"}</td>
                     <td>{professional?.phone || "-"}</td>
                     <td>{professional?.shiftStart || "-"}</td>
                     <td>{professional?.shiftEnd || "-"}</td>

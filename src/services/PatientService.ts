@@ -22,14 +22,16 @@ class PatientService {
 
     const mapped: Patient[] = rawData.map((item: any) => ({
       id: item.id,
-      patientName: item.fullName,
-      documentType: item.documentType,
-      documentNumber: item.documentNumber,
+      full_name: item.full_name,  // Corregir el mapeo de las propiedades
+      document_type: item.document_type,
+      document_number: item.document_number,
       phone: item.phone ?? "-",
-      socialSecurity: item.healthInsurance ?? "-",
-      plan: item.insurancePlan ?? "-",
-      notes: item.note ?? "-",
+      health_insurance: item.health_insurance ?? "-",
+      insurance_plan: item.insurance_plan ?? "-",
+      note: item.note ?? "-",
+      state: item.state ?? "-",
     }));
+    
 
     return mapped;
   }
@@ -55,7 +57,6 @@ class PatientService {
   
   static async updatePatient(id: number, data: any): Promise<Patient> {
     const token = AuthService.getToken();
-    console.log(id, data)
     const response = await fetch(`${this.BASE_URL}/${id}`, {
       method: "PUT",
       headers: {

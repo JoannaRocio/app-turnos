@@ -1,12 +1,14 @@
+import { Patient } from "./Patient";
+
+// type AppointmentState = "pendiente" | "confirmado" | "cancelado";
+
 export interface Appointment {
-    id: number;
-    patientName: string;
-    appointmentDate: string;
-    reason: string;
-    dni: string;
-    attended: boolean;
-    socialSecurity: string;
-    plan: string;
-    phone: string;
-    notes: string;
+  patientDni: string;
+  patientFullName: string;
+  dateTime: string; // formato ISO
+  professionalFullName: string;
+  professionalDni: string;
+  reason: string;
+  state: string;
+  patient: Patient; // el objeto completo del paciente
 }
