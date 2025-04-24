@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./AppointmentsComponent.scss";
 import { Appointment } from "../../interfaces/Appointment";
-// import { patientsMock } from "../../mocks/PatientsMock";
-import { IoIosCrop, IoIosCube, IoIosRemove, IoIosRemoveCircle, IoIosRemoveCircleOutline } from "react-icons/io";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
 import ConfirmModal from "../ConfirmModal/ConfirmModalComponent";
 import AppointmentService from "../../services/AppointmentService";
 import ProfessionalPanel from "../ProfessionalPanel/ProfessionalPanel";
@@ -13,8 +12,8 @@ import { Professional } from "../../interfaces/Professional";
 interface Props {
   patients: Patient[];
   professionals: Professional[];
-  selectedDate: Date;
   appointments: Appointment[];
+  onAppointmentsUpdate: () => void;
 }
 
 const generateTimeSlots = (): string[] => {
@@ -31,41 +30,36 @@ const generateTimeSlots = (): string[] => {
   return slots;
 };
 
-const AppointmentsComponent: React.FC<Props> = ({ selectedDate, appointments, patients, professionals }) => {
-  console.log("Appointments recibidos:", appointments);
-console.log("Patients recibidos:", patients);
-
+const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, professionals, onAppointmentsUpdate }) => {
   const timeSlots = generateTimeSlots();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [nameSearch, setNameSearch] = useState("");
   const [dniSearch, setDniSearch] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
+  const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
   const [apptToDelete, setApptToDelete] = useState<{
     patientName: string;
     date: string;
     time: string;
   } | null>(null);
 
-  const [selectedDateCalendar, setSelectedDateCalendar] = useState(null);
-
-  const handleDateSelect = (date: any) => {
-    setSelectedDateCalendar(date);
-    console.log("Fecha seleccionada:", date);
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
   };
 
-
-  const handleDelete = (appt: any, time: string) => {
-    // setApptToDelete();
-    setShowConfirm(true);
-  };
+  const appointmentsForSelectedDate = appointments.filter(appt =>
+    appt.dateTime.startsWith(selectedDate.toISOString().split("T")[0])
+  );
 
   const confirmDelete = (appt: any, time: string) => {
-    // setApptToDelete();
     setShowConfirm(true);
   };    
 
   const [newAppointment, setNewAppointment] = useState({
+    appointmentId: 0,
     patientId: 0,
     documentNumber: "",
     time: "",
@@ -73,6 +67,19 @@ console.log("Patients recibidos:", patients);
     notes: ""
   });
 
+  useEffect(() => {
+    if (isEditMode && currentAppointment) {
+      const patient = patients.find(p => p.id === currentAppointment.patient.id);
+      if (patient) {
+        setNameSearch(patient.full_name); // nombre y apellido
+        setDniSearch(patient.document_number); // opcional
+      }
+    } else {
+      setNameSearch("");
+      setDniSearch("");
+    }
+  }, [isModalOpen, isEditMode, currentAppointment, patients]);
+  
   useEffect(() => {
     const matchByName = patients.find(p =>
       nameSearch && p.full_name?.toLowerCase().includes(nameSearch.toLowerCase())
@@ -110,13 +117,13 @@ console.log("Patients recibidos:", patients);
 
   const openModalForTime = (time: string) => {
     const apptExists = getAppointmentForTime(time);
-    console.log(patients);
     const appointment = appointments.find(p => p.patient.id === apptExists?.patient.id);
     const patient = patients.find(p => p.id === apptExists?.patient.id);
   
     if (apptExists) {
       setIsEditMode(true);
       setNewAppointment({
+        appointmentId: apptExists.appointmentId,
         patientId: 0,
         documentNumber: apptExists.patient.document_number,
         time: time,
@@ -126,6 +133,7 @@ console.log("Patients recibidos:", patients);
     } else {
       setIsEditMode(false);
       setNewAppointment({
+        appointmentId: 0,
         patientId: 0,
         documentNumber: "",
         time: time,
@@ -142,63 +150,55 @@ console.log("Patients recibidos:", patients);
   };
 
   const getAppointmentForTime = (time: string) => {
-    const selectedDateStr = selectedDate.toISOString().split("T")[0];
-    return appointments.find((appt) => {
-      if (appt.dateTime) {
-        const [datePart, timePartFull] = appt.dateTime.split("T");
-        const timePart = timePartFull?.slice(0, 5);
-
-        return datePart === selectedDateStr && timePart === time;
-      }
-      return false;
-    });
+    return appointmentsForSelectedDate.find(appt =>
+      appt.dateTime.includes(`T${time}`)
+    );
   };
   
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(newAppointment, 'appointment');
   
     if (!newAppointment.documentNumber || !newAppointment.time || !newAppointment.reason) {
       alert("Por favor, completá todos los campos obligatorios.");
       return;
     }
   
-    // Armamos el objeto como lo espera el backend
-    const appointmentToCreate = {
+    const appointmentToSave = {
       patientDni: newAppointment.documentNumber,
       dateTime: `${selectedDate.toISOString().split("T")[0]}T${newAppointment.time}:00`,
       reason: newAppointment.reason,
       state: "PENDIENTE",
-      professionalId: professionals[0].professionalId
+      professionalId: professionals[0].professionalId,
+      appointmentId: newAppointment.appointmentId
     };
   
     try {
-      const response = await AppointmentService.createAppointment(appointmentToCreate);
-      console.log("✅ Turno creado:", response);
+  
+      if (isEditMode) {
+        await AppointmentService.updateAppointment(newAppointment.appointmentId, appointmentToSave);
+        onAppointmentsUpdate();
+      } else {
+        await AppointmentService.createAppointment(appointmentToSave);
+        onAppointmentsUpdate();
+      }
+  
       closeModal();
-      // Acá podrías actualizar la lista de turnos si es necesario
+  
     } catch (error) {
-      console.error("❌ Error al crear el turno:", error);
-      alert("Ocurrió un error al crear el turno.");
+      alert(error);
     }
-  };  
-
-  const handleDeleteAppointment = (time: string) => {
-    console.log(time)
   };
 
   function handleDeleteConfirmed(apptToDelete: { patientName: string; date: string; time: string; }) {
     throw new Error("Function not implemented.");
   }
 
-  const filteredPatients = appointments.filter((p) =>
-    p.patient?.full_name?.toLowerCase().includes(nameSearch.toLowerCase()) &&
-    p.patient?.document_number?.includes(dniSearch)
+  const filteredPatients = patients.filter((p) =>
+    p?.full_name?.toLowerCase().includes(nameSearch.toLowerCase()) &&
+    p?.document_number?.includes(dniSearch)
   );
-
+  
   return (
-    
     <>
     <section>
       <h3 className="text-white">
@@ -239,17 +239,17 @@ console.log("Patients recibidos:", patients);
                       key={index}
                       onClick={() => openModalForTime(time)}
                       className={!appt ? "clickable-row" : ""}
-                      style={{ cursor: !appt ? "pointer" : "default" }}
+                      style={{ cursor: !appt ? "pointer" : "default", fontSize:'1.3rem' }}
                     >
                       <td>{time}</td>
-                      <td>{appt?.patient.full_name || "-"}</td>
-                      <td>{appt?.patient.document_number || "-"}</td>
+                      <td>{appt?.patient.full_name ?? "-"}</td>
+                      <td>{appt?.patient.document_number ?? "-"}</td>
                       <td>{appt?.state ? "✔️" : appt ? "❌" : "-"}</td>
-                      <td>{appt?.patient.health_insurance || "-"}</td>
-                      <td>{appt?.patient.insurance_plan || "-"}</td>
-                      <td>{appt?.patient.phone || "-"}</td>
-                      <td>{appt?.reason || "-"}</td>
-                      <td>{appt?.patient.note || "-"}</td>
+                      <td>{appt?.patient.health_insurance ?? "-"}</td>
+                      <td>{appt?.patient.insurance_plan ?? "-"}</td>
+                      <td>{appt?.patient.phone ?? "-"}</td>
+                      <td>{appt?.reason ?? "-"}</td>
+                      <td>{appt?.patient.note ?? "-"}</td>
                       <td>
                         {appt && (
                           <span className="d-flex justify-content-center btn-delete"
@@ -303,7 +303,7 @@ console.log("Patients recibidos:", patients);
                         placeholder="Escribí el nombre" />
                       <datalist id="patientsByName">
                         {filteredPatients.map((p) => (
-                          <option key={p.patient.id} value={p.patient.full_name} />
+                          <option key={p.id} value={p.full_name} />
                         ))}
                       </datalist>
                     </label>
@@ -322,7 +322,7 @@ console.log("Patients recibidos:", patients);
                         placeholder="Escribí el DNI" />
                       <datalist id="patientsByDni">
                         {filteredPatients.map((p) => (
-                          <option key={p.patient.id} value={p.patient.document_number} />
+                          <option key={p.id} value={p.document_number} />
                         ))}
                       </datalist>
                     </label>
@@ -349,10 +349,7 @@ console.log("Patients recibidos:", patients);
 
                     <label>
                       Notas:
-                      <textarea
-                        name="notes"
-                        value={newAppointment.notes}
-                        onChange={handleChange} />
+                      <textarea name="notes" value={newAppointment.notes} onChange={handleChange}/>
                     </label>
 
                     <button type="submit">{isEditMode ? "Actualizar" : "Guardar"}</button>
@@ -367,11 +364,7 @@ console.log("Patients recibidos:", patients);
           </div>
 
           <div className="col-2">
-            <CalendarComponent onDateSelect={handleDateSelect}></CalendarComponent>
-{/* 
-            <CalendarComponent onDateSelect={function (date: Date): void {
-              throw new Error("Function not implemented.");
-            } }></CalendarComponent> */}
+            <CalendarComponent onDateSelect={handleDateSelect} />
           </div>
         </div>
 

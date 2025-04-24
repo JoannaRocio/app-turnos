@@ -5,7 +5,7 @@
 .appointments-table {
     width: 100%;
     border-collapse: collapse;
-    // margin-top: 20px;
+    font-size: 1rem;
     background-color: gainsboro;
     
     th, td {
@@ -38,20 +38,16 @@
   }
   
   .modal {
-    background: white;
-    padding: 2rem;
     border-radius: 10px;
     width: 400px;
-    max-height: 90vh;
     overflow-y: auto;
-    max-height: 600px;
-    max-width: 600px;
-
     max-height: 560px;
     max-width: 600px;
     justify-self: anchor-center;
     padding: 40px;
     align-self: anchor-center;
+    display: block !important;
+    background: var(--color-tertiary-light);
   
     form {
       display: flex;
@@ -72,12 +68,7 @@
   tr {
     height: 50px;
     max-height: 50px;
-    font-size: 1.5rem;
-  }
-
-  .modal {
-    display: block !important;
-    background: var(--color-tertiary-light);
+    font-size: 1.2rem;
   }
 
   .modal.edit-mode {

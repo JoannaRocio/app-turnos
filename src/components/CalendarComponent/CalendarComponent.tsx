@@ -15,7 +15,6 @@ const CalendarComponent: React.FC<Props> = ({ onDateSelect }) => {
     onDateSelect(date);
   };
 
-  // Genera las fechas de referencia para los 4 calendarios
   const generateMonthDates = (): Date[] => {
     const dates = [];
     const now = new Date();
