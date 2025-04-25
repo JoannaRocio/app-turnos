@@ -17,7 +17,6 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("")
-    // setSuccess("")
 
     if (!username || !password) {
       setError("Por favor, completa todos los campos.");
@@ -25,8 +24,7 @@ const Login: React.FC = () => {
     }
   
     const data = await AuthService.login(username, password);
-  
-    if (data.status === true) {
+    if (data.token != null) {
       AuthService.saveToken(data.token);
 
       login();

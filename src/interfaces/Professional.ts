@@ -3,7 +3,7 @@ export interface Professional {
     professionalId: number;
     professionalName: string;
     documentType: string;
-    professionalDni: number;
+    professionalDni: string;
     phone: string;
     shiftStart: string; 
     shiftEnd: string;

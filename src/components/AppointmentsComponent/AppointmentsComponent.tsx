@@ -71,8 +71,8 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
     if (isEditMode && currentAppointment) {
       const patient = patients.find(p => p.id === currentAppointment.patient.id);
       if (patient) {
-        setNameSearch(patient.full_name); // nombre y apellido
-        setDniSearch(patient.document_number); // opcional
+        setNameSearch(patient.fullName); // nombre y apellido
+        setDniSearch(patient.documentNumber); // opcional
       }
     } else {
       setNameSearch("");
@@ -82,28 +82,28 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   
   useEffect(() => {
     const matchByName = patients.find(p =>
-      nameSearch && p.full_name?.toLowerCase().includes(nameSearch.toLowerCase())
+      nameSearch && p.fullName?.toLowerCase().includes(nameSearch.toLowerCase())
     );
     const matchByDni = patients.find(p =>
-      dniSearch && p.document_number?.includes(dniSearch)
+      dniSearch && p.documentNumber?.includes(dniSearch)
     );
   
     if (matchByName && !dniSearch) {
       setNewAppointment(prev => ({
         ...prev,
         patientId: matchByName.id,
-        documentNumber: matchByName.document_number,
-        patientName: matchByName.full_name
+        documentNumber: matchByName.documentNumber,
+        patientName: matchByName.fullName
       }));
-      setDniSearch(matchByName.document_number);
+      setDniSearch(matchByName.documentNumber);
     } else if (matchByDni && !nameSearch) {
       setNewAppointment(prev => ({
         ...prev,
         patientId: matchByDni.id,
-        documentNumber: matchByDni.document_number,
-        patientName: matchByDni.full_name
+        documentNumber: matchByDni.documentNumber,
+        patientName: matchByDni.fullName
       }));
-      setNameSearch(matchByDni.full_name);
+      setNameSearch(matchByDni.fullName);
     }
   }, [nameSearch, dniSearch, patients]);
   
@@ -125,7 +125,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
       setNewAppointment({
         appointmentId: apptExists.appointmentId,
         patientId: 0,
-        documentNumber: apptExists.patient.document_number,
+        documentNumber: apptExists.patient.documentNumber,
         time: time,
         reason: appointment?.reason ?? "-",
         notes: patient?.note ?? "-"
@@ -194,8 +194,8 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   }
 
   const filteredPatients = patients.filter((p) =>
-    p?.full_name?.toLowerCase().includes(nameSearch.toLowerCase()) &&
-    p?.document_number?.includes(dniSearch)
+    p?.fullName?.toLowerCase().includes(nameSearch.toLowerCase()) &&
+    p?.documentNumber?.includes(dniSearch)
   );
   
   return (
@@ -242,11 +242,11 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
                       style={{ cursor: !appt ? "pointer" : "default", fontSize:'1.3rem' }}
                     >
                       <td>{time}</td>
-                      <td>{appt?.patient.full_name ?? "-"}</td>
-                      <td>{appt?.patient.document_number ?? "-"}</td>
+                      <td>{appt?.patient.fullName ?? "-"}</td>
+                      <td>{appt?.patient.documentNumber ?? "-"}</td>
                       <td>{appt?.state ? "✔️" : appt ? "❌" : "-"}</td>
-                      <td>{appt?.patient.health_insurance ?? "-"}</td>
-                      <td>{appt?.patient.insurance_plan ?? "-"}</td>
+                      <td>{appt?.patient.healthInsurance ?? "-"}</td>
+                      <td>{appt?.patient.insurancePlan ?? "-"}</td>
                       <td>{appt?.patient.phone ?? "-"}</td>
                       <td>{appt?.reason ?? "-"}</td>
                       <td>{appt?.patient.note ?? "-"}</td>
@@ -303,7 +303,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
                         placeholder="Escribí el nombre" />
                       <datalist id="patientsByName">
                         {filteredPatients.map((p) => (
-                          <option key={p.id} value={p.full_name} />
+                          <option key={p.id} value={p.fullName} />
                         ))}
                       </datalist>
                     </label>
@@ -322,7 +322,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
                         placeholder="Escribí el DNI" />
                       <datalist id="patientsByDni">
                         {filteredPatients.map((p) => (
-                          <option key={p.id} value={p.document_number} />
+                          <option key={p.id} value={p.documentNumber} />
                         ))}
                       </datalist>
                     </label>

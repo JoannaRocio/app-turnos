@@ -14,6 +14,7 @@ class AuthService {
     }
   
     static getToken() {
+
       return localStorage.getItem(this.TOKEN_KEY);
     }
   

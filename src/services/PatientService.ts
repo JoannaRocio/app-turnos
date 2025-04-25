@@ -20,20 +20,7 @@ class PatientService {
 
     const rawData = await response.json();
 
-    const mapped: Patient[] = rawData.map((item: any) => ({
-      id: item.id,
-      full_name: item.full_name,  // Corregir el mapeo de las propiedades
-      document_type: item.document_type,
-      document_number: item.document_number,
-      phone: item.phone ?? "-",
-      health_insurance: item.health_insurance ?? "-",
-      insurance_plan: item.insurance_plan ?? "-",
-      note: item.note ?? "-",
-      state: item.state ?? "-",
-    }));
-    
-
-    return mapped;
+    return rawData;
   }
 
   static async createPatient(data: any): Promise<void> {

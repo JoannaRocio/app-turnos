@@ -20,8 +20,8 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
       return <p className="text-white">Cargando pacientes...</p>;
     }
     const filteredPatients = patients.filter((p) => {
-    const nameMatch = p.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const dniMatch = p.document_number?.toString().includes(searchTerm);
+    const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const dniMatch = p.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
     })
     
@@ -48,13 +48,13 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
 
       const handleNewPatient = () => {
         const emptyPatient: Partial<Patient> = {
-          id: 0, 
-          full_name: "",
-          document_type: "",
-          document_number: "",
+          id: 0,
+          fullName: "",
+          documentType: "",
+          documentNumber: "",
           phone: "",
-          health_insurance: "",
-          insurance_plan: "",
+          healthInsurance: "",
+          insurancePlan: "",
           note: "",
         };
         setSelectedPatient(emptyPatient);
@@ -96,11 +96,11 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
             <tbody>
                 {filteredPatients.map((patient, index) => (
                 <tr key={index} onClick={() => handleRowClick(patient)} className="clickable-row">
-                    <td>{patient.full_name || "-"}</td>
-                    <td>{patient.document_type || "-"}</td>
-                    <td>{patient.document_number || "-"}</td>
-                    <td>{patient?.health_insurance || "-"}</td>
-                    <td>{patient?.insurance_plan || "-"}</td>
+                    <td>{patient.fullName || "-"}</td>
+                    <td>{patient.documentType || "-"}</td>
+                    <td>{patient.documentNumber || "-"}</td>
+                    <td>{patient?.healthInsurance || "-"}</td>
+                    <td>{patient?.insurancePlan || "-"}</td>
                     <td>{patient?.phone || "-"}</td>
                     <td>{patient?.note || "-"}</td>
                 </tr>
