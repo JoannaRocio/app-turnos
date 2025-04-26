@@ -37,6 +37,44 @@ class ProfessionalService {
 
     return mapped;
   }
+
+  static async createProfessional(data: any): Promise<void> {
+    const token = AuthService.getToken();
+  
+    const response = await fetch(this.BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(data),
+    });
+  
+    const responseText = await response.text();
+  
+    if (!response.ok) {
+      throw new Error(`Error creando profesional: ${responseText}`);
+    }
+  }
+  
+  static async updateProfessional(id: number, data: any): Promise<Professional> {
+    const token = AuthService.getToken();
+    const response = await fetch(`${this.BASE_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error actualizando profesional: ${errorText}`);
+    }
+
+    return await response.json();
+  }
 }
 
 export default ProfessionalService;

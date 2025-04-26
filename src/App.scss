@@ -26,10 +26,15 @@
   --color-neutral-disabled: #3F4554;
 
   // WHITE(BEIGE)
-  --color-white-light: #FFFFFF;
-  --color-white-dark: #D4CFBB;
-  --color-white-hover: #F8F5EA;
-  --color-white-disabled: #E7E3CF;
+  // --color-white-light: #FFFFFF;
+  // --color-white-dark: #D4CFBB;
+  // --color-white-hover: #F8F5EA;
+  // --color-white-disabled: #E7E3CF;
+
+  --color-white-light:     #FFFFFF; /* Blanco puro */
+  --color-white-hover:     #F0EAD6; /* Beige claro, más cálido */
+  --color-white-disabled:  #D6D3C2; /* Gris claro, apagado */
+  --color-white-dark:      #B8B29A; /* Beige grisáceo más oscuro */
 
   // BLACK
 

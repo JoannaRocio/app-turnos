@@ -13,7 +13,7 @@ interface Props {
   patients: Patient[];
   professionals: Professional[];
   appointments: Appointment[];
-  onAppointmentsUpdate: () => void;
+  onAppointmentsUpdate: (selectedProfessional: any) => void;
 }
 
 const generateTimeSlots = (): string[] => {
@@ -39,6 +39,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedProfessional, setSelectedProfessional] = useState('');
 
   const [apptToDelete, setApptToDelete] = useState<{
     patientName: string;
@@ -48,6 +49,11 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
+  };
+
+  const handleProfessionalSelected = async (dniSelected: string) => {
+    setSelectedProfessional(dniSelected);
+    onAppointmentsUpdate(dniSelected);
   };
 
   const appointmentsForSelectedDate = appointments.filter(appt =>
@@ -69,10 +75,11 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
 
   useEffect(() => {
     if (isEditMode && currentAppointment) {
+      console.log(currentAppointment, 'currentAppointment')
       const patient = patients.find(p => p.id === currentAppointment.patient.id);
       if (patient) {
-        setNameSearch(patient.fullName); // nombre y apellido
-        setDniSearch(patient.documentNumber); // opcional
+        setNameSearch(patient.fullName);
+        setDniSearch(patient.documentNumber);
       }
     } else {
       setNameSearch("");
@@ -176,10 +183,10 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   
       if (isEditMode) {
         await AppointmentService.updateAppointment(newAppointment.appointmentId, appointmentToSave);
-        onAppointmentsUpdate();
+        onAppointmentsUpdate(selectedProfessional);
       } else {
         await AppointmentService.createAppointment(appointmentToSave);
-        onAppointmentsUpdate();
+        onAppointmentsUpdate(selectedProfessional);
       }
   
       closeModal();
@@ -210,7 +217,8 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
 
         <div className="row">
           <div className="col-2">
-            <ProfessionalPanel></ProfessionalPanel>
+            <ProfessionalPanel professionals={professionals} 
+              onProfessionalSelect={handleProfessionalSelected}/>
           </div>
 
           <div className="col-8">

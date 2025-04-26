@@ -37,7 +37,7 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
           alert("Paciente creado con éxito");
         }
     
-        await reloadPatients();
+        reloadPatients();
         setModalOpen(false);
         setSelectedPatient(null);
 

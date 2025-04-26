@@ -16,6 +16,7 @@ const Home: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [selectedProfessional, setSelectedProfessional] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,7 +26,7 @@ const Home: React.FC = () => {
       if (componenteActivo === "agenda-turnos") {
         await loadPatients();
         await loadAllProfessionals();
-        await loadAppointments();
+        await loadAppointments(selectedProfessional);
       }
       if (componenteActivo === "profesionales") {
         await loadAllProfessionals();
@@ -54,12 +55,19 @@ const Home: React.FC = () => {
     }
   };
 
-  const loadAppointments = async () => {
+  const loadAppointments = async (selectedProfessional: string) => {
     try {
-      // const data = await AppointmentService.getProfessionalAppointmentsByDni(professionals[0].professionalDni);
-      const data = await AppointmentService.getAllAppointments();
+      const data = await ProfessionalService.getAllProfessionals();
+      setProfessionals(data);
   
-      setAppointments(data);
+      if (data.length > 1) {
+        const dniProfessional = data[0].professionalDni;
+        const appointmentsData = await AppointmentService.getAppointmentByDni(selectedProfessional || dniProfessional);
+        setAppointments(appointmentsData);
+      } else {
+        console.warn("No hay suficientes profesionales para obtener el segundo.");
+      }
+  
     } catch (error) {
       console.error("Error al cargar los turnos:", error);
     }
@@ -73,7 +81,7 @@ const Home: React.FC = () => {
         <PatientsComponent patients={patients ?? []} reloadPatients={loadPatients} />
       )}
 
-      {componenteActivo === "profesionales" && <ProfessionalsComponent professionals={professionals} />}
+      {componenteActivo === "profesionales" && <ProfessionalsComponent professionals={professionals} reloadProfessional={loadAllProfessionals} />}
 
       {componenteActivo === "agenda-turnos" && (
         <AppointmentsComponent patients={patients} appointments={appointments} professionals={professionals} onAppointmentsUpdate={loadAppointments} />

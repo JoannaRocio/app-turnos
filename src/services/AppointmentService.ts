@@ -42,11 +42,11 @@ class AppointmentService {
     const rawData = await response.json();
     return rawData;
   }
-  
-  static async getProfessionalAppointmentsByDni(professionalDni: string): Promise<Appointment[]> {
+
+  static async getAppointmentByDni(professionalDni: string): Promise<Appointment[]> {
     const token = localStorage.getItem(this.TOKEN_KEY);
 
-    const response = await fetch(`http://localhost:8080/api/appointments/dni/${professionalDni}`, {
+    const response = await fetch(`http://localhost:8080/api/appointments/professional/dni/${professionalDni}`, {
       method: "GET",
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
@@ -62,24 +62,6 @@ class AppointmentService {
     return rawData;
   }
 
-  static async getPatientAppointmentsByDni(professionalDni: string): Promise<Appointment[]> {
-    const token = localStorage.getItem(this.TOKEN_KEY);
-
-    const response = await fetch(`http://localhost:8080/api/appointments/dni/${professionalDni}`, {
-      method: "GET",
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    const rawData = await response.json();
-    return rawData;
-  }
 
   static async updateAppointment(id: number, appointment: any) {
     const token = localStorage.getItem(this.TOKEN_KEY);

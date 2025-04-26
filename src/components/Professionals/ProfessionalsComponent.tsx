@@ -3,14 +3,17 @@ import { Patient } from "../../interfaces/Patient";
 import "./ProfessionalsComponent.scss";
 import PatientModalComponent from "../PatientModal/PatientModalComponent";
 import { Professional } from "../../interfaces/Professional";
+import ProfessionalService from "../../services/ProfessionalService";
+import ProfessionalModal from "../ProfessionalModal/ProfessionalModal";
 
 interface Props {
     professionals: Professional[];
-}
+    onProfessionalSelect: () => void;
+  }
 
-const ProfessionalsComponent: React.FC<{ professionals: Professional[] }> = ({ professionals }) => {
+const ProfessionalsComponent: React.FC<{ professionals: Professional[], reloadProfessional: () => void }> = ({ professionals, reloadProfessional }) => {
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
+    const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional> | null>(null);
     const [showEditModal, setShowEditModal] = useState(false);
 
     const handleRowClick = (professional: Professional) => {
@@ -18,12 +21,42 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[] }> = ({ p
     setShowEditModal(true);
     };
 
-    const handleSave = (updated: Patient) => {
-    console.log("Guardar cambios en profesional:", updated);
-    setShowEditModal(false);
-    setSelectedProfessional(null);
-    // Aca podés llamar a tu API o actualizar el estado global si lo estás usando
-    };
+    const handleSave = async (professionalData: Partial<Professional>) => {
+        try {
+          if (professionalData.professionalId) {
+            await ProfessionalService.updateProfessional(professionalData.professionalId, professionalData);
+  
+            alert("Paciente actualizado con éxito");
+          } else {
+            await ProfessionalService.createProfessional(professionalData);
+  
+            alert("Paciente creado con éxito");
+          }
+      
+          reloadProfessional();
+          setShowEditModal(false);
+          setSelectedProfessional(null);
+  
+        } catch (error) {
+          console.log(error)
+        }
+      };
+
+    const handleNewProfessional = () => {
+        const emptyProfessional: Partial<Professional> = {
+            professionalId: 0,
+            professionalName: "",
+            documentType: "",
+            professionalDni: "",
+            phone: "",
+            shiftStart: "",
+            shiftEnd: "",
+            unavailableHours: "",
+            specialties: ""
+        };
+        setSelectedProfessional(emptyProfessional);
+        setShowEditModal(true);
+      };
 
     const filteredProfessional = professionals.filter((professional) => {
     const nameMatch = professional.professionalName?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -35,7 +68,10 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[] }> = ({ p
 
     return (
         <section>
-            <h3 className="text-white">Profesionales</h3>
+            <div className="d-flex">
+                <h3 className="text-white">Profesionales</h3>
+                <button className="btn btn-light btn-nuevo"  onClick={handleNewProfessional}>Nuevo</button>
+            </div>
 
             <input
             type="text"
@@ -74,12 +110,12 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[] }> = ({ p
                 </tbody>
             </table>
 
-            {/* <PatientModalComponent
-            isOpen={showEditModal}
-            patient={selectedProfessional}
-            onClose={() => setShowEditModal(false)}
-            onSave={handleSave}
-            /> */}
+            <ProfessionalModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                professional={selectedProfessional}
+                onSave={handleSave}
+            />
         </section>
     );
 };
