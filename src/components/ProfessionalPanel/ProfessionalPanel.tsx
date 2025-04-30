@@ -4,13 +4,13 @@ import { Professional } from "../../interfaces/Professional";
 
 interface Props {
     professionals: Professional[];
-    onProfessionalSelect: (dni: string) => void;
+    onProfessionalSelect: (professional: Professional) => void;
   }
 
 const ProfessionalPanel: React.FC<Props> = ({ professionals, onProfessionalSelect }) => {
 
     const handleRowClick = (professional: Professional) => {
-        onProfessionalSelect(professional.professionalDni); // ← acá se envía al padre
+        onProfessionalSelect(professional); // ← acá se envía al padre
         };
 
     return (

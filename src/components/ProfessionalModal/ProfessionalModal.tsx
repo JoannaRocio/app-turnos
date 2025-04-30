@@ -6,7 +6,9 @@ import { Professional } from "../../interfaces/Professional";
 interface ProfessionalModalProps {
   isOpen: boolean;
   onClose: () => void;
+  // professional: Partial<Professional>;
   professional: Partial<Professional> | null;
+
   onSave: (updated: Partial<Professional>) => void;
 }
 

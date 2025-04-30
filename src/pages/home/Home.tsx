@@ -9,14 +9,18 @@ import AppointmentService from "../../services/AppointmentService";
 import { Professional } from "../../interfaces/Professional";
 import ProfessionalService from "../../services/ProfessionalService";
 import { Appointment } from "../../interfaces/Appointment";
+import AdminDashboard from "../../components/AdminPanel/AdminDashboard";
+import UserService from "../../services/UserService";
+import { User } from "../../interfaces/User";
 
 const Home: React.FC = () => {
   
   const { componenteActivo } = useComponente();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
-  const [selectedProfessional, setSelectedProfessional] = useState('');
+  const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,14 +31,27 @@ const Home: React.FC = () => {
         await loadPatients();
         await loadAllProfessionals();
         await loadAppointments(selectedProfessional);
+
       }
       if (componenteActivo === "profesionales") {
         await loadAllProfessionals();
       }
+      if (componenteActivo === "panel-admin") {
+        await loadUsers();
+      }
     }
 
     fetchData();
-  }, [componenteActivo]);
+  }, [componenteActivo, selectedProfessional]);
+
+  const loadUsers = async () => {
+    try {
+      const data = await UserService.getAllUsers();
+      setUsers(data);
+    } catch (err) {
+      console.error("Error al traer usuarios:", err);
+    }
+  };
 
   const loadPatients = async () => {
     try {
@@ -55,19 +72,21 @@ const Home: React.FC = () => {
     }
   };
 
-  const loadAppointments = async (selectedProfessional: string) => {
+  const loadAppointments = async (selectedProfessional?: Professional) => {
     try {
       const data = await ProfessionalService.getAllProfessionals();
       setProfessionals(data);
   
-      if (data.length > 1) {
-        const dniProfessional = data[0].professionalDni;
-        const appointmentsData = await AppointmentService.getAppointmentByDni(selectedProfessional || dniProfessional);
-        setAppointments(appointmentsData);
-      } else {
-        console.warn("No hay suficientes profesionales para obtener el segundo.");
+      if (!selectedProfessional && data.length > 0) {
+        selectedProfessional = data[0];
       }
   
+      if (selectedProfessional) {
+        const appointmentsData = await AppointmentService.getAppointmentByDni(selectedProfessional.professionalDni);
+        setAppointments(appointmentsData);
+      } else {
+        console.warn("No hay profesional seleccionado ni profesionales disponibles.");
+      }
     } catch (error) {
       console.error("Error al cargar los turnos:", error);
     }
@@ -86,6 +105,8 @@ const Home: React.FC = () => {
       {componenteActivo === "agenda-turnos" && (
         <AppointmentsComponent patients={patients} appointments={appointments} professionals={professionals} onAppointmentsUpdate={loadAppointments} />
       )}
+
+      {componenteActivo === "panel-admin" && <AdminDashboard users={users} reloadUsers={loadUsers}/>}
     </section>
   );
 };

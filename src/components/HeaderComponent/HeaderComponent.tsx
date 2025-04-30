@@ -38,6 +38,11 @@ const HeaderComponent: React.FC = () => {
                 Profesionales
               </button>
             </li>
+            <li className="nav-item">
+              <button className={`nav-link btn text-white ${componenteActivo === "panel-admin" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("panel-admin")}>
+                Panel admin
+              </button>
+            </li>
           </ul>
         </nav>
 

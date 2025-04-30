@@ -2,7 +2,7 @@ import { Professional } from "../interfaces/Professional";
 import AuthService from "./AuthService";
 
 class ProfessionalService {
-  private static BASE_URL = "http://localhost:8080/api/professionals";
+  private static readonly BASE_URL = "http://localhost:8080/api/professionals";
 
   static async getAllProfessionals(): Promise<Professional[]> {
     const token = AuthService.getToken();

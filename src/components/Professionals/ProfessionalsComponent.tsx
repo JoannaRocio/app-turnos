@@ -13,7 +13,9 @@ interface Props {
 
 const ProfessionalsComponent: React.FC<{ professionals: Professional[], reloadProfessional: () => void }> = ({ professionals, reloadProfessional }) => {
     const [searchTerm, setSearchTerm] = useState("");
+    // const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional>>();
     const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional> | null>(null);
+
     const [showEditModal, setShowEditModal] = useState(false);
 
     const handleRowClick = (professional: Professional) => {

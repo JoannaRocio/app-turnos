@@ -39,7 +39,9 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedProfessional, setSelectedProfessional] = useState('');
+  // const [selectedProfessional, setSelectedProfessional] = useState('');
+  const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
+
 
   const [apptToDelete, setApptToDelete] = useState<{
     patientName: string;
@@ -51,9 +53,15 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
     setSelectedDate(date);
   };
 
-  const handleProfessionalSelected = async (dniSelected: string) => {
-    setSelectedProfessional(dniSelected);
-    onAppointmentsUpdate(dniSelected);
+  // const handleProfessionalSelected = async (selected: Professional) => {
+  //   console.log(selected, 'handleProfessionalSelected')
+  //   setSelectedProfessional(selected.professionalDni);
+  //   onAppointmentsUpdate(selected.professionalDni);
+  // };
+
+  const handleProfessionalSelect = (professional: Professional) => {
+    setSelectedProfessional(professional);
+    onAppointmentsUpdate(professional);
   };
 
   const appointmentsForSelectedDate = appointments.filter(appt =>
@@ -175,7 +183,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
       dateTime: `${selectedDate.toISOString().split("T")[0]}T${newAppointment.time}:00`,
       reason: newAppointment.reason,
       state: "PENDIENTE",
-      professionalId: professionals[0].professionalId,
+      professionalId: selectedProfessional?.professionalId,
       appointmentId: newAppointment.appointmentId
     };
   
@@ -209,7 +217,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
     <>
     <section>
       <h3 className="text-white">
-        Agenda de Turnos - {selectedDate.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
+        {selectedProfessional?.professionalName} Agenda de Turnos - {selectedDate.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
       </h3>
     </section>
     
@@ -218,7 +226,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
         <div className="row">
           <div className="col-2">
             <ProfessionalPanel professionals={professionals} 
-              onProfessionalSelect={handleProfessionalSelected}/>
+              onProfessionalSelect={handleProfessionalSelect}/>
           </div>
 
           <div className="col-8">
