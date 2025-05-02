@@ -183,7 +183,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
       dateTime: `${selectedDate.toISOString().split("T")[0]}T${newAppointment.time}:00`,
       reason: newAppointment.reason,
       state: "PENDIENTE",
-      professionalId: selectedProfessional?.professionalId,
+      professionalId: selectedProfessional?.professionalId ?? professionals[0].professionalId,
       appointmentId: newAppointment.appointmentId
     };
   

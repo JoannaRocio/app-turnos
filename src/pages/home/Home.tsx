@@ -68,7 +68,7 @@ const Home: React.FC = () => {
       const data = await ProfessionalService.getAllProfessionals();
       setProfessionals(data);
     } catch (error) {
-      console.error("Error al cargar los turnos:", error);
+      console.error("Error al cargar los profesionales:", error);
     }
   };
 
