@@ -135,3 +135,24 @@
   .confirm-actions button:last-child {
     background-color: #ccc;
   }
+
+  .no-caret::after {
+    display: none !important;
+  }
+
+  .dropdown-menu.show {
+    font-size: 1.5rem;
+    padding: 0rem;
+  }
+
+  .dropdown-toggle.show,
+  .dropdown-toggle:focus,
+  .dropdown-toggle:active {
+    background-color: #606e7a !important; // o el color que prefieras
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2); // para dar un efecto de "presionado"
+    border-color: #545b62 !important;
+  }
+
+  .item-drop:hover {
+    background-color: var(--color-tertiary-hover) !important;
+  }

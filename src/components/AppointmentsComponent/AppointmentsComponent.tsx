@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import "./AppointmentsComponent.scss";
 import { Appointment } from "../../interfaces/Appointment";
-import { IoIosRemoveCircleOutline } from "react-icons/io";
+import { IoIosExpand, IoIosRemoveCircleOutline } from "react-icons/io";
 import ConfirmModal from "../ConfirmModal/ConfirmModalComponent";
 import AppointmentService from "../../services/AppointmentService";
 import ProfessionalPanel from "../ProfessionalPanel/ProfessionalPanel";
 import CalendarComponent from "../CalendarComponent/CalendarComponent";
 import { Patient } from "../../interfaces/Patient";
 import { Professional } from "../../interfaces/Professional";
+import Dropdown from "react-bootstrap/esm/Dropdown";
+import { FiMoreVertical } from "react-icons/fi";
+import ClinicalHistoryComponent from "../ClinicalHistoryComponent/ClinicalHistory";
+import { ClinicalHistoryEntry } from "../../interfaces/ClinicalHistoryEntry";
+import ClinicalHistoryService from "../../services/ClinicalHistoryService";
 
 interface Props {
   patients: Patient[];
@@ -41,7 +46,11 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   // const [selectedProfessional, setSelectedProfessional] = useState('');
   const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
-
+  const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
+  const [showClinicalHistory, setShowClinicalHistory] = useState(false);
+  const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
+  const [patientData, setPatientData] = useState<Patient | null>(null);
+  
 
   const [apptToDelete, setApptToDelete] = useState<{
     patientName: string;
@@ -70,7 +79,18 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
 
   const confirmDelete = (appt: any, time: string) => {
     setShowConfirm(true);
-  };    
+  };   
+  
+  const openClinicalHistory = async (appt: any) => {
+    try {
+      const data = await ClinicalHistoryService.getOrCreate(appt.patient);
+      setShowClinicalHistory(true);
+      setClinicalHistoryData(data);
+      setPatientData(appt.patient); 
+    } catch (error) {
+      console.error("Error al obtener o crear la historia clínica:", error);
+    }
+  };
 
   const [newAppointment, setNewAppointment] = useState({
     appointmentId: 0,
@@ -212,6 +232,12 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
     p?.fullName?.toLowerCase().includes(nameSearch.toLowerCase()) &&
     p?.documentNumber?.includes(dniSearch)
   );
+
+
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation(); // 🔐 Esto evita que el click llegue al <tr>
+    };
+
   
   return (
     <>
@@ -220,171 +246,177 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
         {selectedProfessional?.professionalName} Agenda de Turnos - {selectedDate.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
       </h3>
     </section>
+
+    {showClinicalHistory && patientData ? (
+      <ClinicalHistoryComponent data={clinicalHistoryData} patient={patientData} onBack={() => setShowClinicalHistory(false)} />
+      ) : (
+      
+      <section className="container-fluid">
+
+          <div className="row">
+            <div className="col-2">
+              <ProfessionalPanel professionals={professionals} 
+                onProfessionalSelect={handleProfessionalSelect}/>
+            </div>
+
+            <div className="col-8">
+              <table className="appointments-table">
+                <thead>
+                  <tr>
+                    <th>Hora</th>
+                    <th>Paciente</th>
+                    <th>DNI</th>
+                    <th>Asistencia</th>
+                    <th>Obra Social</th>
+                    <th>Plan</th>
+                    <th>Teléfono</th>
+                    <th>Motivo</th>
+                    <th>Notas</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeSlots.map((time, index) => {
     
-    <section className="container-fluid">
+                    const appt = getAppointmentForTime(time);
 
-        <div className="row">
-          <div className="col-2">
-            <ProfessionalPanel professionals={professionals} 
-              onProfessionalSelect={handleProfessionalSelect}/>
-          </div>
+                    return (
+                      <tr
+                        key={index}
+                        onClick={() => openModalForTime(time)}
+                        className={!appt ? "clickable-row" : ""}
+                        style={{ cursor: !appt ? "pointer" : "default", fontSize:'1.3rem' }}
+                      >
+                        <td>{time}</td>
+                        <td>{appt?.patient.fullName ?? "-"}</td>
+                        <td>{appt?.patient.documentNumber ?? "-"}</td>
+                        <td>{appt?.state ? "✔️" : appt ? "❌" : "-"}</td>
+                        <td>{appt?.patient.healthInsurance ?? "-"}</td>
+                        <td>{appt?.patient.insurancePlan ?? "-"}</td>
+                        <td>{appt?.patient.phone ?? "-"}</td>
+                        <td>{appt?.reason ?? "-"}</td>
+                        <td>{appt?.patient.note ?? "-"}</td>
+                        <td onClick={handleClick}>
+                          <Dropdown show={activeDropdownIndex === index}
+                            onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}>
+                            <Dropdown.Toggle disabled={!appt} variant="secondary" size="lg" className="no-caret" style={{ width: '100%' }}>
+                              <FiMoreVertical size={20} />
+                            </Dropdown.Toggle>
 
-          <div className="col-8">
-            <table className="appointments-table">
-              <thead>
-                <tr>
-                  <th>Hora</th>
-                  <th>Paciente</th>
-                  <th>DNI</th>
-                  <th>Asistencia</th>
-                  <th>Obra Social</th>
-                  <th>Plan</th>
-                  <th>Teléfono</th>
-                  <th>Motivo</th>
-                  <th>Notas</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {timeSlots.map((time, index) => {
-  
-                  const appt = getAppointmentForTime(time);
+                            <Dropdown.Menu>
+                              <Dropdown.Item className="item-drop" onClick={() => openClinicalHistory(appt)}>Ver ficha</Dropdown.Item>
+                              <Dropdown.Item className="item-drop" onClick={() => openModalForTime(time)}>Editar</Dropdown.Item>
+                              <Dropdown.Item className="item-drop" onClick={() => confirmDelete(appt, time)}>Eliminar</Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
 
-                  return (
-                    <tr
-                      key={index}
-                      onClick={() => openModalForTime(time)}
-                      className={!appt ? "clickable-row" : ""}
-                      style={{ cursor: !appt ? "pointer" : "default", fontSize:'1.3rem' }}
-                    >
-                      <td>{time}</td>
-                      <td>{appt?.patient.fullName ?? "-"}</td>
-                      <td>{appt?.patient.documentNumber ?? "-"}</td>
-                      <td>{appt?.state ? "✔️" : appt ? "❌" : "-"}</td>
-                      <td>{appt?.patient.healthInsurance ?? "-"}</td>
-                      <td>{appt?.patient.insurancePlan ?? "-"}</td>
-                      <td>{appt?.patient.phone ?? "-"}</td>
-                      <td>{appt?.reason ?? "-"}</td>
-                      <td>{appt?.patient.note ?? "-"}</td>
-                      <td>
-                        {appt && (
-                          <span className="d-flex justify-content-center btn-delete"
-                            title="Eliminar turno"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              confirmDelete(appt, time);
-                            } }
-                          >
-                            <IoIosRemoveCircleOutline color="red" size={22} />
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
+                <ConfirmModal
+                  isOpen={showConfirm}
+                  title="Confirmar eliminación"
+                  message={`¿Estás segura que deseas eliminar el turno de "${apptToDelete?.patientName}"?`}
+                  onConfirm={() => {
+                    if (apptToDelete) {
+                      handleDeleteConfirmed(apptToDelete);
+                    }
+                  } }
+                  onCancel={() => {
+                    setShowConfirm(false);
+                    setApptToDelete(null);
+                  } } />
 
-              <ConfirmModal
-                isOpen={showConfirm}
-                title="Confirmar eliminación"
-                message={`¿Estás segura que deseas eliminar el turno de "${apptToDelete?.patientName}"?`}
-                onConfirm={() => {
-                  if (apptToDelete) {
-                    handleDeleteConfirmed(apptToDelete);
-                  }
-                } }
-                onCancel={() => {
-                  setShowConfirm(false);
-                  setApptToDelete(null);
-                } } />
+              </table>
 
-            </table>
+              {isModalOpen && (
+                <div className={`modal-overlay ${isEditMode ? "edit-mode" : ""}`}>
+                  <div className={`modal ${isEditMode ? "edit-mode" : ""}`}>
+                    <h2>{isEditMode ? "Editar turno" : "Nuevo Turno"}</h2>
+                    <form onSubmit={handleSubmit}>
 
-            {isModalOpen && (
-              <div className={`modal-overlay ${isEditMode ? "edit-mode" : ""}`}>
-                <div className={`modal ${isEditMode ? "edit-mode" : ""}`}>
-                  <h2>{isEditMode ? "Editar turno" : "Nuevo Turno"}</h2>
-                  <form onSubmit={handleSubmit}>
+                      <label>
+                        Paciente:
+                        <input
+                          type="text"
+                          value={nameSearch}
+                          onChange={(e) => {
+                            setNameSearch(e.target.value);
+                            setDniSearch(""); // resetea el otro buscador
+                          } }
+                          list="patientsByName"
+                          placeholder="Escribí el nombre" />
+                        <datalist id="patientsByName">
+                          {filteredPatients.map((p) => (
+                            <option key={p.id} value={p.fullName} />
+                          ))}
+                        </datalist>
+                      </label>
 
-                    <label>
-                      Paciente:
-                      <input
-                        type="text"
-                        value={nameSearch}
-                        onChange={(e) => {
-                          setNameSearch(e.target.value);
-                          setDniSearch(""); // resetea el otro buscador
-                        } }
-                        list="patientsByName"
-                        placeholder="Escribí el nombre" />
-                      <datalist id="patientsByName">
-                        {filteredPatients.map((p) => (
-                          <option key={p.id} value={p.fullName} />
-                        ))}
-                      </datalist>
-                    </label>
+                      <label>
+                        DNI:
+                        <input
+                          type="text"
+                          value={dniSearch}
+                          readOnly={!!nameSearch} // Solo lectura si hay nombre seleccionado
+                          onChange={(e) => {
+                            setDniSearch(e.target.value);
+                            setNameSearch(""); // resetea el otro buscador
+                          } }
+                          list="patientsByDni"
+                          placeholder="Escribí el DNI" />
+                        <datalist id="patientsByDni">
+                          {filteredPatients.map((p) => (
+                            <option key={p.id} value={p.documentNumber} />
+                          ))}
+                        </datalist>
+                      </label>
 
-                    <label>
-                      DNI:
-                      <input
-                        type="text"
-                        value={dniSearch}
-                        readOnly={!!nameSearch} // Solo lectura si hay nombre seleccionado
-                        onChange={(e) => {
-                          setDniSearch(e.target.value);
-                          setNameSearch(""); // resetea el otro buscador
-                        } }
-                        list="patientsByDni"
-                        placeholder="Escribí el DNI" />
-                      <datalist id="patientsByDni">
-                        {filteredPatients.map((p) => (
-                          <option key={p.id} value={p.documentNumber} />
-                        ))}
-                      </datalist>
-                    </label>
+                      <label>
+                        Hora:
+                        <select name="time" value={newAppointment.time} onChange={handleChange}>
+                          {timeSlots.map((time) => (
+                            <option key={time} value={time} disabled={!!getAppointmentForTime(time)}>
+                              {time}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
 
-                    <label>
-                      Hora:
-                      <select name="time" value={newAppointment.time} onChange={handleChange}>
-                        {timeSlots.map((time) => (
-                          <option key={time} value={time} disabled={!!getAppointmentForTime(time)}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                      <label>
+                        Motivo:
+                        <input
+                          type="text"
+                          name="reason"
+                          value={newAppointment.reason}
+                          onChange={handleChange} />
+                      </label>
 
-                    <label>
-                      Motivo:
-                      <input
-                        type="text"
-                        name="reason"
-                        value={newAppointment.reason}
-                        onChange={handleChange} />
-                    </label>
+                      <label>
+                        Notas:
+                        <textarea name="notes" value={newAppointment.notes} onChange={handleChange}/>
+                      </label>
 
-                    <label>
-                      Notas:
-                      <textarea name="notes" value={newAppointment.notes} onChange={handleChange}/>
-                    </label>
+                      <button type="submit">{isEditMode ? "Actualizar" : "Guardar"}</button>
 
-                    <button type="submit">{isEditMode ? "Actualizar" : "Guardar"}</button>
-
-                    <button type="button" onClick={closeModal}>
-                      Cancelar
-                    </button>
-                  </form>
+                      <button type="button" onClick={closeModal}>
+                        Cancelar
+                      </button>
+                    </form>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
+            <div className="col-2">
+              <CalendarComponent onDateSelect={handleDateSelect} />
+            </div>
           </div>
 
-          <div className="col-2">
-            <CalendarComponent onDateSelect={handleDateSelect} />
-          </div>
-        </div>
-
-    </section>
+      </section>
+    )}
     </>
   );
 };
