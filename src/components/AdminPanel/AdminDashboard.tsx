@@ -64,6 +64,8 @@ const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ 
 
     return (
       <section>
+        <h2 className="text-white">Panel de administrador</h2>
+
         <div className="tabs mb-4">
           <button
             className={`tab-button ${activeTab === "usuarios" ? "active" : ""}`}

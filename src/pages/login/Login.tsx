@@ -22,16 +22,28 @@ const Login: React.FC = () => {
       setError("Por favor, completa todos los campos.");
       return;
     }
-  
-    const data = await AuthService.login(username, password);
-    if (data.token != null) {
-      AuthService.saveToken(data.token);
 
-      login();
+    const data = await AuthService.login(username, password);
+
+    if (data.token && data.user?.role) {
+      AuthService.saveToken(data.token);
+      AuthService.saveRole(data.user.role); // Guarda "USUARIO", "ADMIN", etc.
+
+      login(); // Actualiza estado de contexto
       navigate("/Home");
     } else {
-      setError(data.message);
+      setError(data.message ?? "Error de autenticación");
     }
+  
+    // const data = await AuthService.login(username, password);
+    // if (data.token != null) {
+    //   AuthService.saveToken(data.token);
+
+    //   login();
+    //   navigate("/Home");
+    // } else {
+    //   setError(data.message);
+    // }
   
   };
 

@@ -82,6 +82,24 @@ class AppointmentService {
 
     return await response.text();
   }
+
+  static async deleteAppointment(id: number): Promise<string> {
+    const token = localStorage.getItem(this.TOKEN_KEY);
+  
+    const response = await fetch(`http://localhost:8080/api/appointments/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+  
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error);
+    }
+  
+    return await response.text();
+  }
 }
 
 export default AppointmentService;

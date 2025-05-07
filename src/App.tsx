@@ -1,3 +1,4 @@
+// src/App.tsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import HeaderComponent from "./components/HeaderComponent/HeaderComponent";
 import Home from "./pages/home/Home";
@@ -6,6 +7,7 @@ import { AuthProvider, useAuth } from "./context/ContextAuth";
 import Login from "./pages/login/Login";
 import PasswordRecovery from "./pages/password-recovery/PasswordRecovery";
 import ResetPassword from "./pages/password-recovery/reset-password/ResetPassword";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import './App.scss';
 
 function AppRoutes() {
@@ -13,19 +15,28 @@ function AppRoutes() {
 
   return (
     <>
-
       {isAuthenticated && <HeaderComponent />}
 
       <Routes>
-        <Route path="/Inicio-sesion" element={isAuthenticated ? <Navigate to="/Home"/> : <Login />} />
-        <Route path="/Recuperar-contraseña" element={<PasswordRecovery />} />
-        <Route path="/Cambiar-contrasena" element={<ResetPassword />} />
-        <Route path="/Home" element={isAuthenticated ? <Home /> : <Navigate to="/Inicio-sesion" replace />} />
+        <Route path="/Inicio-sesion" element={isAuthenticated ? <Navigate to="/Home" /> : <Login />} />
+        <Route path="/Recuperar-contraseña" element={isAuthenticated ? <Navigate to="/Home" /> : <PasswordRecovery />} />
+        <Route path="/Cambiar-contrasena" element={isAuthenticated ? <Navigate to="/Home" /> : <ResetPassword />} />
+
+        {/* Ruta protegida por roles */}
+        <Route
+          path="/Home"
+          element={
+            <ProtectedRoute allowedRoles={["USUARIO", "MODERADOR", "ADMIN"]}>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/no-autorizado" element={<div>No estás autorizado para ver esta página.</div>} />
 
         <Route path="/" element={<Navigate to={isAuthenticated ? "/Home" : "/Inicio-sesion"} />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-
     </>
   );
 }

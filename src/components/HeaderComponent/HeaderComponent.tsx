@@ -1,16 +1,15 @@
-// src/components/HeaderComponent/HeaderComponent.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./HeaderComponent.scss";
-import AuthService from "../../services/AuthService";
 import { useComponente } from "../../context/ContextComponent";
 import { useAuth } from "../../context/ContextAuth";
 
 const HeaderComponent: React.FC = () => {
   const navigate = useNavigate();
   const { componenteActivo, setComponenteActivo } = useComponente();
-  const { logout } = useAuth();
+  const { logout, userRole } = useAuth();
 
+  const role = userRole ?? "";
   const handleLogOut = () => {
     logout();
     navigate("/Inicio-sesion");
@@ -28,21 +27,28 @@ const HeaderComponent: React.FC = () => {
                 Agenda de turnos
               </button>
             </li>
+
             <li className="nav-item">
               <button className={`nav-link btn text-white ${componenteActivo === "pacientes" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("pacientes")}>
                 Pacientes
               </button>
             </li>
-            <li className="nav-item">
-              <button className={`nav-link btn text-white ${componenteActivo === "profesionales" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("profesionales")}>
-                Profesionales
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className={`nav-link btn text-white ${componenteActivo === "panel-admin" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("panel-admin")}>
-                Panel admin
-              </button>
-            </li>
+
+            {(role === "ADMIN" || role === "MODERADOR") && (
+              <li className="nav-item">
+                <button className={`nav-link btn text-white ${componenteActivo === "profesionales" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("profesionales")}>
+                  Profesionales
+                </button>
+              </li>
+            )}
+
+            {role === "ADMIN" && (
+              <li className="nav-item">
+                <button className={`nav-link btn text-white ${componenteActivo === "panel-admin" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("panel-admin")}>
+                  Panel admin
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
 

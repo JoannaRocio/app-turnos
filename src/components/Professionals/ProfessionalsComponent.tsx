@@ -70,6 +70,8 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[], reloadPr
 
     return (
         <section>
+            <h2 className="text-white">Listado de profesionales</h2>
+
             <div className="d-flex">
                 <h3 className="text-white">Profesionales</h3>
                 <button className="btn btn-light btn-nuevo"  onClick={handleNewProfessional}>Nuevo</button>

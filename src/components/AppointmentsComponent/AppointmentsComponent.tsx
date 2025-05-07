@@ -51,8 +51,8 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
   const [patientData, setPatientData] = useState<Patient | null>(null);
   
-
   const [apptToDelete, setApptToDelete] = useState<{
+    appointmentId: number;
     patientName: string;
     date: string;
     time: string;
@@ -78,6 +78,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   );
 
   const confirmDelete = (appt: any, time: string) => {
+    setCurrentAppointment(appt)
     setShowConfirm(true);
   };   
   
@@ -224,9 +225,23 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
     }
   };
 
-  function handleDeleteConfirmed(apptToDelete: { patientName: string; date: string; time: string; }) {
-    throw new Error("Function not implemented.");
+  async function handleDeleteConfirmed(currentAppointment: any) {
+    console.log(currentAppointment, 'handleDeleteConfirmed')
+
+    try {
+      console.log('entra al boton confirmed')
+      await AppointmentService.deleteAppointment(currentAppointment?.id);
+      alert("Turno eliminado correctamente.");
+      setShowConfirm(false);
+      setApptToDelete(null);
+      onAppointmentsUpdate(selectedProfessional);
+    } catch (error) {
+      setCurrentAppointment(null)
+      console.error("Error eliminando el turno:", error);
+      alert("Ocurrió un error al eliminar el turno.");
+    }
   }
+  
 
   const filteredPatients = patients.filter((p) =>
     p?.fullName?.toLowerCase().includes(nameSearch.toLowerCase()) &&
@@ -242,8 +257,9 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   return (
     <>
     <section>
+      <h2 className="text-white">Agenda de turnos</h2>
       <h3 className="text-white">
-        {selectedProfessional?.professionalName} Agenda de Turnos - {selectedDate.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
+        {selectedProfessional?.professionalName ?? professionals[0]?.professionalName} {selectedDate.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}
       </h3>
     </section>
 
@@ -318,13 +334,18 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
                 <ConfirmModal
                   isOpen={showConfirm}
                   title="Confirmar eliminación"
-                  message={`¿Estás segura que deseas eliminar el turno de "${apptToDelete?.patientName}"?`}
+                  message={`¿Estás segura que deseas eliminar el turno de "${currentAppointment?.patient.fullName}"?`}
                   onConfirm={() => {
-                    if (apptToDelete) {
-                      handleDeleteConfirmed(apptToDelete);
+                    if (currentAppointment) {
+                      console.log(apptToDelete,'apptoDelete')
+                      handleDeleteConfirmed(currentAppointment);
+                    }
+                    else {
+                      alert("No ha seleccionado ningún turno disponible.")
                     }
                   } }
                   onCancel={() => {
+                    console.log(apptToDelete,'apptoDelete')
                     setShowConfirm(false);
                     setApptToDelete(null);
                   } } />

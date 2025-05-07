@@ -12,17 +12,25 @@ import { Appointment } from "../../interfaces/Appointment";
 import AdminDashboard from "../../components/AdminPanel/AdminDashboard";
 import UserService from "../../services/UserService";
 import { User } from "../../interfaces/User";
+import { useAuth } from "../../context/ContextAuth";
 
 const Home: React.FC = () => {
   
-  const { componenteActivo } = useComponente();
+  // const { componenteActivo } = useComponente();
+  const [componenteActivo, setComponenteActivo] = useState<string>("agenda-turnos"); // ✅ valor por defecto
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
 
+  const { userRole } = useAuth();
+  const role = userRole ?? "";
+
   useEffect(() => {
+    if (!componenteActivo) {
+      setComponenteActivo("agenda-turnos");
+    }
     const fetchData = async () => {
       if (componenteActivo === "pacientes") {
         await loadPatients();
@@ -93,20 +101,27 @@ const Home: React.FC = () => {
   };
 
   return (
-    <section>
-      <h2 className="text-white">Inicio</h2>
+    <section className="home-section">
+        {componenteActivo === "pacientes" && ["USUARIO", "MODERADOR", "ADMIN"].includes(role) && (
+          <PatientsComponent patients={patients ?? []} reloadPatients={loadPatients} />
+        )}
 
-      {componenteActivo === "pacientes" && (
-        <PatientsComponent patients={patients ?? []} reloadPatients={loadPatients} />
-      )}
+        {componenteActivo === "profesionales" && ["MODERADOR", "ADMIN"].includes(role) && (
+          <ProfessionalsComponent professionals={professionals} reloadProfessional={loadAllProfessionals} />
+        )}
 
-      {componenteActivo === "profesionales" && <ProfessionalsComponent professionals={professionals} reloadProfessional={loadAllProfessionals} />}
+        {componenteActivo === "agenda-turnos" && ["USUARIO", "MODERADOR", "ADMIN"].includes(role) && (
+          <AppointmentsComponent
+            patients={patients}
+            appointments={appointments}
+            professionals={professionals}
+            onAppointmentsUpdate={loadAppointments}
+          />
+        )}
 
-      {componenteActivo === "agenda-turnos" && (
-        <AppointmentsComponent patients={patients} appointments={appointments} professionals={professionals} onAppointmentsUpdate={loadAppointments} />
-      )}
-
-      {componenteActivo === "panel-admin" && <AdminDashboard users={users} reloadUsers={loadUsers}/>}
+        {componenteActivo === "panel-admin" && role === "ADMIN" && (
+          <AdminDashboard users={users} reloadUsers={loadUsers} />
+        )}
     </section>
   );
 };

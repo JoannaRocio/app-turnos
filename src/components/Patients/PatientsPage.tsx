@@ -3,13 +3,14 @@ import { Patient } from "../../interfaces/Patient";
 import "./PatientsPage.scss";
 import PatientModalComponent from "../PatientModal/PatientModalComponent";
 import PatientService from "../../services/PatientService";
+import { useAuth } from "../../context/ContextAuth";
 
 const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => void }> = ({ patients, reloadPatients }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedPatient, setSelectedPatient] = useState<Partial<Patient> | null>(null);
-    // const [patient, setPatient] = useState<Patient[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
-    // const [showEditModal, setShowEditModal] = useState(false);
+    const { userRole } = useAuth();
+    const role = userRole ?? "";
 
     const handleRowClick = (patient: Patient) => {
     setSelectedPatient(patient);
@@ -68,9 +69,15 @@ const PatientsComponent: React.FC<{ patients: Patient[]; reloadPatients: () => v
     return (
 
         <section>
+            <h2 className="text-white">Listado de pacientes</h2>
+
             <div className="d-flex">
                 <h3 className="text-white">Pacientes</h3>
-                <button className="btn btn-light btn-nuevo"  onClick={handleNewPatient}>Nuevo</button>
+                {role !== "USUARIO" && (
+                  <button className="btn btn-light btn-nuevo" onClick={handleNewPatient}>
+                    Nuevo
+                  </button>
+                )}
             </div>
 
             <input
