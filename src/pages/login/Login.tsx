@@ -1,20 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Login.scss";
 import { useNavigate } from 'react-router-dom';
 import AuthService from "../../services/AuthService";
 import { useAuth } from "../../context/ContextAuth";
 import { IoMdEye, IoMdEyeOff} from "react-icons/io";
+import { useComponente } from "../../context/ContextComponent";
 
 const Login: React.FC = () => {
   const [username, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("")
   const [showPassword, setShowPassword] = useState(false);
+  const { componenteActivo, setComponenteActivo } = useComponente();
   
   const navigate = useNavigate();
   const { login } = useAuth();
   
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+
     e.preventDefault();
     setError("")
 
@@ -30,20 +33,12 @@ const Login: React.FC = () => {
       AuthService.saveRole(data.user.role); // Guarda "USUARIO", "ADMIN", etc.
 
       login(); // Actualiza estado de contexto
-      navigate("/Home");
+      setComponenteActivo("agenda-turnos");
+      navigate("/Sucursales");
+
     } else {
       setError(data.message ?? "Error de autenticación");
     }
-  
-    // const data = await AuthService.login(username, password);
-    // if (data.token != null) {
-    //   AuthService.saveToken(data.token);
-
-    //   login();
-    //   navigate("/Home");
-    // } else {
-    //   setError(data.message);
-    // }
   
   };
 
@@ -61,8 +56,6 @@ const Login: React.FC = () => {
           <div className="row">
             <div className="col">
               {error && <p className="error-message">{error}</p>}
-              {/* {success && <p className="success-message">{success}</p>} */}
-
               <form onSubmit={handleLogin}>
                 <div className="form-group">
                   <label htmlFor="user">Usuario:</label>

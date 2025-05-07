@@ -93,6 +93,12 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
               placeholder="Teléfono"
             />
             <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="Correo electrónico"
+            />
+            <input
               type="text"
               value={form.note}
               onChange={(e) => setForm({ ...form, note: e.target.value })}

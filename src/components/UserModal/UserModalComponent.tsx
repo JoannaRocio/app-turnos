@@ -59,7 +59,6 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
               onChange={(e) => setForm({ ...form, username: e.target.value })}
               placeholder="Nombre de usuario"
             />
-            {!user?.id && (
             <input
                 type="password"
                 autoComplete="new-password"
@@ -67,7 +66,6 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="Contraseña"
             />
-            )}
             <input
               type="email"
               value={form.email}

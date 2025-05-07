@@ -284,8 +284,8 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
                     <th>DNI</th>
                     <th>Asistencia</th>
                     <th>Obra Social</th>
-                    <th>Plan</th>
-                    <th>Teléfono</th>
+                    {/* <th>Plan</th> */}
+                    {/* <th>Teléfono</th> */}
                     <th>Motivo</th>
                     <th>Notas</th>
                     <th>Acciones</th>
@@ -308,8 +308,8 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
                         <td>{appt?.patient.documentNumber ?? "-"}</td>
                         <td>{appt?.state ? "✔️" : appt ? "❌" : "-"}</td>
                         <td>{appt?.patient.healthInsurance ?? "-"}</td>
-                        <td>{appt?.patient.insurancePlan ?? "-"}</td>
-                        <td>{appt?.patient.phone ?? "-"}</td>
+                        {/* <td>{appt?.patient.insurancePlan ?? "-"}</td> */}
+                        {/* <td>{appt?.patient.phone ?? "-"}</td> */}
                         <td>{appt?.reason ?? "-"}</td>
                         <td>{appt?.patient.note ?? "-"}</td>
                         <td onClick={handleClick}>

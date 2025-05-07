@@ -33,7 +33,7 @@ const MetricsComponent = () => {
       try {
         const [perDay, perWeek, stats] = await Promise.all([
           MetricsService.getAppointmentsPerDay(),
-          MetricsService.getNewPatientsPerWeek(),
+          MetricsService.getNewPatientsPerMonth(),
           MetricsService.getAppointmentStats()
         ]);
 
@@ -143,7 +143,7 @@ const MetricsComponent = () => {
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow metrics-container mt-6">
-        <h3 className="text-xl font-bold mb-4">Pacientes nuevos por día de la semana</h3>
+        <h3 className="text-xl font-bold mb-4">Pacientes nuevos por mes.</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={patientsByDayOfWeek}>
             <CartesianGrid strokeDasharray="3 3" />

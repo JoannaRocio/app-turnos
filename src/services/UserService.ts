@@ -26,8 +26,8 @@ class UserService {
 
   static async createUser(data: any): Promise<void> {
     const token = AuthService.getToken();
-  
-    const response = await fetch(this.BASE_URL, {
+    console.log(data, 'data, createuser')
+    const response = await fetch(`${this.BASE_URL}/save`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,8 @@ class UserService {
   }
   
   
-  static async updateUser(id: number, data: Partial<User>): Promise<void> {
+  
+  static async updateUser(id: number, data: Partial<User | null>): Promise<void> {
     const token = AuthService.getToken();
   
     const response = await fetch(`${this.BASE_URL}/${id}`, {

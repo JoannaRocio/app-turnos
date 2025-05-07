@@ -28,8 +28,8 @@ class MetricsService {
   }
 
   // ✅ Nuevos pacientes por semana
-  static async getNewPatientsPerWeek(): Promise<Record<number, number>> {
-    return this.fetchWithAuth(`${this.BASE_URL}/new-patients-per-week`);
+  static async getNewPatientsPerMonth(): Promise<Record<number, number>> {
+    return this.fetchWithAuth(`${this.BASE_URL}/new-patients-per-month`);
   }
 
   // ✅ Estadísticas de estado de turnos

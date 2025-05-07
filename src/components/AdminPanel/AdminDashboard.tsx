@@ -28,6 +28,7 @@ const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ 
     
     const handleSave = async (userData: Partial<User>) => {
       try {
+        console.log(selectedUser,'userdata')
         if (userData.id) {
           await UserService.updateUser(userData.id, userData);
           alert("Usuario actualizado con éxito");
@@ -48,7 +49,6 @@ const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ 
 
       const handleNewUser = () => {
         const emptyUser: Partial<User> = {
-          id: 0,
           username: "",
           password: "",
           email: "",

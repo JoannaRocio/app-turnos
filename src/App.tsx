@@ -1,5 +1,5 @@
 // src/App.tsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import HeaderComponent from "./components/HeaderComponent/HeaderComponent";
 import Home from "./pages/home/Home";
 import { ComponenteProvider } from "./context/ContextComponent";
@@ -9,18 +9,27 @@ import PasswordRecovery from "./pages/password-recovery/PasswordRecovery";
 import ResetPassword from "./pages/password-recovery/reset-password/ResetPassword";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import './App.scss';
+import BranchSelector from "./pages/branch-selector/BranchSelector";
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  const isBranchSelectorRoute = location.pathname.toLowerCase().includes("/sucursales");
+
 
   return (
     <>
-      {isAuthenticated && <HeaderComponent />}
+      {isAuthenticated && !isBranchSelectorRoute && <HeaderComponent />}
 
       <Routes>
-        <Route path="/Inicio-sesion" element={isAuthenticated ? <Navigate to="/Home" /> : <Login />} />
+        <Route path="/Inicio-sesion" element={<Login />} />
+
+        {/* <Route path="/Inicio-sesion" element={isAuthenticated ? <Navigate to="/Home" /> : <Login />} /> */}
         <Route path="/Recuperar-contraseña" element={isAuthenticated ? <Navigate to="/Home" /> : <PasswordRecovery />} />
         <Route path="/Cambiar-contrasena" element={isAuthenticated ? <Navigate to="/Home" /> : <ResetPassword />} />
+
+        <Route path="/Sucursales" element={<BranchSelector />} />
 
         {/* Ruta protegida por roles */}
         <Route

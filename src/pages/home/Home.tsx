@@ -17,7 +17,9 @@ import { useAuth } from "../../context/ContextAuth";
 const Home: React.FC = () => {
   
   // const { componenteActivo } = useComponente();
-  const [componenteActivo, setComponenteActivo] = useState<string>("agenda-turnos"); // ✅ valor por defecto
+  const { componenteActivo, setComponenteActivo } = useComponente();
+
+  // const [componenteActivo, setComponenteActivo] = useState<string>("agenda-turnos"); // ✅ valor por defecto
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -31,6 +33,9 @@ const Home: React.FC = () => {
     if (!componenteActivo) {
       setComponenteActivo("agenda-turnos");
     }
+    // if (!componenteActivo) {
+    //   setComponenteActivo("agenda-turnos");
+    // }
     const fetchData = async () => {
       if (componenteActivo === "pacientes") {
         await loadPatients();
@@ -50,7 +55,7 @@ const Home: React.FC = () => {
     }
 
     fetchData();
-  }, [componenteActivo, selectedProfessional]);
+  }, [componenteActivo, selectedProfessional, userRole]);
 
   const loadUsers = async () => {
     try {
@@ -102,6 +107,7 @@ const Home: React.FC = () => {
 
   return (
     <section className="home-section">
+      
         {componenteActivo === "pacientes" && ["USUARIO", "MODERADOR", "ADMIN"].includes(role) && (
           <PatientsComponent patients={patients ?? []} reloadPatients={loadPatients} />
         )}

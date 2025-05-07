@@ -10,8 +10,10 @@ const HeaderComponent: React.FC = () => {
   const { logout, userRole } = useAuth();
 
   const role = userRole ?? "";
+
   const handleLogOut = () => {
     logout();
+    setComponenteActivo("");
     navigate("/Inicio-sesion");
   };
 
