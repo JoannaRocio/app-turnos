@@ -20,7 +20,6 @@ class UserService {
       throw new Error(`Error al obtener usuarios: ${errorText}`);
     }
     const res = await response.json();
-    console.log(res, 'res');
     return res;
   }
 

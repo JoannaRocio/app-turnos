@@ -22,6 +22,8 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient }) =>
             <p><strong>Documento:</strong> {patient.documentType} {patient.documentNumber}</p>
             <p><strong>Obra Social:</strong> {patient.healthInsurance} - Plan {patient.insurancePlan}</p>
             <p><strong>Teléfono:</strong> {patient.phone}</p>
+            <p><strong>Correo electrónico:</strong> {patient.email}</p>
+
             <p>
                 <strong>Última visita:</strong>{" "}
                 {patient.lastVisitDate
@@ -39,10 +41,10 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient }) =>
             ) : (
             data.map(entry => (
                 <div key={entry.id} className="history-entry">
-                <p><strong>Fecha:</strong> {new Date(entry.dateTime).toLocaleString()}</p>
+                <p><strong>Fecha de última actualización:</strong> {entry.date}</p>
                 <p><strong>Profesional:</strong> {entry.professionalFullName}</p>
-                <p><strong>Motivo:</strong> {entry.reason}</p>
-                <p><strong>Estado:</strong> {entry.state}</p>
+                <p><strong>Descripción:</strong> {entry.description}</p>
+                <p><strong>Archivos adjuntos:</strong> {entry.state}</p>
                 </div>
             ))
             )}

@@ -1,0 +1,26 @@
+.table-healthInsurance {
+    width: 50%;
+    border-collapse: collapse;
+    font-size: 3rem !important;
+    background-color: gainsboro;
+    justify-self: center;
+
+    tr {
+        font-size: 1.6rem !important;
+    }
+
+    td {
+        text-align: center;
+        font-size: 1.6rem !important;
+    }
+}
+
+.btn-health {
+    width: 160px;
+    font-weight: 600 !important;
+    font-size: 1.4rem !important;
+}
+
+.form-health {
+    font-size: 1.4rem !important;
+}

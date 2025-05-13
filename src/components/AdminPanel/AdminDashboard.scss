@@ -10,6 +10,10 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-primary-hover);
+    }
   }
   
   .tab-button.active {
@@ -17,4 +21,5 @@
     color: white;
     font-weight: bold;
   }
+
   

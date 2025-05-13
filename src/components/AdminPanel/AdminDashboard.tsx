@@ -5,12 +5,14 @@ import UserService from "../../services/UserService";
 import { UserRole } from "../../interfaces/UserRole";
 import UserModalComponent from "../UserModal/UserModalComponent";
 import MetricsComponent from "../MetricsComponent/MetricsComponent";
+import HealthInsurancePanel from "../HealthInsurancePanel/HealthInsurancePanel";
 
 const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ users, reloadUsers }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<"usuarios" | "metricas">("usuarios");
+    // const [activeTab, setActiveTab] = useState<"usuarios" | "metricas">("usuarios");
+    const [activeTab, setActiveTab] = useState<"usuarios" | "metricas" | "obrasSociales">("usuarios");
 
     const handleRowClick = (user: User) => {
       setSelectedUser(user);
@@ -67,6 +69,12 @@ const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ 
         <h2 className="text-white">Panel de administrador</h2>
 
         <div className="tabs mb-4">
+          <button className={`tab-button ${activeTab === "usuarios" ? "active" : ""}`} onClick={() => setActiveTab("usuarios")}>Usuarios</button>
+          <button className={`tab-button ${activeTab === "metricas" ? "active" : ""}`} onClick={() => setActiveTab("metricas")}>Métricas</button>
+          <button className={`tab-button ${activeTab === "obrasSociales" ? "active" : ""}`} onClick={() => setActiveTab("obrasSociales")}>Obras Sociales</button>
+        </div>
+
+        {/* <div className="tabs mb-4">
           <button
             className={`tab-button ${activeTab === "usuarios" ? "active" : ""}`}
             onClick={() => setActiveTab("usuarios")}
@@ -79,7 +87,7 @@ const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ 
           >
             Métricas
           </button>
-        </div>
+        </div> */}
     
         {activeTab === "usuarios" && (
           <>
@@ -125,6 +133,8 @@ const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ 
         )}
     
         {activeTab === "metricas" && <MetricsComponent />}
+
+        {activeTab === "obrasSociales" && <HealthInsurancePanel />}
       </section>
     );    
 };

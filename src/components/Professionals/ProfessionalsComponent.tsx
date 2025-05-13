@@ -66,8 +66,6 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[], reloadPr
     return nameMatch || dniMatch;
     });
 
-    console.log(professionals,'en el componente')
-
     return (
         <section>
             <h2 className="text-white">Listado de profesionales</h2>
