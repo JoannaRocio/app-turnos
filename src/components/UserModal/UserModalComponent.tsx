@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import "./UserModalComponent.scss";
 import { User } from "../../interfaces/User";
 import { UserRole } from "../../interfaces/UserRole";
+import { Professional } from "../../interfaces/Professional";
 
 interface UserModalComponentProps {
   isOpen: boolean;
   onClose: () => void;
   user: Partial<User> | null;
   onSave: (updated: Partial<User>) => void;
+  professionals: Professional[];
 }
 
 const UserModalComponent: React.FC<UserModalComponentProps> = ({
@@ -15,24 +17,27 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
   onClose,
   user,
   onSave,
+  professionals
 }) => {
 
-  const [form, setForm] = useState<Partial<User>>({
+  const [form, setForm] = useState<Partial<User> & { professionalId?: number }>({
     username: "",
     password: "",
     email: "",
     role: UserRole.USUARIO,
+    professionalId: undefined,
   });
   
   useEffect(() => {
     if (user) {
-      setForm(user);
+      setForm({ ...user });
     } else {
       setForm({
         username: "",
         password: "",
         email: "",
         role: UserRole.USUARIO,
+        professionalId: undefined,
       });
     }
   }, [user]);
@@ -81,6 +86,20 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
                 <option value="MODERADOR">MODERADOR</option>
                 <option value="USUARIO">USUARIO</option>
             </select>
+
+            {form.role === UserRole.USUARIO && (
+              <select
+                value={form.professionalId ?? ""}
+                onChange={(e) => setForm({ ...form, professionalId: Number(e.target.value) })}
+              >
+                <option value="">Seleccione un profesional...</option>
+                {professionals.map((prof) => (
+                  <option key={prof.professionalId} value={prof.professionalId}>
+                    {prof.professionalName}
+                  </option>
+                ))}
+              </select>
+            )}
             <div className="modal-buttons">
               <button type="submit" disabled={!form.username || !form.email || !form.password || !form.role}>Guardar</button>
               <button type="button" onClick={onClose}>Cancelar</button>

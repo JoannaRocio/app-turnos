@@ -33,9 +33,6 @@ const Home: React.FC = () => {
     if (!componenteActivo) {
       setComponenteActivo("agenda-turnos");
     }
-    // if (!componenteActivo) {
-    //   setComponenteActivo("agenda-turnos");
-    // }
     const fetchData = async () => {
       if (componenteActivo === "pacientes") {
         await loadPatients();
@@ -55,7 +52,7 @@ const Home: React.FC = () => {
     }
 
     fetchData();
-  }, [componenteActivo, selectedProfessional, userRole]);
+  }, [componenteActivo, selectedProfessional, setComponenteActivo, userRole]);
 
   const loadUsers = async () => {
     try {
@@ -79,6 +76,7 @@ const Home: React.FC = () => {
   const loadAllProfessionals = async () => {
     try {
       const data = await ProfessionalService.getAllProfessionals();
+      setSelectedProfessional(data[0])
       setProfessionals(data);
     } catch (error) {
       console.error("Error al cargar los profesionales:", error);
@@ -108,8 +106,8 @@ const Home: React.FC = () => {
   return (
     <section className="home-section">
       
-        {componenteActivo === "pacientes" && ["USUARIO", "MODERADOR", "ADMIN"].includes(role) && (
-          <PatientsComponent patients={patients ?? []} reloadPatients={loadPatients} />
+        {componenteActivo === "pacientes" && ["USUARIO", "MODERADOR", "ADMIN"].includes(role) && selectedProfessional?.professionalId !== undefined && (
+          <PatientsComponent patients={patients ?? []} professionalId={selectedProfessional?.professionalId} reloadPatients={loadPatients} />
         )}
 
         {componenteActivo === "profesionales" && ["MODERADOR", "ADMIN"].includes(role) && (
@@ -126,7 +124,7 @@ const Home: React.FC = () => {
         )}
 
         {componenteActivo === "panel-admin" && role === "ADMIN" && (
-          <AdminDashboard users={users} reloadUsers={loadUsers} />
+          <AdminDashboard users={users} reloadUsers={loadUsers} professionals={professionals} />
         )}
     </section>
   );

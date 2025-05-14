@@ -13,6 +13,7 @@ import { FiMoreVertical } from "react-icons/fi";
 import ClinicalHistoryComponent from "../ClinicalHistoryComponent/ClinicalHistory";
 import { ClinicalHistoryEntry } from "../../interfaces/ClinicalHistoryEntry";
 import ClinicalHistoryService from "../../services/ClinicalHistoryService";
+import ActionDropdown from "../ActionDropdown/ActionDropdown";
 
 interface Props {
   patients: Patient[];
@@ -84,7 +85,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
   
   const openClinicalHistory = async (appt: any) => {
     try {
-      const data = await ClinicalHistoryService.getOrCreate(appt.patient);
+      const data = await ClinicalHistoryService.getOrCreate(appt.patient, appt.professionalId);
       setShowClinicalHistory(true);
       setClinicalHistoryData(data);
       setPatientData(appt.patient); 
@@ -115,7 +116,7 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
       setDniSearch("");
     }
   }, [isModalOpen, isEditMode, currentAppointment, patients]);
-  
+
   useEffect(() => {
     const matchByName = patients.find(p =>
       nameSearch && p.fullName?.toLowerCase().includes(nameSearch.toLowerCase())
@@ -263,8 +264,8 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
       </h3>
     </section>
 
-    {showClinicalHistory && patientData ? (
-      <ClinicalHistoryComponent data={clinicalHistoryData} patient={patientData} onBack={() => setShowClinicalHistory(false)} />
+    {showClinicalHistory && patientData && selectedProfessional?.professionalId !== undefined ? (
+      <ClinicalHistoryComponent data={clinicalHistoryData} patient={patientData} professionalId={selectedProfessional?.professionalId} onBack={() => setShowClinicalHistory(false)} />
       ) : (
       
       <section className="container-fluid">
@@ -313,18 +314,14 @@ const AppointmentsComponent: React.FC<Props> = ({ appointments, patients, profes
                         <td>{appt?.reason ?? "-"}</td>
                         <td>{appt?.patient.note ?? "-"}</td>
                         <td onClick={handleClick}>
-                          <Dropdown show={activeDropdownIndex === index}
-                            onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}>
-                            <Dropdown.Toggle disabled={!appt} variant="secondary" size="lg" className="no-caret" style={{ width: '100%' }}>
-                              <FiMoreVertical size={20} />
-                            </Dropdown.Toggle>
-
-                            <Dropdown.Menu>
-                              <Dropdown.Item className="item-drop" onClick={() => openClinicalHistory(appt)}>Ver ficha</Dropdown.Item>
-                              <Dropdown.Item className="item-drop" onClick={() => openModalForTime(time)}>Editar</Dropdown.Item>
-                              <Dropdown.Item className="item-drop" onClick={() => confirmDelete(appt, time)}>Eliminar</Dropdown.Item>
-                            </Dropdown.Menu>
-                          </Dropdown>
+                          <ActionDropdown
+                            disabled={!appt}
+                            isOpen={activeDropdownIndex === index}
+                            onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                            onView={() => openClinicalHistory(appt)}
+                            onEdit={() => openModalForTime(time)}
+                            onDelete={() => confirmDelete(appt, time)}
+                          />
                         </td>
                       </tr>
                     );

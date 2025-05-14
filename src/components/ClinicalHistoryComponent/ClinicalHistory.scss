@@ -70,3 +70,37 @@
     }
   }
   
+  .new-entry {
+    margin-top: 2rem;
+  
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      resize: vertical;
+      font-size: 1rem;
+    }
+  
+    button {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  
+    .error {
+      color: red;
+      margin-top: 0.5rem;
+    }
+  }
+
+  .textArea-clinialHistory {
+    font-size: 1.5rem !important;
+  }
+  
+  .btn-guardar-clinicalHistory {
+    font-size: 1.5rem !important;
+  }
+
+  .form-clinicalHistory {
+    font-size: 1.5rem !important;
+  }

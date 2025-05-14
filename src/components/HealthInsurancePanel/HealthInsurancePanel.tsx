@@ -30,7 +30,66 @@ type ArancelEntry = {
   amount: number;
 };
 
+interface Plan {
+  id: number;
+  insuranceId: number; // Relación con la obra social
+  name: string;
+}
+
+const mockPlans: Plan[] = [
+  { id: 1, insuranceId: 1, name: "OSDE 210" },
+  { id: 2, insuranceId: 1, name: "OSDE 310" },
+  { id: 3, insuranceId: 2, name: "SMG Classic" },
+  { id: 4, insuranceId: 2, name: "SMG Premium" },
+  { id: 5, insuranceId: 3, name: "Galeno Azul" },
+  { id: 6, insuranceId: 3, name: "Galeno Oro" },
+];
+
 const HealthInsurancePanel: React.FC = () => {
+  // Planes
+  const [plans, setPlans] = useState<Plan[]>(mockPlans);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [selectedInsuranceForPlan, setSelectedInsuranceForPlan] = useState<number | "">("");
+  const [planInput, setPlanInput] = useState("");
+
+  const handleEditPlan = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setSelectedInsuranceForPlan(plan.insuranceId);
+    setPlanInput(plan.name);
+  };
+  
+  const handleDeletePlan = (id: number) => {
+    setPlans(plans.filter((p) => p.id !== id));
+  };
+  
+  const handleSavePlan = () => {
+    const trimmed = planInput.trim();
+    if (!trimmed || selectedInsuranceForPlan === "") return;
+  
+    if (selectedPlan) {
+      setPlans(
+        plans.map((p) =>
+          p.id === selectedPlan.id
+            ? { ...p, name: trimmed, insuranceId: Number(selectedInsuranceForPlan) }
+            : p
+        )
+      );
+    } else {
+      setPlans([
+        ...plans,
+        {
+          id: Date.now(),
+          name: trimmed,
+          insuranceId: Number(selectedInsuranceForPlan),
+        },
+      ]);
+    }
+  
+    setSelectedPlan(null);
+    setPlanInput("");
+    setSelectedInsuranceForPlan("");
+  };
+
   // Aranceles 
   const [aranceles, setAranceles] = useState<ArancelEntry[]>([]);
   const [selectedInsuranceId, setSelectedInsuranceId] = useState<number | "">("");
@@ -145,11 +204,6 @@ const HealthInsurancePanel: React.FC = () => {
         <div className="col-md-8 col-12">
           <h3 className="text-white">Obras Sociales</h3>
         </div>
-        {/* <div className="col-md-4 col-12 text-md-end mt-2 mt-md-0">
-          <button className="btn btn-light btn-health" onClick={handleNewInsurance}>
-            Nueva
-          </button>
-        </div> */}
       </div>
 
       <div className="row">
@@ -208,6 +262,100 @@ const HealthInsurancePanel: React.FC = () => {
               </div>
               <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveInsurance}>
                 {selectedInsurance ? "Guardar cambios" : "Agregar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr className="my-5 border-light" />
+
+      {/* ---------------------- Planes ---------------------- */}
+      <div className="row align-items-center mb-4">
+        <div className="col-md-8 col-12">
+          <h3 className="text-white">Planes por Obra Social</h3>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-12">
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover table-striped bg-white">
+              <thead className="table-dark">
+                <tr>
+                  <th>Plan</th>
+                  <th>Obra Social</th>
+                  <th style={{ width: "200px" }}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plans.map((plan) => {
+                  const insuranceName = insurances.find((i) => i.id === plan.insuranceId)?.name || "N/A";
+                  return (
+                    <tr key={plan.id}>
+                      <td>{plan.name}</td>
+                      <td>{insuranceName}</td>
+                      <td>
+                        <div className="d-flex justify-content-center">
+                          <button
+                            className="btn btn-warning btn-lg me-2 btn-health"
+                            onClick={() => handleEditPlan(plan)}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            className="btn btn-danger btn-lg btn-health"
+                            onClick={() => handleDeletePlan(plan.id)}
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div className="row mt-4 mb-5">
+        <div className="col-lg-6 col-md-8 col-sm-12">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">
+                {selectedPlan ? "Editar plan" : "Agregar plan"}
+              </h5>
+              <div className="mb-3">
+                <select
+                  className="form-select form-health"
+                  value={selectedInsuranceForPlan}
+                  onChange={(e) => setSelectedInsuranceForPlan(Number(e.target.value))}
+                >
+                  <option value="">Seleccionar obra social</option>
+                  {insurances.map((i) => (
+                    <option key={i.id} value={i.id}>
+                      {i.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control form-health"
+                    placeholder="Nombre del plan"
+                  value={planInput}
+                  onChange={(e) => setPlanInput(e.target.value)}
+                />
+              </div>
+
+              <button
+                className="btn btn-primary btn-health btn-lg"
+                onClick={handleSavePlan}
+              >
+                {selectedPlan ? "Guardar cambios" : "Agregar"}
               </button>
             </div>
           </div>

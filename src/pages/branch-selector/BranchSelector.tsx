@@ -21,7 +21,7 @@ const BranchSelector: React.FC = () => {
           Puerto Madero
         </button>
         <button className="btn btn-primary btn-branch" onClick={() => handleSelectBranch("Rafael Castillo")}>
-          Rafael Castillo
+          Casanova
         </button>
       </div>
     </div>

@@ -6,8 +6,9 @@ import { UserRole } from "../../interfaces/UserRole";
 import UserModalComponent from "../UserModal/UserModalComponent";
 import MetricsComponent from "../MetricsComponent/MetricsComponent";
 import HealthInsurancePanel from "../HealthInsurancePanel/HealthInsurancePanel";
+import { Professional } from "../../interfaces/Professional";
 
-const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ users, reloadUsers }) => {
+const AdminDashboard: React.FC<{ users: User[]; professionals: Professional[]; reloadUsers: () => void }> = ({ users, professionals, reloadUsers }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -127,8 +128,7 @@ const AdminDashboard: React.FC<{ users: User[]; reloadUsers: () => void }> = ({ 
               isOpen={modalOpen}
               onClose={() => setModalOpen(false)}
               user={selectedUser}
-              onSave={handleSave}
-            />
+              onSave={handleSave} professionals={professionals}            />
           </>
         )}
     

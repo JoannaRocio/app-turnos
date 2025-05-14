@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { Patient } from "../../interfaces/Patient";
 import "./ProfessionalsComponent.scss";
 import PatientModalComponent from "../PatientModal/PatientModalComponent";
 import { Professional } from "../../interfaces/Professional";
 import ProfessionalService from "../../services/ProfessionalService";
 import ProfessionalModal from "../ProfessionalModal/ProfessionalModal";
+import { User } from "../../interfaces/User";
+import { useAuth } from "../../context/ContextAuth";
 
 interface Props {
     professionals: Professional[];
@@ -15,7 +17,8 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[], reloadPr
     const [searchTerm, setSearchTerm] = useState("");
     // const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional>>();
     const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional> | null>(null);
-
+    const { userRole } = useAuth();
+    const isUsuario = userRole === "USUARIO";
     const [showEditModal, setShowEditModal] = useState(false);
 
     const handleRowClick = (professional: Professional) => {
@@ -72,7 +75,12 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[], reloadPr
 
             <div className="d-flex">
                 <h3 className="text-white">Profesionales</h3>
-                <button className="btn btn-light btn-nuevo"  onClick={handleNewProfessional}>Nuevo</button>
+                {!isUsuario && (
+                  <button className="btn btn-light btn-nuevo" onClick={handleNewProfessional}>
+                    Nuevo
+                  </button>
+                )}
+                {/* <button className="btn btn-light btn-nuevo"  onClick={handleNewProfessional}>Nuevo</button> */}
             </div>
 
             <input
@@ -98,7 +106,15 @@ const ProfessionalsComponent: React.FC<{ professionals: Professional[], reloadPr
             </thead>
             <tbody>
                 {filteredProfessional.map((professional, index) => (
-                    <tr key={index} onClick={() => handleRowClick(professional)} className="clickable-row">
+                    <tr 
+                    key={index} 
+                    onClick={() => {
+                      if (!isUsuario) handleRowClick(professional);
+                    }}
+                    className={!isUsuario ? "clickable-row" : ""}
+                    // onClick={() => handleRowClick(professional)} 
+                    // className="clickable-row"
+                    >
                     <td>{professional?.professionalName || "-"}</td>
                     <td>{professional?.documentType || "-"}</td>
                     <td>{professional?.professionalDni || "-"}</td>
