@@ -1,16 +1,16 @@
-import { Appointment } from "../interfaces/Appointment";
+import { Appointment } from '../interfaces/Appointment';
 
 class AppointmentService {
-  private static readonly TOKEN_KEY = "token";
+  private static readonly TOKEN_KEY = 'token';
 
   static async createAppointment(appointment: any) {
     const token = localStorage.getItem(this.TOKEN_KEY);
 
-    const response = await fetch("http://localhost:8080/api/appointments", {
-      method: "POST",
+    const response = await fetch('http://localhost:8080/api/appointments', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
       },
       body: JSON.stringify(appointment),
     });
@@ -27,10 +27,10 @@ class AppointmentService {
   static async getAllAppointments(): Promise<Appointment[]> {
     const token = localStorage.getItem(this.TOKEN_KEY);
 
-    const response = await fetch("http://localhost:8080/api/appointments", {
-      method: "GET",
+    const response = await fetch('http://localhost:8080/api/appointments', {
+      method: 'GET',
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token ? `Bearer ${token}` : '',
       },
     });
 
@@ -46,12 +46,15 @@ class AppointmentService {
   static async getAppointmentByDni(professionalDni: string): Promise<Appointment[]> {
     const token = localStorage.getItem(this.TOKEN_KEY);
 
-    const response = await fetch(`http://localhost:8080/api/appointments/professional/dni/${professionalDni}`, {
-      method: "GET",
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
+    const response = await fetch(
+      `http://localhost:8080/api/appointments/professional/dni/${professionalDni}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.text();
@@ -62,15 +65,14 @@ class AppointmentService {
     return rawData;
   }
 
-
   static async updateAppointment(id: number, appointment: any) {
     const token = localStorage.getItem(this.TOKEN_KEY);
 
     const response = await fetch(`http://localhost:8080/api/appointments/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
       },
       body: JSON.stringify(appointment),
     });
@@ -85,19 +87,19 @@ class AppointmentService {
 
   static async deleteAppointment(id: number): Promise<string> {
     const token = localStorage.getItem(this.TOKEN_KEY);
-  
+
     const response = await fetch(`http://localhost:8080/api/appointments/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token ? `Bearer ${token}` : '',
       },
     });
-  
+
     if (!response.ok) {
       const error = await response.text();
       throw new Error(error);
     }
-  
+
     return await response.text();
   }
 }

@@ -1,6 +1,6 @@
-import React from "react";
-import { Dropdown } from "react-bootstrap";
-import { FiMoreVertical } from "react-icons/fi";
+import React from 'react';
+import { Dropdown } from 'react-bootstrap';
+import { FiMoreVertical } from 'react-icons/fi';
 
 interface ActionDropdownProps {
   onView?: () => void;
@@ -26,7 +26,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
         variant="secondary"
         size="lg"
         className="no-caret"
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
       >
         <FiMoreVertical size={20} />
       </Dropdown.Toggle>

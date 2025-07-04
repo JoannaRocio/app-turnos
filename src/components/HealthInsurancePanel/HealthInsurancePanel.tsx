@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import "./HealthInsurancePanel.scss";
+import React, { useState } from 'react';
+import './HealthInsurancePanel.scss';
 
 interface HealthInsurance {
   id: number;
@@ -12,15 +12,15 @@ interface Service {
 }
 
 const mockInsurances: HealthInsurance[] = [
-  { id: 1, name: "OSDE" },
-  { id: 2, name: "Swiss Medical" },
-  { id: 3, name: "Galeno" },
+  { id: 1, name: 'OSDE' },
+  { id: 2, name: 'Swiss Medical' },
+  { id: 3, name: 'Galeno' },
 ];
 
 const mockServices: Service[] = [
-  { id: 1, name: "Limpieza de sarro" },
-  { id: 2, name: "Extracción de muela" },
-  { id: 3, name: "Tratamiento de conducto" },
+  { id: 1, name: 'Limpieza de sarro' },
+  { id: 2, name: 'Extracción de muela' },
+  { id: 3, name: 'Tratamiento de conducto' },
 ];
 
 type ArancelEntry = {
@@ -37,38 +37,38 @@ interface Plan {
 }
 
 const mockPlans: Plan[] = [
-  { id: 1, insuranceId: 1, name: "OSDE 210" },
-  { id: 2, insuranceId: 1, name: "OSDE 310" },
-  { id: 3, insuranceId: 2, name: "SMG Classic" },
-  { id: 4, insuranceId: 2, name: "SMG Premium" },
-  { id: 5, insuranceId: 3, name: "Galeno Azul" },
-  { id: 6, insuranceId: 3, name: "Galeno Oro" },
+  { id: 1, insuranceId: 1, name: 'OSDE 210' },
+  { id: 2, insuranceId: 1, name: 'OSDE 310' },
+  { id: 3, insuranceId: 2, name: 'SMG Classic' },
+  { id: 4, insuranceId: 2, name: 'SMG Premium' },
+  { id: 5, insuranceId: 3, name: 'Galeno Azul' },
+  { id: 6, insuranceId: 3, name: 'Galeno Oro' },
 ];
 
 const HealthInsurancePanel: React.FC = () => {
   // Planes
   const [plans, setPlans] = useState<Plan[]>(mockPlans);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [selectedInsuranceForPlan, setSelectedInsuranceForPlan] = useState<number | "">("");
-  const [planInput, setPlanInput] = useState("");
+  const [selectedInsuranceForPlan, setSelectedInsuranceForPlan] = useState<number | ''>('');
+  const [planInput, setPlanInput] = useState('');
 
   const handleEditPlan = (plan: Plan) => {
     setSelectedPlan(plan);
     setSelectedInsuranceForPlan(plan.insuranceId);
     setPlanInput(plan.name);
   };
-  
+
   const handleDeletePlan = (id: number) => {
-    setPlans(plans.filter((p) => p.id !== id));
+    setPlans(plans.filter(p => p.id !== id));
   };
-  
+
   const handleSavePlan = () => {
     const trimmed = planInput.trim();
-    if (!trimmed || selectedInsuranceForPlan === "") return;
-  
+    if (!trimmed || selectedInsuranceForPlan === '') return;
+
     if (selectedPlan) {
       setPlans(
-        plans.map((p) =>
+        plans.map(p =>
           p.id === selectedPlan.id
             ? { ...p, name: trimmed, insuranceId: Number(selectedInsuranceForPlan) }
             : p
@@ -84,29 +84,29 @@ const HealthInsurancePanel: React.FC = () => {
         },
       ]);
     }
-  
+
     setSelectedPlan(null);
-    setPlanInput("");
-    setSelectedInsuranceForPlan("");
+    setPlanInput('');
+    setSelectedInsuranceForPlan('');
   };
 
-  // Aranceles 
+  // Aranceles
   const [aranceles, setAranceles] = useState<ArancelEntry[]>([]);
-  const [selectedInsuranceId, setSelectedInsuranceId] = useState<number | "">("");
-  const [selectedServiceId, setSelectedServiceId] = useState<number | "">("");
-  const [amountInput, setAmountInput] = useState<string>("");
+  const [selectedInsuranceId, setSelectedInsuranceId] = useState<number | ''>('');
+  const [selectedServiceId, setSelectedServiceId] = useState<number | ''>('');
+  const [amountInput, setAmountInput] = useState<string>('');
 
   const handleSaveArancel = () => {
     if (
-      selectedInsuranceId === "" ||
-      selectedServiceId === "" ||
-      amountInput.trim() === "" ||
+      selectedInsuranceId === '' ||
+      selectedServiceId === '' ||
+      amountInput.trim() === '' ||
       isNaN(Number(amountInput))
     ) {
-      alert("Completa todos los campos correctamente");
+      alert('Completa todos los campos correctamente');
       return;
     }
-  
+
     setAranceles([
       ...aranceles,
       {
@@ -116,21 +116,21 @@ const HealthInsurancePanel: React.FC = () => {
         amount: Number(amountInput),
       },
     ]);
-  
+
     // Reset
-    setSelectedInsuranceId("");
-    setSelectedServiceId("");
-    setAmountInput("");
-  }
+    setSelectedInsuranceId('');
+    setSelectedServiceId('');
+    setAmountInput('');
+  };
 
   // Obras Sociales
   const [insurances, setInsurances] = useState<HealthInsurance[]>(mockInsurances);
   const [selectedInsurance, setSelectedInsurance] = useState<HealthInsurance | null>(null);
-  const [insuranceInput, setInsuranceInput] = useState("");
+  const [insuranceInput, setInsuranceInput] = useState('');
 
   const handleNewInsurance = () => {
     setSelectedInsurance(null);
-    setInsuranceInput("");
+    setInsuranceInput('');
   };
 
   const handleEditInsurance = (insurance: HealthInsurance) => {
@@ -139,35 +139,33 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   const handleDeleteInsurance = (id: number) => {
-    setInsurances(insurances.filter((i) => i.id !== id));
+    setInsurances(insurances.filter(i => i.id !== id));
   };
 
   const handleSaveInsurance = () => {
     const trimmed = insuranceInput.trim();
-    if (trimmed === "") return;
+    if (trimmed === '') return;
 
     if (selectedInsurance) {
       setInsurances(
-        insurances.map((i) =>
-          i.id === selectedInsurance.id ? { ...i, name: trimmed } : i
-        )
+        insurances.map(i => (i.id === selectedInsurance.id ? { ...i, name: trimmed } : i))
       );
     } else {
       setInsurances([...insurances, { id: Date.now(), name: trimmed }]);
     }
 
     setSelectedInsurance(null);
-    setInsuranceInput("");
+    setInsuranceInput('');
   };
 
   // Servicios
   const [services, setServices] = useState<Service[]>(mockServices);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [serviceInput, setServiceInput] = useState("");
+  const [serviceInput, setServiceInput] = useState('');
 
   const handleNewService = () => {
     setSelectedService(null);
-    setServiceInput("");
+    setServiceInput('');
   };
 
   const handleEditService = (service: Service) => {
@@ -176,25 +174,21 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   const handleDeleteService = (id: number) => {
-    setServices(services.filter((s) => s.id !== id));
+    setServices(services.filter(s => s.id !== id));
   };
 
   const handleSaveService = () => {
     const trimmed = serviceInput.trim();
-    if (trimmed === "") return;
+    if (trimmed === '') return;
 
     if (selectedService) {
-      setServices(
-        services.map((s) =>
-          s.id === selectedService.id ? { ...s, name: trimmed } : s
-        )
-      );
+      setServices(services.map(s => (s.id === selectedService.id ? { ...s, name: trimmed } : s)));
     } else {
       setServices([...services, { id: Date.now(), name: trimmed }]);
     }
 
     setSelectedService(null);
-    setServiceInput("");
+    setServiceInput('');
   };
 
   return (
@@ -213,11 +207,11 @@ const HealthInsurancePanel: React.FC = () => {
               <thead className="table-dark">
                 <tr>
                   <th>Nombre</th>
-                  <th style={{ width: "200px" }}>Acciones</th>
+                  <th style={{ width: '200px' }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {insurances.map((insurance) => (
+                {insurances.map(insurance => (
                   <tr key={insurance.id}>
                     <td>{insurance.name}</td>
                     <td>
@@ -249,7 +243,7 @@ const HealthInsurancePanel: React.FC = () => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title">
-                {selectedInsurance ? "Editar obra social" : "Agregar obra social"}
+                {selectedInsurance ? 'Editar obra social' : 'Agregar obra social'}
               </h5>
               <div className="mb-3">
                 <input
@@ -257,11 +251,11 @@ const HealthInsurancePanel: React.FC = () => {
                   className="form-control form-health"
                   placeholder="Nombre de la obra social"
                   value={insuranceInput}
-                  onChange={(e) => setInsuranceInput(e.target.value)}
+                  onChange={e => setInsuranceInput(e.target.value)}
                 />
               </div>
               <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveInsurance}>
-                {selectedInsurance ? "Guardar cambios" : "Agregar"}
+                {selectedInsurance ? 'Guardar cambios' : 'Agregar'}
               </button>
             </div>
           </div>
@@ -285,12 +279,13 @@ const HealthInsurancePanel: React.FC = () => {
                 <tr>
                   <th>Plan</th>
                   <th>Obra Social</th>
-                  <th style={{ width: "200px" }}>Acciones</th>
+                  <th style={{ width: '200px' }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {plans.map((plan) => {
-                  const insuranceName = insurances.find((i) => i.id === plan.insuranceId)?.name || "N/A";
+                {plans.map(plan => {
+                  const insuranceName =
+                    insurances.find(i => i.id === plan.insuranceId)?.name || 'N/A';
                   return (
                     <tr key={plan.id}>
                       <td>{plan.name}</td>
@@ -324,17 +319,15 @@ const HealthInsurancePanel: React.FC = () => {
         <div className="col-lg-6 col-md-8 col-sm-12">
           <div className="card">
             <div className="card-body">
-              <h5 className="card-title">
-                {selectedPlan ? "Editar plan" : "Agregar plan"}
-              </h5>
+              <h5 className="card-title">{selectedPlan ? 'Editar plan' : 'Agregar plan'}</h5>
               <div className="mb-3">
                 <select
                   className="form-select form-health"
                   value={selectedInsuranceForPlan}
-                  onChange={(e) => setSelectedInsuranceForPlan(Number(e.target.value))}
+                  onChange={e => setSelectedInsuranceForPlan(Number(e.target.value))}
                 >
                   <option value="">Seleccionar obra social</option>
-                  {insurances.map((i) => (
+                  {insurances.map(i => (
                     <option key={i.id} value={i.id}>
                       {i.name}
                     </option>
@@ -342,20 +335,17 @@ const HealthInsurancePanel: React.FC = () => {
                 </select>
               </div>
               <div className="mb-3">
-                  <input
-                    type="text"
-                    className="form-control form-health"
-                    placeholder="Nombre del plan"
+                <input
+                  type="text"
+                  className="form-control form-health"
+                  placeholder="Nombre del plan"
                   value={planInput}
-                  onChange={(e) => setPlanInput(e.target.value)}
+                  onChange={e => setPlanInput(e.target.value)}
                 />
               </div>
 
-              <button
-                className="btn btn-primary btn-health btn-lg"
-                onClick={handleSavePlan}
-              >
-                {selectedPlan ? "Guardar cambios" : "Agregar"}
+              <button className="btn btn-primary btn-health btn-lg" onClick={handleSavePlan}>
+                {selectedPlan ? 'Guardar cambios' : 'Agregar'}
               </button>
             </div>
           </div>
@@ -383,11 +373,11 @@ const HealthInsurancePanel: React.FC = () => {
               <thead className="table-dark">
                 <tr>
                   <th>Nombre del Servicio</th>
-                  <th style={{ width: "200px" }}>Acciones</th>
+                  <th style={{ width: '200px' }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {services.map((service) => (
+                {services.map(service => (
                   <tr key={service.id}>
                     <td>{service.name}</td>
                     <td>
@@ -419,7 +409,7 @@ const HealthInsurancePanel: React.FC = () => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title">
-                {selectedService ? "Editar servicio" : "Agregar servicio"}
+                {selectedService ? 'Editar servicio' : 'Agregar servicio'}
               </h5>
               <div className="mb-3">
                 <input
@@ -427,14 +417,11 @@ const HealthInsurancePanel: React.FC = () => {
                   className="form-control form-health"
                   placeholder="Nombre del servicio"
                   value={serviceInput}
-                  onChange={(e) => setServiceInput(e.target.value)}
+                  onChange={e => setServiceInput(e.target.value)}
                 />
               </div>
-              <button
-                className="btn btn-primary btn-health btn-lg"
-                onClick={handleSaveService}
-              >
-                {selectedService ? "Guardar cambios" : "Agregar"}
+              <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveService}>
+                {selectedService ? 'Guardar cambios' : 'Agregar'}
               </button>
             </div>
           </div>
@@ -460,10 +447,10 @@ const HealthInsurancePanel: React.FC = () => {
                 <select
                   className="form-select form-health"
                   value={selectedInsuranceId}
-                  onChange={(e) => setSelectedInsuranceId(Number(e.target.value))}
+                  onChange={e => setSelectedInsuranceId(Number(e.target.value))}
                 >
                   <option value="">Seleccionar obra social</option>
-                  {insurances.map((i) => (
+                  {insurances.map(i => (
                     <option key={i.id} value={i.id}>
                       {i.name}
                     </option>
@@ -474,10 +461,10 @@ const HealthInsurancePanel: React.FC = () => {
                 <select
                   className="form-select form-health"
                   value={selectedServiceId}
-                  onChange={(e) => setSelectedServiceId(Number(e.target.value))}
+                  onChange={e => setSelectedServiceId(Number(e.target.value))}
                 >
                   <option value="">Seleccionar servicio</option>
-                  {services.map((s) => (
+                  {services.map(s => (
                     <option key={s.id} value={s.id}>
                       {s.name}
                     </option>
@@ -490,13 +477,10 @@ const HealthInsurancePanel: React.FC = () => {
                   className="form-control form-health"
                   placeholder="Monto / Arancel"
                   value={amountInput}
-                  onChange={(e) => setAmountInput(e.target.value)}
+                  onChange={e => setAmountInput(e.target.value)}
                 />
               </div>
-              <button
-                className="btn btn-primary btn-health btn-lg"
-                onClick={handleSaveArancel}
-              >
+              <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveArancel}>
                 Guardar
               </button>
               {/* <button
@@ -525,9 +509,10 @@ const HealthInsurancePanel: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {aranceles.map((a) => {
-                    const insuranceName = insurances.find((i) => i.id === a.insuranceId)?.name || "N/A";
-                    const serviceName = services.find((s) => s.id === a.serviceId)?.name || "N/A";
+                  {aranceles.map(a => {
+                    const insuranceName =
+                      insurances.find(i => i.id === a.insuranceId)?.name || 'N/A';
+                    const serviceName = services.find(s => s.id === a.serviceId)?.name || 'N/A';
 
                     return (
                       <tr key={a.id}>
@@ -543,7 +528,6 @@ const HealthInsurancePanel: React.FC = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

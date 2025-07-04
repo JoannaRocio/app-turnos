@@ -1,20 +1,20 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "./HeaderComponent.scss";
-import { useComponente } from "../../context/ContextComponent";
-import { useAuth } from "../../context/ContextAuth";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import './HeaderComponent.scss';
+import { useComponente } from '../../context/ContextComponent';
+import { useAuth } from '../../context/ContextAuth';
 
 const HeaderComponent: React.FC = () => {
   const navigate = useNavigate();
   const { componenteActivo, setComponenteActivo } = useComponente();
   const { logout, userRole } = useAuth();
 
-  const role = userRole ?? "";
+  const role = userRole ?? '';
 
   const handleLogOut = () => {
     logout();
-    setComponenteActivo("");
-    navigate("/Inicio-sesion");
+    setComponenteActivo('');
+    navigate('/Inicio-sesion');
   };
 
   return (
@@ -25,28 +25,40 @@ const HeaderComponent: React.FC = () => {
         <nav>
           <ul className="nav">
             <li className="nav-item">
-              <button className={`nav-link btn text-white ${componenteActivo === "agenda-turnos" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("agenda-turnos")}>
+              <button
+                className={`nav-link btn text-white ${componenteActivo === 'agenda-turnos' ? 'fw-bold' : ''}`}
+                onClick={() => setComponenteActivo('agenda-turnos')}
+              >
                 Agenda de turnos
               </button>
             </li>
 
             <li className="nav-item">
-              <button className={`nav-link btn text-white ${componenteActivo === "pacientes" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("pacientes")}>
+              <button
+                className={`nav-link btn text-white ${componenteActivo === 'pacientes' ? 'fw-bold' : ''}`}
+                onClick={() => setComponenteActivo('pacientes')}
+              >
                 Pacientes
               </button>
             </li>
 
-            {(role === "ADMIN" || role === "MODERADOR") && (
+            {(role === 'ADMIN' || role === 'MODERADOR') && (
               <li className="nav-item">
-                <button className={`nav-link btn text-white ${componenteActivo === "profesionales" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("profesionales")}>
+                <button
+                  className={`nav-link btn text-white ${componenteActivo === 'profesionales' ? 'fw-bold' : ''}`}
+                  onClick={() => setComponenteActivo('profesionales')}
+                >
                   Profesionales
                 </button>
               </li>
             )}
 
-            {role === "ADMIN" && (
+            {role === 'ADMIN' && (
               <li className="nav-item">
-                <button className={`nav-link btn text-white ${componenteActivo === "panel-admin" ? "fw-bold" : ""}`} onClick={() => setComponenteActivo("panel-admin")}>
+                <button
+                  className={`nav-link btn text-white ${componenteActivo === 'panel-admin' ? 'fw-bold' : ''}`}
+                  onClick={() => setComponenteActivo('panel-admin')}
+                >
                   Panel admin
                 </button>
               </li>

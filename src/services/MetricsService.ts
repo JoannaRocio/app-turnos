@@ -1,16 +1,16 @@
-import AuthService from "./AuthService";
+import AuthService from './AuthService';
 
 class MetricsService {
-  private static readonly BASE_URL = "http://localhost:8080/api/metrics";
+  private static readonly BASE_URL = 'http://localhost:8080/api/metrics';
 
   private static async fetchWithAuth<T>(url: string): Promise<T> {
     const token = AuthService.getToken();
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
       },
     });
 

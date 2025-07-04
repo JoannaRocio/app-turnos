@@ -1,17 +1,16 @@
-import React, { useState } from "react";
-import ClinicalHistoryService from "../../services/ClinicalHistoryService";
-import { ClinicalHistoryEntry } from "../../interfaces/ClinicalHistoryEntry";
-import { Patient } from "../../interfaces/Patient";
-import "./ClinicalHistory.scss";
-import { Professional } from "../../interfaces/Professional";
-import ConfirmModal from "../ConfirmModal/ConfirmModalComponent";
-
+import React, { useState } from 'react';
+import ClinicalHistoryService from '../../services/ClinicalHistoryService';
+import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
+import { Patient } from '../../interfaces/Patient';
+import './ClinicalHistory.scss';
+import { Professional } from '../../interfaces/Professional';
+import ConfirmModal from '../ConfirmModal/ConfirmModalComponent';
 
 interface Props {
   data: ClinicalHistoryEntry[];
   onBack: () => void;
   patient: Patient;
-  professionalId: number
+  professionalId: number;
 }
 
 interface Service {
@@ -21,21 +20,21 @@ interface Service {
 
 // Lista de tratamientos disponibles
 const availableTreatments: Service[] = [
-  { id: 1, name: "Limpieza de sarro" },
-  { id: 2, name: "Extracción de carie" },
-  { id: 3, name: "Extracción de muela" },
-  { id: 4, name: "Colocación de resina" },
-  { id: 5, name: "Tratamiento de conducto" },
-  { id: 6, name: "Profilaxis dental" },
-  { id: 7, name: "Blanqueamiento dental" },
-  { id: 8, name: "Colocación de corona" },
-  { id: 9, name: "Colocación de puente" },
-  { id: 10, name: "Ortodoncia" },
-  { id: 11, name: "Radiografía panorámica" },
-  { id: 12, name: "Extracción de diente de leche" },
-  { id: 13, name: "Colocación de implante" },
-  { id: 14, name: "Control de rutina" },
-  { id: 15, name: "Aplicación de flúor" }
+  { id: 1, name: 'Limpieza de sarro' },
+  { id: 2, name: 'Extracción de carie' },
+  { id: 3, name: 'Extracción de muela' },
+  { id: 4, name: 'Colocación de resina' },
+  { id: 5, name: 'Tratamiento de conducto' },
+  { id: 6, name: 'Profilaxis dental' },
+  { id: 7, name: 'Blanqueamiento dental' },
+  { id: 8, name: 'Colocación de corona' },
+  { id: 9, name: 'Colocación de puente' },
+  { id: 10, name: 'Ortodoncia' },
+  { id: 11, name: 'Radiografía panorámica' },
+  { id: 12, name: 'Extracción de diente de leche' },
+  { id: 13, name: 'Colocación de implante' },
+  { id: 14, name: 'Control de rutina' },
+  { id: 15, name: 'Aplicación de flúor' },
 ];
 
 const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, professionalId }) => {
@@ -49,16 +48,16 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
       const updated = entries.filter(e => e.id !== entry.id);
       setEntries(updated);
     } catch (err: any) {
-      console.error("Error al eliminar:", err);
+      console.error('Error al eliminar:', err);
     } finally {
       setShowConfirm(false);
       setEntryToDelete(null);
     }
   };
-  
+
   // Tratamiento
   const [selectedTreatments, setSelectedTreatments] = useState<Service[]>([]);
-  const [selectedId, setSelectedId] = useState<number | "">("");
+  const [selectedId, setSelectedId] = useState<number | ''>('');
 
   // Agrega tratamiento si no está ya seleccionado
   const handleAddTreatment = () => {
@@ -66,7 +65,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
     if (treatment && !selectedTreatments.some(t => t.id === treatment.id)) {
       setSelectedTreatments([...selectedTreatments, treatment]);
     }
-    setSelectedId("");
+    setSelectedId('');
   };
 
   // Elimina un tratamiento de los seleccionados
@@ -75,22 +74,22 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   };
 
   // Entrada nueva
-  const [newEntry, setNewEntry] = useState("");
+  const [newEntry, setNewEntry] = useState('');
   const [entries, setEntries] = useState(data);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleSave = async () => {
     if (!newEntry.trim()) return;
 
     try {
       setLoading(true);
-      console.log(patient, newEntry, 'que hay')
+      console.log(patient, newEntry, 'que hay');
       await ClinicalHistoryService.createClinicalHistory(patient, newEntry, professionalId);
       const updated = await ClinicalHistoryService.getOrCreate(patient, professionalId);
       setEntries(updated);
-      setNewEntry("");
-      setError("");
+      setNewEntry('');
+      setError('');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -100,28 +99,51 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
 
   return (
     <section className="container my-4">
-      <button className="btn btn-secondary btn-lg mb-3 btn-guardar-clinicalHistory" onClick={onBack}>← Volver</button>
+      <button
+        className="btn btn-secondary btn-lg mb-3 btn-guardar-clinicalHistory"
+        onClick={onBack}
+      >
+        ← Volver
+      </button>
 
       <div className="card mb-4">
         <div className="row g-0">
           <div className="col-md-3 d-flex align-items-center justify-content-center p-3">
-            <img src="/images/profile-pic.png" alt="Foto perfil" className="img-fluid rounded-circle" />
+            <img
+              src="/images/profile-pic.png"
+              alt="Foto perfil"
+              className="img-fluid rounded-circle"
+            />
           </div>
           <div className="col-md-9">
             <div className="card-body">
               <h2 className="card-title">{patient.fullName}</h2>
-              <p><strong>Documento:</strong> {patient.documentType} {patient.documentNumber}</p>
-              <p><strong>Obra Social:</strong> {patient.healthInsurance || "-"}</p>
-              <p><strong>Plan:</strong> {patient.insurancePlan || "-"}</p>
-              <p><strong>Teléfono:</strong> {patient.phone || "-"}</p>
-              <p><strong>Correo electrónico:</strong> {patient.email || "-"}</p>
               <p>
-                <strong>Última visita:</strong>{" "}
+                <strong>Documento:</strong> {patient.documentType} {patient.documentNumber}
+              </p>
+              <p>
+                <strong>Obra Social:</strong> {patient.healthInsurance || '-'}
+              </p>
+              <p>
+                <strong>Plan:</strong> {patient.insurancePlan || '-'}
+              </p>
+              <p>
+                <strong>Teléfono:</strong> {patient.phone || '-'}
+              </p>
+              <p>
+                <strong>Correo electrónico:</strong> {patient.email || '-'}
+              </p>
+              <p>
+                <strong>Última visita:</strong>{' '}
                 {patient.lastVisitDate
                   ? new Date(patient.lastVisitDate).toLocaleDateString()
-                  : "Sin datos"}
+                  : 'Sin datos'}
               </p>
-              {patient.note && <p><strong>Nota:</strong> {patient.note}</p>}
+              {patient.note && (
+                <p>
+                  <strong>Nota:</strong> {patient.note}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -141,10 +163,10 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                 id="treatmentSelect"
                 className="form-select form-clinicalHistory"
                 value={selectedId}
-                onChange={(e) => setSelectedId(Number(e.target.value))}
+                onChange={e => setSelectedId(Number(e.target.value))}
               >
                 <option value="">Seleccione un tratamiento...</option>
-                {availableTreatments.map((treatment) => (
+                {availableTreatments.map(treatment => (
                   <option key={treatment.id} value={treatment.id}>
                     {treatment.name}
                   </option>
@@ -153,17 +175,17 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
             </div>
 
             <button
-                className="btn btn-primary btn-lg btn-guardar-clinicalHistory mb-2"
-                type="button"
-                onClick={handleAddTreatment}
-                disabled={!selectedId}
-              >
+              className="btn btn-primary btn-lg btn-guardar-clinicalHistory mb-2"
+              type="button"
+              onClick={handleAddTreatment}
+              disabled={!selectedId}
+            >
               Agregar tratamiento
             </button>
 
             {selectedTreatments.length > 0 && (
               <div className="d-flex flex-wrap gap-2">
-                {selectedTreatments.map((t) => (
+                {selectedTreatments.map(t => (
                   <span key={t.id} className="badge bg-secondary d-flex align-items-center fs-3">
                     {t.name}
                     <button
@@ -171,7 +193,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                       className="btn-close btn-close-white ms-2"
                       aria-label="Eliminar"
                       onClick={() => handleRemoveTreatment(t.id)}
-                      style={{ fontSize: "0.6rem" }}
+                      style={{ fontSize: '0.6rem' }}
                     ></button>
                   </span>
                 ))}
@@ -184,12 +206,16 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         <textarea
           className="form-control textArea-clinialHistory mb-2"
           value={newEntry}
-          onChange={(e) => setNewEntry(e.target.value)}
+          onChange={e => setNewEntry(e.target.value)}
           rows={4}
           placeholder="Descripción de la atención..."
         />
-        <button className="btn btn-warning btn-lg btn-guardar-clinicalHistory" onClick={handleSave} disabled={loading}>
-          {loading ? "Guardando..." : "Guardar"}
+        <button
+          className="btn btn-warning btn-lg btn-guardar-clinicalHistory"
+          onClick={handleSave}
+          disabled={loading}
+        >
+          {loading ? 'Guardando...' : 'Guardar'}
         </button>
         {error && <div className="alert alert-danger mt-2">{error}</div>}
       </div>
@@ -201,9 +227,9 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         ) : (
           entries.map(entry => {
             const mockTreatments = [
-              "Limpieza de sarro",
-              "Extracción de carie",
-              "Blanqueamiento dental"
+              'Limpieza de sarro',
+              'Extracción de carie',
+              'Blanqueamiento dental',
             ];
 
             return (
@@ -211,7 +237,10 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                 <div className="card-body">
                   {/* Botones de editar y eliminar */}
                   <div className="position-absolute top-0 end-0 m-2 d-flex gap-2 align-items-center">
-                    <button className="btn btn-secondary d-flex align-items-center gap-1 btn-lg" title="Editar">
+                    <button
+                      className="btn btn-secondary d-flex align-items-center gap-1 btn-lg"
+                      title="Editar"
+                    >
                       <i className="bi bi-pencil"></i> Editar
                     </button>
                     <button
@@ -226,8 +255,12 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                     </button>
                   </div>
 
-                  <p><strong>Fecha de última actualización:</strong> {entry.date}</p>
-                  <p><strong>Profesional:</strong> {entry.professionalFullName}</p>
+                  <p>
+                    <strong>Fecha de última actualización:</strong> {entry.date}
+                  </p>
+                  <p>
+                    <strong>Profesional:</strong> {entry.professionalFullName}
+                  </p>
 
                   {/* Tratamientos mockeados */}
                   <div>
@@ -239,8 +272,12 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                     </ul>
                   </div>
 
-                  <p><strong>Descripción:</strong> {entry.description}</p>
-                  <p><strong>Archivos adjuntos:</strong> {entry.state}</p>
+                  <p>
+                    <strong>Descripción:</strong> {entry.description}
+                  </p>
+                  <p>
+                    <strong>Archivos adjuntos:</strong> {entry.state}
+                  </p>
                 </div>
               </div>
             );
@@ -265,7 +302,6 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         />
       )}
     </section>
-    
   );
 };
 

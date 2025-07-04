@@ -1,7 +1,7 @@
 // components/ConfirmModal.tsx
 
-import React from "react";
-import "./ConfirmModalComponent.scss";
+import React from 'react';
+import './ConfirmModalComponent.scss';
 
 type ConfirmModalProps = {
   isOpen: boolean;

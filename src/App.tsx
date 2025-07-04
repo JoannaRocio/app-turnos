@@ -1,22 +1,21 @@
 // src/App.tsx
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import HeaderComponent from "./components/HeaderComponent/HeaderComponent";
-import Home from "./pages/home/Home";
-import { ComponenteProvider } from "./context/ContextComponent";
-import { AuthProvider, useAuth } from "./context/ContextAuth";
-import Login from "./pages/login/Login";
-import PasswordRecovery from "./pages/password-recovery/PasswordRecovery";
-import ResetPassword from "./pages/password-recovery/reset-password/ResetPassword";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import HeaderComponent from './components/HeaderComponent/HeaderComponent';
+import Home from './pages/home/Home';
+import { ComponenteProvider } from './context/ContextComponent';
+import { AuthProvider, useAuth } from './context/ContextAuth';
+import Login from './pages/login/Login';
+import PasswordRecovery from './pages/password-recovery/PasswordRecovery';
+import ResetPassword from './pages/password-recovery/reset-password/ResetPassword';
+import ProtectedRoute from './routes/ProtectedRoute';
 import './App.scss';
-import BranchSelector from "./pages/branch-selector/BranchSelector";
+import BranchSelector from './pages/branch-selector/BranchSelector';
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  const isBranchSelectorRoute = location.pathname.toLowerCase().includes("/sucursales");
-
+  const isBranchSelectorRoute = location.pathname.toLowerCase().includes('/sucursales');
 
   return (
     <>
@@ -26,8 +25,14 @@ function AppRoutes() {
         <Route path="/Inicio-sesion" element={<Login />} />
 
         {/* <Route path="/Inicio-sesion" element={isAuthenticated ? <Navigate to="/Home" /> : <Login />} /> */}
-        <Route path="/Recuperar-contraseña" element={isAuthenticated ? <Navigate to="/Home" /> : <PasswordRecovery />} />
-        <Route path="/Cambiar-contrasena" element={isAuthenticated ? <Navigate to="/Home" /> : <ResetPassword />} />
+        <Route
+          path="/Recuperar-contraseña"
+          element={isAuthenticated ? <Navigate to="/Home" /> : <PasswordRecovery />}
+        />
+        <Route
+          path="/Cambiar-contrasena"
+          element={isAuthenticated ? <Navigate to="/Home" /> : <ResetPassword />}
+        />
 
         <Route path="/Sucursales" element={<BranchSelector />} />
 
@@ -35,15 +40,18 @@ function AppRoutes() {
         <Route
           path="/Home"
           element={
-            <ProtectedRoute allowedRoles={["USUARIO", "MODERADOR", "ADMIN"]}>
+            <ProtectedRoute allowedRoles={['USUARIO', 'MODERADOR', 'ADMIN']}>
               <Home />
             </ProtectedRoute>
           }
         />
 
-        <Route path="/no-autorizado" element={<div>No estás autorizado para ver esta página.</div>} />
+        <Route
+          path="/no-autorizado"
+          element={<div>No estás autorizado para ver esta página.</div>}
+        />
 
-        <Route path="/" element={<Navigate to={isAuthenticated ? "/Home" : "/Inicio-sesion"} />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? '/Home' : '/Inicio-sesion'} />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>

@@ -6,13 +6,15 @@ import { BrowserRouter as Router } from 'react-router-dom'; // Importar Router
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
-  throw new Error("No se encontró el elemento con id 'root'. Asegúrate de que esté definido en el archivo HTML.");
+  throw new Error(
+    "No se encontró el elemento con id 'root'. Asegúrate de que esté definido en el archivo HTML."
+  );
 }
 
 const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-      <App />
+    <App />
   </React.StrictMode>
 );

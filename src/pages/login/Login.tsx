@@ -1,28 +1,27 @@
-import React, { useEffect, useState } from "react";
-import "./Login.scss";
+import React, { useEffect, useState } from 'react';
+import './Login.scss';
 import { useNavigate } from 'react-router-dom';
-import AuthService from "../../services/AuthService";
-import { useAuth } from "../../context/ContextAuth";
-import { IoMdEye, IoMdEyeOff} from "react-icons/io";
-import { useComponente } from "../../context/ContextComponent";
+import AuthService from '../../services/AuthService';
+import { useAuth } from '../../context/ContextAuth';
+import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
+import { useComponente } from '../../context/ContextComponent';
 
 const Login: React.FC = () => {
-  const [username, setUser] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("")
+  const [username, setUser] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const { componenteActivo, setComponenteActivo } = useComponente();
-  
+
   const navigate = useNavigate();
   const { login } = useAuth();
-  
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("")
+    setError('');
 
     if (!username || !password) {
-      setError("Por favor, completa todos los campos.");
+      setError('Por favor, completa todos los campos.');
       return;
     }
 
@@ -33,20 +32,17 @@ const Login: React.FC = () => {
       AuthService.saveRole(data.user.role); // Guarda "USUARIO", "ADMIN", etc.
 
       login(); // Actualiza estado de contexto
-      setComponenteActivo("agenda-turnos");
-      navigate("/Sucursales");
-
+      setComponenteActivo('agenda-turnos');
+      navigate('/Sucursales');
     } else {
-      setError(data.message ?? "Error de autenticación");
+      setError(data.message ?? 'Error de autenticación');
     }
-  
   };
 
   return (
     <section className="container-login ">
       <div className="row justify-content-center">
         <div className="col-12 container-formLogin">
-
           <div className="row">
             <div className="col pb-4">
               <h3 className="text-center">Iniciar sesión</h3>
@@ -63,25 +59,25 @@ const Login: React.FC = () => {
                     type="text"
                     id="user"
                     value={username}
-                    onChange={(e) => setUser(e.target.value)}
+                    onChange={e => setUser(e.target.value)}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="password">Contraseña:</label>
-                  <div style={{ display: "flex", alignItems: "center" }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
                     <input
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       id="password"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={e => setPassword(e.target.value)}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
+                      onClick={() => setShowPassword(prev => !prev)}
                       className="btn-show-password"
                     >
-                      {showPassword ? <IoMdEye size={20}/> : <IoMdEyeOff size={20} />}
+                      {showPassword ? <IoMdEye size={20} /> : <IoMdEyeOff size={20} />}
                     </button>
                   </div>
                 </div>
@@ -94,7 +90,6 @@ const Login: React.FC = () => {
               </form>
             </div>
           </div>
-
         </div>
       </div>
     </section>

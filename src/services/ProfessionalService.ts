@@ -1,17 +1,17 @@
-import { Professional } from "../interfaces/Professional";
-import AuthService from "./AuthService";
+import { Professional } from '../interfaces/Professional';
+import AuthService from './AuthService';
 
 class ProfessionalService {
-  private static readonly BASE_URL = "http://localhost:8080/api/professionals";
+  private static readonly BASE_URL = 'http://localhost:8080/api/professionals';
 
   static async getAllProfessionals(): Promise<Professional[]> {
     const token = AuthService.getToken();
 
     const response = await fetch(this.BASE_URL, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
       },
     });
 
@@ -28,11 +28,11 @@ class ProfessionalService {
       professionalName: item.fullName,
       documentType: item.documentType,
       professionalDni: Number(item.documentNumber),
-      phone: item.phone ?? "-",
+      phone: item.phone ?? '-',
       shiftStart: item.startTime,
       shiftEnd: item.endTime,
-      unavailableHours: "-",
-      specialties: "-"
+      unavailableHours: '-',
+      specialties: '-',
     }));
 
     return mapped;
@@ -40,30 +40,30 @@ class ProfessionalService {
 
   static async createProfessional(data: any): Promise<void> {
     const token = AuthService.getToken();
-  
+
     const response = await fetch(this.BASE_URL, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
       },
       body: JSON.stringify(data),
     });
-  
+
     const responseText = await response.text();
-  
+
     if (!response.ok) {
       throw new Error(`Error creando profesional: ${responseText}`);
     }
   }
-  
+
   static async updateProfessional(id: number, data: any): Promise<Professional> {
     const token = AuthService.getToken();
     const response = await fetch(`${this.BASE_URL}/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
       },
       body: JSON.stringify(data),
     });

@@ -1,4 +1,4 @@
-import { Patient } from "./Patient";
+import { Patient } from './Patient';
 
 // type AppointmentState = "pendiente" | "confirmado" | "cancelado";
 

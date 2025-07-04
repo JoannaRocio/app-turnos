@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
-import AppointmentsComponent from "../../components/AppointmentsComponent/AppointmentsComponent";
-import PatientsComponent from "../../components/Patients/PatientsPage";
-import ProfessionalsComponent from "../../components/Professionals/ProfessionalsComponent";
-import { useComponente } from "../../context/ContextComponent";
-import { Patient } from "../../interfaces/Patient";
-import PatientService from "../../services/PatientService";
-import AppointmentService from "../../services/AppointmentService";
-import { Professional } from "../../interfaces/Professional";
-import ProfessionalService from "../../services/ProfessionalService";
-import { Appointment } from "../../interfaces/Appointment";
-import AdminDashboard from "../../components/AdminPanel/AdminDashboard";
-import UserService from "../../services/UserService";
-import { User } from "../../interfaces/User";
-import { useAuth } from "../../context/ContextAuth";
+import React, { useEffect, useState } from 'react';
+import AppointmentsComponent from '../../components/AppointmentsComponent/AppointmentsComponent';
+import PatientsComponent from '../../components/Patients/PatientsPage';
+import ProfessionalsComponent from '../../components/Professionals/ProfessionalsComponent';
+import { useComponente } from '../../context/ContextComponent';
+import { Patient } from '../../interfaces/Patient';
+import PatientService from '../../services/PatientService';
+import AppointmentService from '../../services/AppointmentService';
+import { Professional } from '../../interfaces/Professional';
+import ProfessionalService from '../../services/ProfessionalService';
+import { Appointment } from '../../interfaces/Appointment';
+import AdminDashboard from '../../components/AdminPanel/AdminDashboard';
+import UserService from '../../services/UserService';
+import { User } from '../../interfaces/User';
+import { useAuth } from '../../context/ContextAuth';
 
 const Home: React.FC = () => {
-  
   // const { componenteActivo } = useComponente();
   const { componenteActivo, setComponenteActivo } = useComponente();
 
@@ -27,29 +26,28 @@ const Home: React.FC = () => {
   const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
 
   const { userRole } = useAuth();
-  const role = userRole ?? "";
+  const role = userRole ?? '';
 
   useEffect(() => {
     if (!componenteActivo) {
-      setComponenteActivo("agenda-turnos");
+      setComponenteActivo('agenda-turnos');
     }
     const fetchData = async () => {
-      if (componenteActivo === "pacientes") {
+      if (componenteActivo === 'pacientes') {
         await loadPatients();
       }
-      if (componenteActivo === "agenda-turnos") {
+      if (componenteActivo === 'agenda-turnos') {
         await loadPatients();
         await loadAllProfessionals();
         await loadAppointments(selectedProfessional);
-
       }
-      if (componenteActivo === "profesionales") {
+      if (componenteActivo === 'profesionales') {
         await loadAllProfessionals();
       }
-      if (componenteActivo === "panel-admin") {
+      if (componenteActivo === 'panel-admin') {
         await loadUsers();
       }
-    }
+    };
 
     fetchData();
   }, [componenteActivo, selectedProfessional, setComponenteActivo, userRole]);
@@ -59,27 +57,27 @@ const Home: React.FC = () => {
       const data = await UserService.getAllUsers();
       setUsers(data);
     } catch (err) {
-      console.error("Error al traer usuarios:", err);
+      console.error('Error al traer usuarios:', err);
     }
   };
 
   const loadPatients = async () => {
     try {
       const data = await PatientService.getAll();
-      
+
       setPatients(data);
     } catch (err) {
-      console.error("Error al traer pacientes:", err);
+      console.error('Error al traer pacientes:', err);
     }
   };
-  
+
   const loadAllProfessionals = async () => {
     try {
       const data = await ProfessionalService.getAllProfessionals();
-      setSelectedProfessional(data[0])
+      setSelectedProfessional(data[0]);
       setProfessionals(data);
     } catch (error) {
-      console.error("Error al cargar los profesionales:", error);
+      console.error('Error al cargar los profesionales:', error);
     }
   };
 
@@ -87,45 +85,55 @@ const Home: React.FC = () => {
     try {
       const data = await ProfessionalService.getAllProfessionals();
       setProfessionals(data);
-  
+
       if (!selectedProfessional && data.length > 0) {
         selectedProfessional = data[0];
       }
-  
+
       if (selectedProfessional) {
-        const appointmentsData = await AppointmentService.getAppointmentByDni(selectedProfessional.professionalDni);
+        const appointmentsData = await AppointmentService.getAppointmentByDni(
+          selectedProfessional.professionalDni
+        );
         setAppointments(appointmentsData);
       } else {
-        console.warn("No hay profesional seleccionado ni profesionales disponibles.");
+        console.warn('No hay profesional seleccionado ni profesionales disponibles.');
       }
     } catch (error) {
-      console.error("Error al cargar los turnos:", error);
+      console.error('Error al cargar los turnos:', error);
     }
   };
 
   return (
     <section className="home-section">
-      
-        {componenteActivo === "pacientes" && ["USUARIO", "MODERADOR", "ADMIN"].includes(role) && selectedProfessional?.professionalId !== undefined && (
-          <PatientsComponent patients={patients ?? []} professionalId={selectedProfessional?.professionalId} reloadPatients={loadPatients} />
-        )}
-
-        {componenteActivo === "profesionales" && ["MODERADOR", "ADMIN"].includes(role) && (
-          <ProfessionalsComponent professionals={professionals} reloadProfessional={loadAllProfessionals} />
-        )}
-
-        {componenteActivo === "agenda-turnos" && ["USUARIO", "MODERADOR", "ADMIN"].includes(role) && (
-          <AppointmentsComponent
-            patients={patients}
-            appointments={appointments}
-            professionals={professionals}
-            onAppointmentsUpdate={loadAppointments}
+      {componenteActivo === 'pacientes' &&
+        ['USUARIO', 'MODERADOR', 'ADMIN'].includes(role) &&
+        selectedProfessional?.professionalId !== undefined && (
+          <PatientsComponent
+            patients={patients ?? []}
+            professionalId={selectedProfessional?.professionalId}
+            reloadPatients={loadPatients}
           />
         )}
 
-        {componenteActivo === "panel-admin" && role === "ADMIN" && (
-          <AdminDashboard users={users} reloadUsers={loadUsers} professionals={professionals} />
-        )}
+      {componenteActivo === 'profesionales' && ['MODERADOR', 'ADMIN'].includes(role) && (
+        <ProfessionalsComponent
+          professionals={professionals}
+          reloadProfessional={loadAllProfessionals}
+        />
+      )}
+
+      {componenteActivo === 'agenda-turnos' && ['USUARIO', 'MODERADOR', 'ADMIN'].includes(role) && (
+        <AppointmentsComponent
+          patients={patients}
+          appointments={appointments}
+          professionals={professionals}
+          onAppointmentsUpdate={loadAppointments}
+        />
+      )}
+
+      {componenteActivo === 'panel-admin' && role === 'ADMIN' && (
+        <AdminDashboard users={users} reloadUsers={loadUsers} professionals={professionals} />
+      )}
     </section>
   );
 };

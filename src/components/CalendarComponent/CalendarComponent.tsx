@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import "./CalendarComponent.scss";
+import React, { useState } from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import './CalendarComponent.scss';
 
 interface Props {
   onDateSelect: (date: Date) => void;
@@ -29,11 +29,7 @@ const CalendarComponent: React.FC<Props> = ({ onDateSelect }) => {
     <div className="calendar-wrapper">
       {generateMonthDates().map((date, index) => (
         <div key={index} className="calendar-container">
-          <Calendar
-            onClickDay={handleChange}
-            value={selectedDate}
-            activeStartDate={date}
-          />
+          <Calendar onClickDay={handleChange} value={selectedDate} activeStartDate={date} />
         </div>
       ))}
     </div>

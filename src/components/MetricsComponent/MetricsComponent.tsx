@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import es from "date-fns/locale/es";
-import type { Locale } from "date-fns";
-import "./MetricsComponent.scss";
+import { useEffect, useState } from 'react';
+import es from 'date-fns/locale/es';
+import type { Locale } from 'date-fns';
+import './MetricsComponent.scss';
 import {
   LineChart,
   Line,
@@ -16,11 +16,13 @@ import {
   Cell,
   BarChart,
   Bar,
-} from "recharts";
-import MetricsService from "../../services/MetricsService";
+} from 'recharts';
+import MetricsService from '../../services/MetricsService';
 
 const MetricsComponent = () => {
-  const [appointmentsPerDay, setAppointmentsPerDay] = useState<{ date: string; count: number }[]>([]);
+  const [appointmentsPerDay, setAppointmentsPerDay] = useState<{ date: string; count: number }[]>(
+    []
+  );
   const [appointmentStats, setAppointmentStats] = useState<{ state: string; count: number }[]>([]);
   const [patientsByMonth, setPatientsByMonth] = useState<{ month: string; count: number }[]>([]);
 
@@ -34,7 +36,7 @@ const MetricsComponent = () => {
           MetricsService.getNewPatientsPerMonth(),
           MetricsService.getAppointmentStats(),
         ]);
-  
+
         // Turnos por día
         const appointmentsArray = Object.entries(perDay)
           .map(([date, count]) => ({
@@ -43,29 +45,28 @@ const MetricsComponent = () => {
           }))
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         setAppointmentsPerDay(appointmentsArray);
-  
+
         // Pacientes nuevos por mes (ya es un número, solo lo procesamos)
         const patientsByMonthArray = Object.entries(perMonth).map(([month, value]) => ({
           month,
           count: value, // Directamente el valor numérico
         }));
         setPatientsByMonth(patientsByMonthArray);
-  
+
         // Estado de los turnos
         const statsArray = Object.entries(stats).map(([state, count]) => ({
           state,
           count: Number(count),
         }));
         setAppointmentStats(statsArray);
-  
       } catch (err) {
-        console.error("Error cargando métricas:", err);
+        console.error('Error cargando métricas:', err);
       }
     };
-  
+
     fetchMetrics();
   }, [esLocale]);
-  
+
   //   const fetchMetrics = async () => {
   //     try {
   //       const [perDay, perWeek, stats] = await Promise.all([
@@ -140,26 +141,24 @@ const MetricsComponent = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  tickFormatter={(date) =>
-                    new Date(date).toLocaleDateString("es-AR", {
-                      day: "2-digit",
-                      month: "short",
+                  tickFormatter={date =>
+                    new Date(date).toLocaleDateString('es-AR', {
+                      day: '2-digit',
+                      month: 'short',
                     })
                   }
                 />
                 <YAxis allowDecimals={false} />
                 <Tooltip
-                  formatter={(value: number) => [`${value} turnos`, "Cantidad"]}
-                  labelFormatter={(label) =>
-                    `Fecha: ${new Date(label).toLocaleDateString("es-AR")}`
-                  }
+                  formatter={(value: number) => [`${value} turnos`, 'Cantidad']}
+                  labelFormatter={label => `Fecha: ${new Date(label).toLocaleDateString('es-AR')}`}
                 />
                 <Line
                   type="monotone"
                   dataKey="count"
                   stroke="#007bff"
                   activeDot={{ r: 6 }}
-                  label={{ position: "top", fill: "#333", fontSize: 12 }}
+                  label={{ position: 'top', fill: '#333', fontSize: 12 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -184,8 +183,6 @@ const MetricsComponent = () => {
           </div>
         </div>
       </div>
-
-
 
       {/* Estado de turnos y pie chart */}
       <div className="row mb-5">
@@ -220,7 +217,7 @@ const MetricsComponent = () => {
                   {appointmentStats.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0d6efd"][index % 5]}
+                      fill={['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0d6efd'][index % 5]}
                     />
                   ))}
                 </Pie>
