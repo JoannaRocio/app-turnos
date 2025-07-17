@@ -29,9 +29,8 @@ const Home: React.FC = () => {
   const role = userRole ?? '';
 
   useEffect(() => {
-    if (!componenteActivo) {
-      setComponenteActivo('agenda-turnos');
-    }
+    if (!componenteActivo) setComponenteActivo('agenda-turnos');
+
     const fetchData = async () => {
       if (componenteActivo === 'pacientes') {
         await loadPatients();
@@ -39,7 +38,6 @@ const Home: React.FC = () => {
       if (componenteActivo === 'agenda-turnos') {
         await loadPatients();
         await loadAllProfessionals();
-        await loadAppointments(selectedProfessional);
       }
       if (componenteActivo === 'profesionales') {
         await loadAllProfessionals();
@@ -50,7 +48,13 @@ const Home: React.FC = () => {
     };
 
     fetchData();
-  }, [componenteActivo, selectedProfessional, setComponenteActivo, userRole]);
+  }, [componenteActivo]);
+
+  useEffect(() => {
+    if (componenteActivo === 'agenda-turnos' && selectedProfessional) {
+      loadAppointments(selectedProfessional);
+    }
+  }, [selectedProfessional]);
 
   const loadUsers = async () => {
     try {
@@ -74,7 +78,11 @@ const Home: React.FC = () => {
   const loadAllProfessionals = async () => {
     try {
       const data = await ProfessionalService.getAllProfessionals();
-      setSelectedProfessional(data[0]);
+
+      if (!selectedProfessional && data.length > 0) {
+        setSelectedProfessional(data[0]);
+      }
+
       setProfessionals(data);
     } catch (error) {
       console.error('Error al cargar los profesionales:', error);
