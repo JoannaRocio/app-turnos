@@ -27,7 +27,7 @@ const AdminDashboard: React.FC<{
   if (!users) {
     return <p className="text-white">Cargando usuarios...</p>;
   }
-  const filteredUsers = users.filter(u => {
+  const filteredUsers = users.filter((u) => {
     const nameMatch = u.username?.toLowerCase().includes(searchTerm.toLowerCase());
     const emailMatch = u.email?.toString().includes(searchTerm);
     return nameMatch || emailMatch;
@@ -74,19 +74,19 @@ const AdminDashboard: React.FC<{
 
       <div className="tabs mb-4">
         <button
-          className={`tab-button ${activeTab === 'usuarios' ? 'active' : ''}`}
+          className={`App-buttonTertiary ${activeTab === 'usuarios' ? 'active' : ''}`}
           onClick={() => setActiveTab('usuarios')}
         >
           Usuarios
         </button>
         <button
-          className={`tab-button ${activeTab === 'metricas' ? 'active' : ''}`}
+          className={`App-buttonTertiary ${activeTab === 'metricas' ? 'active' : ''}`}
           onClick={() => setActiveTab('metricas')}
         >
           Métricas
         </button>
         <button
-          className={`tab-button ${activeTab === 'obrasSociales' ? 'active' : ''}`}
+          className={`App-buttonTertiary ${activeTab === 'obrasSociales' ? 'active' : ''}`}
           onClick={() => setActiveTab('obrasSociales')}
         >
           Obras Sociales
@@ -110,9 +110,9 @@ const AdminDashboard: React.FC<{
 
       {activeTab === 'usuarios' && (
         <>
-          <div className="d-flex">
+          <div className="d-flex justify-content-between">
             <h3 className="text-white">Usuarios</h3>
-            <button className="btn btn-light btn-nuevo" onClick={handleNewUser}>
+            <button className="btn App-buttonTertiary" onClick={handleNewUser}>
               Nuevo
             </button>
           </div>
@@ -122,7 +122,7 @@ const AdminDashboard: React.FC<{
             className="form-control mb-3 filter-input"
             placeholder="Buscar por nombre o email..."
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
 
           <table className="appointments-table">

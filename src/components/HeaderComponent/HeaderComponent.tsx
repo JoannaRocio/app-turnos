@@ -20,35 +20,35 @@ const HeaderComponent: React.FC = () => {
   return (
     <header className="container-header">
       <div className="container d-flex justify-content-between align-items-center">
-        <h2 className="text-white">Turnos APP</h2>
+        <h2>Turnos APP</h2>
 
         <nav>
           <ul className="nav">
             <li className="nav-item">
               <button
-                className={`nav-link btn text-white ${componenteActivo === 'agenda-turnos' ? 'fw-bold' : ''}`}
+                className={`nav-link btn ${componenteActivo === 'agenda-turnos' ? 'fw-bold' : ''}`}
                 onClick={() => setComponenteActivo('agenda-turnos')}
               >
-                Agenda de turnos
+                <div className="title-header">Agenda de turnos</div>
               </button>
             </li>
 
             <li className="nav-item">
               <button
-                className={`nav-link btn text-white ${componenteActivo === 'pacientes' ? 'fw-bold' : ''}`}
+                className={`nav-link btn ${componenteActivo === 'pacientes' ? 'fw-bold' : ''}`}
                 onClick={() => setComponenteActivo('pacientes')}
               >
-                Pacientes
+                <div className="title-header">Pacientes</div>
               </button>
             </li>
 
             {(role === 'ADMIN' || role === 'MODERADOR') && (
               <li className="nav-item">
                 <button
-                  className={`nav-link btn text-white ${componenteActivo === 'profesionales' ? 'fw-bold' : ''}`}
+                  className={`nav-link btn ${componenteActivo === 'profesionales' ? 'fw-bold' : ''}`}
                   onClick={() => setComponenteActivo('profesionales')}
                 >
-                  Profesionales
+                  <div className="title-header">Profesionales</div>
                 </button>
               </li>
             )}
@@ -56,17 +56,17 @@ const HeaderComponent: React.FC = () => {
             {role === 'ADMIN' && (
               <li className="nav-item">
                 <button
-                  className={`nav-link btn text-white ${componenteActivo === 'panel-admin' ? 'fw-bold' : ''}`}
+                  className={`nav-link btn ${componenteActivo === 'panel-admin' ? 'fw-bold' : ''}`}
                   onClick={() => setComponenteActivo('panel-admin')}
                 >
-                  Panel admin
+                  <div className="title-header">Panel admin</div>
                 </button>
               </li>
             )}
           </ul>
         </nav>
 
-        <button onClick={handleLogOut} className="btn btn-light">
+        <button onClick={handleLogOut} className="btn App-buttonSecondary">
           Cerrar sesión
         </button>
       </div>

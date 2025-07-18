@@ -1,49 +1,42 @@
 @import "~bootstrap/scss/bootstrap";
 
 :root {
-  // PRIMARY
-  --color-primary-light: #3A4C65;
-  --color-primary-dark: #0F1B33;
-  --color-primary-hover: #253659;  
-  --color-primary-disabled: #5C708A;
+  // PRIMARY (Basado en --rt-color-primary y derivados)
+  --color-primary-light: #268aa3;       /* similar a primary-15 */
+  --color-primary-dark: #005e75;        /* azul profundo */
+  --color-primary-hover: #17829d;       /* primary-35 */
+  --color-primary-disabled: #00769340;  /* primary-40 con transparencia */
 
-  // SECONDARY
-  --color-secondary-light: #5F7D99;
-  --color-secondary-dark: #2B4558;
-  --color-secondary-hover: #4E6F89;
-  --color-secondary-disabled: #8FA3B8;
+  // SECONDARY (Basado en --rt-color-secondary y --rt-color-fourth)
+  --color-secondary-light: #24a5b8;
+  --color-secondary-dark: #21a7ae;
+  --color-secondary-hover: #07cfc8;
+  --color-secondary-disabled: #24a5b840;
 
-  // TERTIARY
-  --color-tertiary-light: #94A7C5;
-  --color-tertiary-dark: #5A7391;
-  --color-tertiary-hover: #8599B8;
-  --color-tertiary-disabled: #B0C1D6;
+  // TERTIARY (Basado en acentos tipo verde y azul claro)
+  --color-tertiary-light: #cce7ed;
+  --color-tertiary-dark: #4cfcda;
+  --color-tertiary-hover: #d6f6f4;
+  --color-tertiary-disabled: #f0f5f9;
 
-  // NEUTRAL
-  --color-neutral-light: #1C2435;
-  --color-neutral-dark: #090E19;
-  --color-neutral-hover: #141A2A;
-  --color-neutral-disabled: #3F4554;
+  // NEUTRAL (Basado en grises y negros)
+  --color-neutral-light: #626262;
+  --color-neutral-dark: #343a40;
+  --color-neutral-hover: #6c757d;
+  --color-neutral-disabled: #706e6f;
 
-  // WHITE(BEIGE)
-  // --color-white-light: #FFFFFF;
-  // --color-white-dark: #D4CFBB;
-  // --color-white-hover: #F8F5EA;
-  // --color-white-disabled: #E7E3CF;
+  // WHITE
+  --color-white-light:     #ffffff;
+  --color-white-hover:     #f0f5f9;
+  --color-white-disabled:  #d6f6f4;
+  --color-white-dark:      #cce7ed;
 
-  --color-white-light:     #FFFFFF; /* Blanco puro */
-  --color-white-hover:     #F0EAD6; /* Beige claro, más cálido */
-  --color-white-disabled:  #D6D3C2; /* Gris claro, apagado */
-  --color-white-dark:      #B8B29A; /* Beige grisáceo más oscuro */
-
-  // BLACK
-
+  // BLACK & ACCENTS
   --color-black: #0d1321;
-  --color-blue: #004bfb;
-  --color-blue-dark:#003dca;
-  --color-red:#d62121;
-  --color-green:#2ebe4d;
-
+  --color-blue: #007693;
+  --color-blue-dark: #005e75;
+  --color-red: #fb1212;
+  --color-green: #4cfcda;
 }
 
 html {
@@ -55,7 +48,8 @@ body {
   font-size: 1.6rem; /* Tamaño base = 16px */
   line-height: 1.5;
 
-  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark), var(--color-tertiary-light));
+  background: linear-gradient(#007693 100%);
+  // background: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark), var(--color-tertiary-light));
   background-size: cover;
   background-repeat: no-repeat;
   min-height: 100vh;
@@ -152,6 +146,41 @@ a {
 
 .App-title {
   color: var(--color-white-light);
+}
+
+.App-buttonSecondary {
+  font-size: 1.5rem !important;
+  padding: .8rem !important;
+  transition: 0.5s !important;
+  color: var(--color-white-light);
+  border-radius: 2rem;
+  width: 130px;
+  background-color: var(--color-primary-light);
+  &:hover {
+      background-color: var(--color-tertiary-disabled) !important;
+      font-weight: 500;
+      border-color: var(--color-primary-light);
+  }
+}
+
+.App-buttonTertiary {
+  font-size: 1.7rem !important;
+  transition: 0.5s !important;
+  color: var(--color-primary-light);
+  border-radius: 1rem;
+
+  background-color: var(--color-white-light);
+  &:hover {
+      background-color: var(--color-primary-light) !important;
+      font-weight: 500;
+      border-color: var(--color-white-light);
+      color: var(--color-white-light);
+  }
+  margin-left: 2rem;
+  margin-right: 1rem;
+  height: fit-content;
+  width: 130px;
+  font-weight: 500;
 }
 
 .error-message {

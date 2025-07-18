@@ -70,7 +70,7 @@ const ProfessionalsComponent: React.FC<{
     setShowEditModal(true);
   };
 
-  const filteredProfessional = professionals.filter(professional => {
+  const filteredProfessional = professionals.filter((professional) => {
     const nameMatch = professional.professionalName
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -82,14 +82,13 @@ const ProfessionalsComponent: React.FC<{
     <section>
       <h2 className="text-white">Listado de profesionales</h2>
 
-      <div className="d-flex">
+      <div className="d-flex justify-content-between">
         <h3 className="text-white">Profesionales</h3>
         {!isUsuario && (
-          <button className="btn btn-light btn-nuevo" onClick={handleNewProfessional}>
+          <button className="btn App-buttonTertiary" onClick={handleNewProfessional}>
             Nuevo
           </button>
         )}
-        {/* <button className="btn btn-light btn-nuevo"  onClick={handleNewProfessional}>Nuevo</button> */}
       </div>
 
       <input
@@ -97,7 +96,7 @@ const ProfessionalsComponent: React.FC<{
         className="form-control mb-3 filter-input"
         placeholder="Buscar por nombre o DNI..."
         value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
 
       <table className="appointments-table">

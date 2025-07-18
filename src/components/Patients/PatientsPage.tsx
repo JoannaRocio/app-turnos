@@ -36,7 +36,7 @@ const PatientsComponent: React.FC<{
   if (!patients) {
     return <p className="text-white">Cargando pacientes...</p>;
   }
-  const filteredPatients = patients.filter(p => {
+  const filteredPatients = patients.filter((p) => {
     const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
     const dniMatch = p.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
@@ -111,10 +111,10 @@ const PatientsComponent: React.FC<{
     <section>
       <h2 className="text-white">Listado de pacientes</h2>
 
-      <div className="d-flex">
+      <div className="d-flex justify-content-between">
         <h3 className="text-white">Pacientes</h3>
         {role !== 'USUARIO' && (
-          <button className="btn btn-light btn-nuevo" onClick={handleNewPatient}>
+          <button className="btn App-buttonTertiary" onClick={handleNewPatient}>
             Nuevo
           </button>
         )}
@@ -125,7 +125,7 @@ const PatientsComponent: React.FC<{
         className="form-control mb-3 filter-input"
         placeholder="Buscar por nombre o DNI..."
         value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
 
       <table className="appointments-table">
@@ -163,7 +163,7 @@ const PatientsComponent: React.FC<{
                 <ActionDropdown
                   disabled={!patient}
                   isOpen={activeDropdownIndex === index}
-                  onToggle={isOpen => setActiveDropdownIndex(isOpen ? index : null)}
+                  onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                   onView={() => openClinicalHistory(patient)}
                   // onEdit={() => openModalForTime(time)}
                   // onDelete={() => confirmDelete(patient)}
