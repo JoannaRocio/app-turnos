@@ -183,6 +183,33 @@ a {
   font-weight: 500;
 }
 
+.modal-buttons {
+  font-size: 1.9rem !important;
+  transition: 0.5s !important;
+  color: var(--color-primary-light);
+  border-radius: 1rem;
+
+  background-color: var(--color-white-light);
+  &:hover {
+      background-color: var(--color-primary-light) !important;
+      font-weight: 500;
+      border-color: var(--color-white-light);
+      color: var(--color-white-light);
+  }
+  &:disabled {
+    background-color: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed;
+    border: 1px solid #aaa;
+    opacity: 0.6;
+  }
+  margin-left: 2rem;
+  margin-right: 1rem;
+  height: fit-content;
+  width: 130px;
+  font-weight: 500;
+}
+
 .error-message {
   color: var(--color-red);
 }
