@@ -1,0 +1,35 @@
+.schedule-grid-vertical {
+  display: flex;
+  gap: 2rem;
+}
+
+.schedule-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.bg-primary-c {
+  background-color: #f0f4ff !important; // Azul muy claro, podés ajustar
+}
+
+.bg-secondary-c {
+  background-color: #fef9f0 !important; // Naranja claro o beige, alternativo
+}
+
+.day-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.range-list {
+  margin: 0;
+  padding-left: 1rem;
+  list-style-type: disc;
+}
+
+.today-row strong {
+  color: #007bff;
+}

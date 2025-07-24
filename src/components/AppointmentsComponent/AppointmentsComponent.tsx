@@ -70,18 +70,12 @@ const AppointmentsComponent: React.FC<Props> = ({
     setSelectedDate(date);
   };
 
-  // const handleProfessionalSelected = async (selected: Professional) => {
-  //   console.log(selected, 'handleProfessionalSelected')
-  //   setSelectedProfessional(selected.professionalDni);
-  //   onAppointmentsUpdate(selected.professionalDni);
-  // };
-
   const handleProfessionalSelect = (professional: Professional) => {
     setSelectedProfessional(professional);
     onAppointmentsUpdate(professional);
   };
 
-  const appointmentsForSelectedDate = appointments.filter(appt =>
+  const appointmentsForSelectedDate = appointments.filter((appt) =>
     appt.dateTime.startsWith(selectedDate.toISOString().split('T')[0])
   );
 
@@ -113,7 +107,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   useEffect(() => {
     if (isEditMode && currentAppointment) {
       console.log(currentAppointment, 'currentAppointment');
-      const patient = patients.find(p => p.id === currentAppointment.patient.id);
+      const patient = patients.find((p) => p.id === currentAppointment.patient.id);
       if (patient) {
         setNameSearch(patient.fullName);
         setDniSearch(patient.documentNumber);
@@ -126,12 +120,12 @@ const AppointmentsComponent: React.FC<Props> = ({
 
   useEffect(() => {
     const matchByName = patients.find(
-      p => nameSearch && p.fullName?.toLowerCase().includes(nameSearch.toLowerCase())
+      (p) => nameSearch && p.fullName?.toLowerCase().includes(nameSearch.toLowerCase())
     );
-    const matchByDni = patients.find(p => dniSearch && p.documentNumber?.includes(dniSearch));
+    const matchByDni = patients.find((p) => dniSearch && p.documentNumber?.includes(dniSearch));
 
     if (matchByName && !dniSearch) {
-      setNewAppointment(prev => ({
+      setNewAppointment((prev) => ({
         ...prev,
         patientId: matchByName.id,
         documentNumber: matchByName.documentNumber,
@@ -139,7 +133,7 @@ const AppointmentsComponent: React.FC<Props> = ({
       }));
       setDniSearch(matchByName.documentNumber);
     } else if (matchByDni && !nameSearch) {
-      setNewAppointment(prev => ({
+      setNewAppointment((prev) => ({
         ...prev,
         patientId: matchByDni.id,
         documentNumber: matchByDni.documentNumber,
@@ -153,13 +147,13 @@ const AppointmentsComponent: React.FC<Props> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setNewAppointment(prev => ({ ...prev, [name]: value }));
+    setNewAppointment((prev) => ({ ...prev, [name]: value }));
   };
 
   const openModalForTime = (time: string) => {
     const apptExists = getAppointmentForTime(time);
-    const appointment = appointments.find(p => p.patient.id === apptExists?.patient.id);
-    const patient = patients.find(p => p.id === apptExists?.patient.id);
+    const appointment = appointments.find((p) => p.patient.id === apptExists?.patient.id);
+    const patient = patients.find((p) => p.id === apptExists?.patient.id);
 
     if (apptExists) {
       setIsEditMode(true);
@@ -191,7 +185,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   };
 
   const getAppointmentForTime = (time: string) => {
-    return appointmentsForSelectedDate.find(appt => appt.dateTime.includes(`T${time}`));
+    return appointmentsForSelectedDate.find((appt) => appt.dateTime.includes(`T${time}`));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -244,7 +238,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   }
 
   const filteredPatients = patients.filter(
-    p =>
+    (p) =>
       p?.fullName?.toLowerCase().includes(nameSearch.toLowerCase()) &&
       p?.documentNumber?.includes(dniSearch)
   );
@@ -324,7 +318,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                           <ActionDropdown
                             disabled={!appt}
                             isOpen={activeDropdownIndex === index}
-                            onToggle={isOpen => setActiveDropdownIndex(isOpen ? index : null)}
+                            onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                             onView={() => openClinicalHistory(appt)}
                             onEdit={() => openModalForTime(time)}
                             onDelete={() => confirmDelete(appt, time)}
@@ -365,7 +359,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                         <input
                           type="text"
                           value={nameSearch}
-                          onChange={e => {
+                          onChange={(e) => {
                             setNameSearch(e.target.value);
                             setDniSearch(''); // resetea el otro buscador
                           }}
@@ -373,7 +367,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                           placeholder="Escribí el nombre"
                         />
                         <datalist id="patientsByName">
-                          {filteredPatients.map(p => (
+                          {filteredPatients.map((p) => (
                             <option key={p.id} value={p.fullName} />
                           ))}
                         </datalist>
@@ -385,7 +379,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                           type="text"
                           value={dniSearch}
                           readOnly={!!nameSearch} // Solo lectura si hay nombre seleccionado
-                          onChange={e => {
+                          onChange={(e) => {
                             setDniSearch(e.target.value);
                             setNameSearch(''); // resetea el otro buscador
                           }}
@@ -393,7 +387,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                           placeholder="Escribí el DNI"
                         />
                         <datalist id="patientsByDni">
-                          {filteredPatients.map(p => (
+                          {filteredPatients.map((p) => (
                             <option key={p.id} value={p.documentNumber} />
                           ))}
                         </datalist>
@@ -411,7 +405,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                       <label>
                         Hora:
                         <select name="time" value={newAppointment.time} onChange={handleChange}>
-                          {timeSlots.map(time => (
+                          {timeSlots.map((time) => (
                             <option
                               key={time}
                               value={time}

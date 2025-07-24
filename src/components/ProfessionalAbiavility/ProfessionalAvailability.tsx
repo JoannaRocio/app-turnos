@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './ProfessionalAvailability.scss';
 
 interface TimeRange {
@@ -15,23 +15,32 @@ interface AvailabilityEntry {
 
 interface AvailabilityFormProps {
   professionalId: number;
-  onSubmit: (data: AvailabilityEntry[]) => void;
+  onSubmit: (data: AvailabilityEntry[], validDays: string[]) => void;
+  initialAvailability?: Record<string, TimeRange[]>;
 }
 
-const daysOfWeek: string[] = ['LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+const daysOfWeek: string[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+const dayLabels: Record<string, string> = {
+  MONDAY: 'Lunes',
+  TUESDAY: 'Martes',
+  WEDNESDAY: 'Miércoles',
+  THURSDAY: 'Jueves',
+  FRIDAY: 'Viernes',
+  SATURDAY: 'Sábado',
+};
 
 const ProfessionalAvailabilityForm: React.FC<AvailabilityFormProps> = ({
   professionalId,
   onSubmit,
+  initialAvailability,
 }) => {
-  // Almacena un array de franjas por día
   const [availability, setAvailability] = useState<Record<string, TimeRange[]>>(() => {
-    // inicializamos con un rango vacío por día para que se vea la tabla lista
-    const init: Record<string, TimeRange[]> = {};
+    const initial: Record<string, TimeRange[]> = {};
     daysOfWeek.forEach((day) => {
-      init[day] = [{ start_time: '', end_time: '' }];
+      initial[day] = [{ start_time: '', end_time: '' }];
     });
-    return init;
+    return initial;
   });
 
   const handleTimeChange = (
@@ -62,9 +71,31 @@ const ProfessionalAvailabilityForm: React.FC<AvailabilityFormProps> = ({
     });
   };
 
+  useEffect(() => {
+    if (initialAvailability) {
+      setAvailability((prev) => {
+        const updated: Record<string, TimeRange[]> = {};
+
+        daysOfWeek.forEach((day) => {
+          if (initialAvailability[day]?.length) {
+            updated[day] = initialAvailability[day];
+          } else {
+            updated[day] = [{ start_time: '', end_time: '' }];
+          }
+        });
+
+        return updated;
+      });
+    }
+  }, [initialAvailability]);
+
   const handleSubmit = () => {
     const entries: AvailabilityEntry[] = [];
+    const validDays: string[] = [];
+
     for (const [day, ranges] of Object.entries(availability)) {
+      let hasValid = false;
+
       ranges.forEach(({ start_time, end_time }) => {
         if (start_time && end_time) {
           entries.push({
@@ -73,10 +104,19 @@ const ProfessionalAvailabilityForm: React.FC<AvailabilityFormProps> = ({
             start_time: start_time + ':00',
             end_time: end_time + ':00',
           });
+          hasValid = true;
         }
       });
+
+      if (hasValid) validDays.push(day);
     }
-    onSubmit(entries);
+
+    if (entries.length === 0) {
+      alert('Por favor, completá al menos una franja horaria válida.');
+      return;
+    }
+
+    onSubmit(entries, validDays);
   };
 
   const handleClearRange = (day: string, index: number) => {
@@ -116,11 +156,11 @@ const ProfessionalAvailabilityForm: React.FC<AvailabilityFormProps> = ({
         </thead>
         <tbody>
           {daysOfWeek.map((day) =>
-            availability[day].map((range, idx) => (
+            (availability[day] || []).map((range, idx) => (
               <tr key={`${day}-${idx}`}>
                 {idx === 0 && (
-                  <td rowSpan={availability[day].length} className="day-label">
-                    {day}
+                  <td rowSpan={(availability[day] || []).length} className="day-label">
+                    {dayLabels[day] || day}
                   </td>
                 )}
                 <td>
@@ -190,6 +230,12 @@ const ProfessionalAvailabilityForm: React.FC<AvailabilityFormProps> = ({
             <h6>+ Agregar horario</h6> {day}
           </button>
         ))}
+      </div>
+
+      <div className="save-button-container">
+        <button type="button" className="btn-save" onClick={handleSubmit}>
+          Guardar disponibilidad
+        </button>
       </div>
     </div>
   );

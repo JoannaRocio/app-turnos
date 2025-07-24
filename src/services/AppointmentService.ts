@@ -43,11 +43,11 @@ class AppointmentService {
     return rawData;
   }
 
-  static async getAppointmentByDni(professionalDni: string): Promise<Appointment[]> {
+  static async getAppointmentByDni(documentNumber: string): Promise<Appointment[]> {
     const token = localStorage.getItem(this.TOKEN_KEY);
 
     const response = await fetch(
-      `http://localhost:8080/api/appointments/professional/dni/${professionalDni}`,
+      `http://localhost:8080/api/appointments/professional/dni/${documentNumber}`,
       {
         method: 'GET',
         headers: {

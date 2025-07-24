@@ -23,7 +23,7 @@ const ProfessionalPanel: React.FC<Props> = ({ professionals, onProfessionalSelec
           <img src="/images/profile-pic.png" alt="Foto perfil" />
           <div className="info">
             <p className="name">{pro.professionalName}</p>
-            <p className="dni">DNI: {pro.professionalDni}</p>
+            <p className="dni">DNI: {pro.documentNumber}</p>
           </div>
         </div>
       ))}

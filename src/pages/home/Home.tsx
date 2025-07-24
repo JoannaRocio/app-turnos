@@ -100,7 +100,7 @@ const Home: React.FC = () => {
 
       if (selectedProfessional) {
         const appointmentsData = await AppointmentService.getAppointmentByDni(
-          selectedProfessional.professionalDni
+          selectedProfessional.documentNumber
         );
         setAppointments(appointmentsData);
       } else {

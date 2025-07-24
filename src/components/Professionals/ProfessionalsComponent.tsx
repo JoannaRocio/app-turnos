@@ -18,7 +18,6 @@ const ProfessionalsComponent: React.FC<{
   reloadProfessional: () => void;
 }> = ({ professionals, reloadProfessional }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  // const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional>>();
   const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional> | null>(
     null
   );
@@ -31,6 +30,82 @@ const ProfessionalsComponent: React.FC<{
     setShowEditModal(true);
   };
 
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(); // ej: "MONDAY"
+
+  const formatSchedulesByDay = (schedules: Professional['schedules']): React.ReactNode => {
+    if (!schedules || schedules.length === 0) return '-';
+
+    const grouped: Record<string, { startTime: string; endTime: string }[]> = {};
+
+    schedules.forEach(({ dayOfWeek, startTime, endTime }) => {
+      if (!grouped[dayOfWeek]) grouped[dayOfWeek] = [];
+      grouped[dayOfWeek].push({
+        startTime: startTime.slice(0, 5),
+        endTime: endTime.slice(0, 5),
+      });
+    });
+
+    const dayLabels: Record<string, string> = {
+      MONDAY: 'Lunes',
+      TUESDAY: 'Martes',
+      WEDNESDAY: 'Miércoles',
+      THURSDAY: 'Jueves',
+      FRIDAY: 'Viernes',
+      SATURDAY: 'Sábado',
+      SUNDAY: 'Domingo',
+    };
+
+    const orderedDays = [
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY',
+    ];
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+
+    const dayElements = orderedDays
+      .filter((day) => grouped[day])
+      .map((day) => {
+        const label = dayLabels[day] || day;
+        const isToday = day === today;
+        return (
+          <div key={day} className={`day-block ${isToday ? 'today-row' : ''}`}>
+            <strong>{label}:</strong>
+            <ul className="range-list">
+              {grouped[day].map((r, i) => (
+                <li key={i}>
+                  {r.startTime} - {r.endTime}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      });
+
+    const columns: React.ReactNode[][] = [];
+    for (let i = 0; i < dayElements.length; i += 2) {
+      const column = [dayElements[i]];
+      if (dayElements[i + 1]) column.push(dayElements[i + 1]);
+      columns.push(column);
+    }
+
+    return (
+      <div className="schedule-grid-vertical">
+        {columns.map((col, colIdx) => (
+          <div
+            className={`schedule-column ${colIdx % 2 === 0 ? 'bg-primary-c' : 'bg-secondary-c'}`}
+            key={colIdx}
+          >
+            {col}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const handleSave = async (professionalData: Partial<Professional>) => {
     try {
       if (professionalData.professionalId) {
@@ -39,18 +114,19 @@ const ProfessionalsComponent: React.FC<{
           professionalData
         );
 
-        alert('Paciente actualizado con éxito');
+        alert('Profesional actualizado con éxito');
       } else {
         await ProfessionalService.createProfessional(professionalData);
 
-        alert('Paciente creado con éxito');
+        alert('Profesional creado con éxito');
       }
 
       reloadProfessional();
       setShowEditModal(false);
       setSelectedProfessional(null);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message ?? 'Error inesperado al guardar el profesional');
     }
   };
 
@@ -59,11 +135,8 @@ const ProfessionalsComponent: React.FC<{
       professionalId: 0,
       professionalName: '',
       documentType: '',
-      professionalDni: '',
+      documentNumber: '',
       phone: '',
-      shiftStart: '',
-      shiftEnd: '',
-      unavailableHours: '',
       specialties: '',
     };
     setSelectedProfessional(emptyProfessional);
@@ -74,7 +147,7 @@ const ProfessionalsComponent: React.FC<{
     const nameMatch = professional.professionalName
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const dniMatch = professional.professionalDni?.toString().includes(searchTerm);
+    const dniMatch = professional.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
   });
 
@@ -106,9 +179,8 @@ const ProfessionalsComponent: React.FC<{
             <th>Tipo documento</th>
             <th>Numero documento</th>
             <th>Teléfono</th>
-            <th>Hora inicio de jornada</th>
-            <th>Hora fin de jornada</th>
-            <th>Horario no disponible</th>
+            {/* <th>Horario de jornada</th> */}
+            <th style={{ width: '350px' }}>Horario de jornada</th>
             <th>Especialidades</th>
           </tr>
         </thead>
@@ -125,11 +197,9 @@ const ProfessionalsComponent: React.FC<{
             >
               <td>{professional?.professionalName || '-'}</td>
               <td>{professional?.documentType || '-'}</td>
-              <td>{professional?.professionalDni || '-'}</td>
+              <td>{professional?.documentNumber || '-'}</td>
               <td>{professional?.phone || '-'}</td>
-              <td>{professional?.shiftStart || '-'}</td>
-              <td>{professional?.shiftEnd || '-'}</td>
-              <td>{professional?.unavailableHours || '-'}</td>
+              <td>{formatSchedulesByDay(professional.schedules)}</td>
               <td>
                 {Array.isArray(professional?.specialties)
                   ? professional.specialties.join(', ')

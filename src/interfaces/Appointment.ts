@@ -8,7 +8,7 @@ export interface Appointment {
   patientFullName: string;
   dateTime: string;
   professionalFullName: string;
-  professionalDni: string;
+  documentNumber: string;
   reason: string;
   state: string;
   patient: Patient;

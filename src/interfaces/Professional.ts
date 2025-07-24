@@ -1,12 +1,15 @@
-// ejemplo extendido de interfaz
+export interface Schedule {
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+}
+
 export interface Professional {
   professionalId: number;
   professionalName: string;
   documentType: string;
-  professionalDni: string;
+  documentNumber: string;
   phone: string;
-  shiftStart: string;
-  shiftEnd: string;
-  unavailableHours: string;
   specialties: string;
+  schedules: Schedule[];
 }

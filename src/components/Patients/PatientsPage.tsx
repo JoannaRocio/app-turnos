@@ -55,6 +55,7 @@ const PatientsComponent: React.FC<{
 
   const handleSave = async (patientData: Partial<Patient>) => {
     try {
+      console.log(patientData.id, 'paciente id');
       if (patientData.id) {
         await PatientService.updatePatient(patientData.id, patientData);
 
