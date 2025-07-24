@@ -45,15 +45,13 @@ class PatientService {
   static async updatePatient(id: number, data: any): Promise<Patient> {
     const token = AuthService.getToken();
 
-    const { id: _, ...payloadWithoutId } = data;
-
     const response = await fetch(`${this.BASE_URL}/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: token ? `Bearer ${token}` : '',
       },
-      body: JSON.stringify(payloadWithoutId),
+      body: JSON.stringify(data), // El body DEBE incluir el id
     });
 
     if (!response.ok) {

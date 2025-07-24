@@ -1,7 +1,9 @@
 import { Appointment } from '../interfaces/Appointment';
+import AuthService from './AuthService';
 
 class AppointmentService {
   private static readonly TOKEN_KEY = 'token';
+  private static BASE_URL = 'http://localhost:8080/api/appointments';
 
   static async createAppointment(appointment: any) {
     const token = localStorage.getItem(this.TOKEN_KEY);
@@ -101,6 +103,32 @@ class AppointmentService {
     }
 
     return await response.text();
+  }
+
+  static async confirmAppointment(id: number): Promise<void> {
+    const token = AuthService.getToken();
+    const res = await fetch(`${this.BASE_URL}/confirmar/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
+
+    if (!res.ok) throw new Error('Error al confirmar turno');
+  }
+
+  static async cancelAppointment(id: number): Promise<void> {
+    const token = AuthService.getToken();
+    const res = await fetch(`${this.BASE_URL}/cancelar/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
+
+    if (!res.ok) throw new Error('Error al cancelar turno');
   }
 }
 

@@ -55,14 +55,23 @@ const PatientsComponent: React.FC<{
 
   const handleSave = async (patientData: Partial<Patient>) => {
     try {
-      console.log(patientData.id, 'paciente id');
-      if (patientData.id) {
-        await PatientService.updatePatient(patientData.id, patientData);
+      const payload = {
+        id: patientData.id, // este puede ser undefined para creación
+        fullName: patientData.fullName,
+        documentType: patientData.documentType,
+        documentNumber: patientData.documentNumber,
+        phone: patientData.phone,
+        email: patientData.email,
+        note: patientData.note,
+        healthInsuranceId: patientData.healthInsuranceId,
+        insurancePlanId: patientData.insurancePlanId,
+      };
 
+      if (patientData.id) {
+        await PatientService.updatePatient(patientData.id, payload);
         alert('Paciente actualizado con éxito');
       } else {
-        await PatientService.createPatient(patientData);
-
+        await PatientService.createPatient(payload);
         alert('Paciente creado con éxito');
       }
 
@@ -70,7 +79,7 @@ const PatientsComponent: React.FC<{
       setModalOpen(false);
       setSelectedPatient(null);
     } catch (error) {
-      console.log(error);
+      console.error('Error al guardar paciente:', error);
     }
   };
 

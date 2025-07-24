@@ -10,16 +10,20 @@ import ResetPassword from './pages/password-recovery/reset-password/ResetPasswor
 import ProtectedRoute from './routes/ProtectedRoute';
 import './App.scss';
 import BranchSelector from './pages/branch-selector/BranchSelector';
+import AppointmentConfirmation from './pages/appointment-confirmation/AppointmentConfirmation';
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  const isBranchSelectorRoute = location.pathname.toLowerCase().includes('/sucursales');
+  // const isBranchSelectorRoute = location.pathname.toLowerCase().includes('/sucursales');
+  const isHiddenHeaderRoute =
+    location.pathname.toLowerCase().includes('/sucursales') ||
+    location.pathname.toLowerCase().includes('/confirmar-turno');
 
   return (
     <>
-      {isAuthenticated && !isBranchSelectorRoute && <HeaderComponent />}
+      {isAuthenticated && !isHiddenHeaderRoute && <HeaderComponent />}
 
       <Routes>
         <Route path="/Inicio-sesion" element={<Login />} />
@@ -45,6 +49,8 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/confirmar-turno/:appointmentId" element={<AppointmentConfirmation />} />
 
         <Route
           path="/no-autorizado"

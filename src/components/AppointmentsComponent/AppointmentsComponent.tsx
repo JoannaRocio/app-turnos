@@ -119,27 +119,34 @@ const AppointmentsComponent: React.FC<Props> = ({
   }, [isModalOpen, isEditMode, currentAppointment, patients]);
 
   useEffect(() => {
-    const matchByName = patients.find(
-      (p) => nameSearch && p.fullName?.toLowerCase().includes(nameSearch.toLowerCase())
-    );
-    const matchByDni = patients.find((p) => dniSearch && p.documentNumber?.includes(dniSearch));
+    const matchByName = nameSearch
+      ? patients.find((p) => p.fullName?.toLowerCase().includes(nameSearch.toLowerCase()))
+      : null;
 
+    const matchByDni = dniSearch
+      ? patients.find((p) => p.documentNumber?.includes(dniSearch))
+      : null;
+
+    // Si se encuentra por nombre y no se buscó por DNI
     if (matchByName && !dniSearch) {
       setNewAppointment((prev) => ({
         ...prev,
-        patientId: matchByName.id,
-        documentNumber: matchByName.documentNumber,
-        patientName: matchByName.fullName,
+        patientId: matchByName.id ?? 0, // <- evita undefined
+        documentNumber: matchByName.documentNumber ?? '',
+        patientName: matchByName.fullName ?? '',
       }));
-      setDniSearch(matchByName.documentNumber);
-    } else if (matchByDni && !nameSearch) {
+      setDniSearch(matchByName.documentNumber ?? '');
+    }
+
+    // Si se encuentra por DNI y no se buscó por nombre
+    else if (matchByDni && !nameSearch) {
       setNewAppointment((prev) => ({
         ...prev,
-        patientId: matchByDni.id,
-        documentNumber: matchByDni.documentNumber,
-        patientName: matchByDni.fullName,
+        patientId: matchByDni.id ?? 0,
+        documentNumber: matchByDni.documentNumber ?? '',
+        patientName: matchByDni.fullName ?? '',
       }));
-      setNameSearch(matchByDni.fullName);
+      setNameSearch(matchByDni.fullName ?? '');
     }
   }, [nameSearch, dniSearch, patients]);
 

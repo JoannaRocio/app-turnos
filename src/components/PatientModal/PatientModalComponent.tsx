@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Patient } from '../../interfaces/Patient';
 import './PatientModalComponent.scss';
+import HealthInsuranceService from '../../services/HealthInsuranceService';
+import { HealthInsurance } from '../../interfaces/HealthInsurance';
 
 interface PatientModalComponentProps {
   isOpen: boolean;
@@ -15,27 +17,66 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
   patient,
   onSave,
 }) => {
-  const [form, setForm] = useState<Partial<Patient>>({
+  const [form, setForm] = useState<{
+    id?: number;
+    fullName: string;
+    documentType: string;
+    documentNumber: string;
+    healthInsuranceId: string;
+    insurancePlanId: string;
+    phone: string;
+    email: string;
+    note: string;
+  }>({
+    id: undefined,
     fullName: '',
     documentType: '',
     documentNumber: '',
-    healthInsuranceName: '',
-    insurancePlanName: '',
+    healthInsuranceId: '',
+    insurancePlanId: '',
     phone: '',
+    email: '',
     note: '',
   });
 
+  const [healthInsurances, setHealthInsurances] = useState<HealthInsurance[]>([]);
+
+  useEffect(() => {
+    const fetchHealthInsurances = async () => {
+      try {
+        const data = await HealthInsuranceService.getActive();
+        setHealthInsurances(data);
+      } catch (error) {
+        console.error('Error cargando obras sociales', error);
+      }
+    };
+
+    fetchHealthInsurances();
+  }, []);
+
   useEffect(() => {
     if (patient) {
-      setForm(patient);
+      setForm({
+        id: patient.id || undefined,
+        fullName: patient.fullName || '',
+        documentType: patient.documentType || '',
+        documentNumber: patient.documentNumber || '',
+        healthInsuranceId: patient.healthInsuranceId?.toString() || '',
+        insurancePlanId: patient.insurancePlanId?.toString() || '',
+        phone: patient.phone || '',
+        email: patient.email || '',
+        note: patient.note || '',
+      });
     } else {
       setForm({
+        id: undefined,
         fullName: '',
         documentType: '',
         documentNumber: '',
-        healthInsuranceName: '',
-        insurancePlanName: '',
+        healthInsuranceId: '',
+        insurancePlanId: '',
         phone: '',
+        email: '',
         note: '',
       });
     }
@@ -50,7 +91,11 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              onSave(form);
+              onSave({
+                ...form,
+                healthInsuranceId: Number(form.healthInsuranceId),
+                insurancePlanId: Number(form.insurancePlanId),
+              });
             }}
           >
             <h4>{patient?.id ? 'Editar paciente' : 'Alta de paciente'}</h4>
@@ -73,18 +118,40 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
               onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
               placeholder="Número documento"
             />
-            <input
-              type="text"
-              value={form.healthInsuranceName}
-              onChange={(e) => setForm({ ...form, healthInsuranceName: e.target.value })}
-              placeholder="Obra social"
-            />
-            <input
-              type="text"
-              value={form.insurancePlanName}
-              onChange={(e) => setForm({ ...form, insurancePlanName: e.target.value })}
-              placeholder="Plan"
-            />
+
+            <select
+              value={form.healthInsuranceId}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  healthInsuranceId: e.target.value,
+                  insurancePlanId: '', // resetea plan cuando cambia obra social
+                })
+              }
+            >
+              <option value="">Seleccione una obra social</option>
+              {healthInsurances.map((insurance) => (
+                <option key={insurance.id} value={insurance.id}>
+                  {insurance.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={form.insurancePlanId}
+              onChange={(e) => setForm({ ...form, insurancePlanId: e.target.value })}
+              disabled={!form.healthInsuranceId}
+            >
+              <option value="">Seleccione un plan</option>
+              {healthInsurances
+                .find((h) => h.id === Number(form.healthInsuranceId))
+                ?.plans.map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </option>
+                ))}
+            </select>
+
             <input
               type="number"
               value={form.phone}

@@ -1,8 +1,10 @@
 export interface Patient {
-  id: number;
+  id?: number;
   fullName: string;
   documentType: string;
   documentNumber: string;
+  healthInsuranceId: number;
+  insurancePlanId: number;
   healthInsuranceName: string;
   insurancePlanName: string;
   phone: string;
