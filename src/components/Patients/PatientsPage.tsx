@@ -81,8 +81,8 @@ const PatientsComponent: React.FC<{
       documentType: '',
       documentNumber: '',
       phone: '',
-      healthInsurance: '',
-      insurancePlan: '',
+      healthInsuranceName: '',
+      insurancePlanName: '',
       note: '',
     };
     setSelectedPatient(emptyPatient);
@@ -156,8 +156,8 @@ const PatientsComponent: React.FC<{
               <td>{patient.fullName || '-'}</td>
               <td>{patient.documentType || '-'}</td>
               <td>{patient.documentNumber || '-'}</td>
-              <td>{patient?.healthInsurance || '-'}</td>
-              <td>{patient?.insurancePlan || '-'}</td>
+              <td>{patient?.healthInsuranceName || '-'}</td>
+              <td>{patient?.insurancePlanName || '-'}</td>
               <td>{patient?.phone || '-'}</td>
               <td>{patient?.note || '-'}</td>
               <td onClick={handleClick}>

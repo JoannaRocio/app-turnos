@@ -55,7 +55,8 @@ class ClinicalHistoryService {
   static async createClinicalHistory(
     patient: Patient,
     description: string,
-    professionalId: number
+    professionalId: number,
+    procedureIds: number[]
   ): Promise<void> {
     const token = AuthService.getToken();
     console.log('aca ', patient);
@@ -68,8 +69,8 @@ class ClinicalHistoryService {
       body: JSON.stringify({
         patientDocumentNumber: patient.documentNumber,
         professionalId: professionalId,
-        date: new Date().toISOString().split('T')[0],
-        description,
+        procedureId: procedureIds,
+        description: description,
       }),
     });
 

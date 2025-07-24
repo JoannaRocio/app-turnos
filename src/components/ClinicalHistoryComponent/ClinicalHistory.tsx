@@ -45,7 +45,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   const handleDeleteConfirmed = async (entry: ClinicalHistoryEntry) => {
     try {
       // await ClinicalHistoryService.deleteEntry(entry.id);
-      const updated = entries.filter(e => e.id !== entry.id);
+      const updated = entries.filter((e) => e.id !== entry.id);
       setEntries(updated);
     } catch (err: any) {
       console.error('Error al eliminar:', err);
@@ -56,21 +56,22 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   };
 
   // Tratamiento
-  const [selectedTreatments, setSelectedTreatments] = useState<Service[]>([]);
+  const [selectedTreatments, setSelectedTreatments] = useState<number[]>([]);
+
   const [selectedId, setSelectedId] = useState<number | ''>('');
 
   // Agrega tratamiento si no está ya seleccionado
   const handleAddTreatment = () => {
-    const treatment = availableTreatments.find(t => t.id === selectedId);
-    if (treatment && !selectedTreatments.some(t => t.id === treatment.id)) {
-      setSelectedTreatments([...selectedTreatments, treatment]);
+    const id = Number(selectedId);
+    if (id && !selectedTreatments.includes(id)) {
+      setSelectedTreatments([...selectedTreatments, id]);
     }
     setSelectedId('');
   };
 
   // Elimina un tratamiento de los seleccionados
   const handleRemoveTreatment = (id: number) => {
-    setSelectedTreatments(selectedTreatments.filter(t => t.id !== id));
+    setSelectedTreatments(selectedTreatments.filter((t) => t !== id));
   };
 
   // Entrada nueva
@@ -85,7 +86,12 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
     try {
       setLoading(true);
       console.log(patient, newEntry, 'que hay');
-      await ClinicalHistoryService.createClinicalHistory(patient, newEntry, professionalId);
+      await ClinicalHistoryService.createClinicalHistory(
+        patient,
+        newEntry,
+        professionalId,
+        selectedTreatments
+      );
       const updated = await ClinicalHistoryService.getOrCreate(patient, professionalId);
       setEntries(updated);
       setNewEntry('');
@@ -122,10 +128,10 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                 <strong>Documento:</strong> {patient.documentType} {patient.documentNumber}
               </p>
               <p>
-                <strong>Obra Social:</strong> {patient.healthInsurance || '-'}
+                <strong>Obra Social:</strong> {patient.healthInsuranceName || '-'}
               </p>
               <p>
-                <strong>Plan:</strong> {patient.insurancePlan || '-'}
+                <strong>Plan:</strong> {patient.insurancePlanName || '-'}
               </p>
               <p>
                 <strong>Teléfono:</strong> {patient.phone || '-'}
@@ -153,60 +159,62 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         <h3 className="text-white">Agregar nueva entrada</h3>
 
         {/* Tratamiento */}
-        {patient.healthInsurance && patient.insurancePlan && (
-          <div className="mb-3">
-            <label htmlFor="treatmentSelect" className="form-label">
-              <h4 className="text-white">Tratamientos disponibles:</h4>
-            </label>
-            <div className="input-group mb-2">
-              <select
-                id="treatmentSelect"
-                className="form-select form-clinicalHistory"
-                value={selectedId}
-                onChange={e => setSelectedId(Number(e.target.value))}
-              >
-                <option value="">Seleccione un tratamiento...</option>
-                {availableTreatments.map(treatment => (
-                  <option key={treatment.id} value={treatment.id}>
-                    {treatment.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              className="btn btn-primary btn-lg btn-guardar-clinicalHistory mb-2"
-              type="button"
-              onClick={handleAddTreatment}
-              disabled={!selectedId}
+        {/* {patient.healthInsuranceName && patient.insurancePlanName && ( */}
+        <div className="mb-3">
+          <label htmlFor="treatmentSelect" className="form-label">
+            <h4 className="text-white">Tratamientos disponibles:</h4>
+          </label>
+          <div className="input-group mb-2">
+            <select
+              id="treatmentSelect"
+              className="form-select form-clinicalHistory"
+              value={selectedId}
+              onChange={(e) => setSelectedId(Number(e.target.value))}
             >
-              Agregar tratamiento
-            </button>
+              <option value="">Seleccione un tratamiento...</option>
+              {availableTreatments.map((treatment) => (
+                <option key={treatment.id} value={treatment.id}>
+                  {treatment.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            {selectedTreatments.length > 0 && (
-              <div className="d-flex flex-wrap gap-2">
-                {selectedTreatments.map(t => (
-                  <span key={t.id} className="badge bg-secondary d-flex align-items-center fs-3">
-                    {t.name}
+          <button
+            className="btn btn-primary btn-lg btn-guardar-clinicalHistory mb-2"
+            type="button"
+            onClick={handleAddTreatment}
+            disabled={!selectedId}
+          >
+            Agregar tratamiento
+          </button>
+
+          {selectedTreatments.length > 0 && (
+            <div className="d-flex flex-wrap gap-2">
+              {selectedTreatments.map((id) => {
+                const treatment = availableTreatments.find((t) => t.id === id);
+                return (
+                  <span key={id} className="badge bg-secondary d-flex align-items-center fs-3">
+                    {treatment?.name || 'Tratamiento'}
                     <button
                       type="button"
                       className="btn-close btn-close-white ms-2"
                       aria-label="Eliminar"
-                      onClick={() => handleRemoveTreatment(t.id)}
+                      onClick={() => handleRemoveTreatment(id)}
                       style={{ fontSize: '0.6rem' }}
                     ></button>
                   </span>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Descripción */}
         <textarea
           className="form-control textArea-clinialHistory mb-2"
           value={newEntry}
-          onChange={e => setNewEntry(e.target.value)}
+          onChange={(e) => setNewEntry(e.target.value)}
           rows={4}
           placeholder="Descripción de la atención..."
         />
@@ -225,7 +233,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         {entries.length === 0 ? (
           <p className="text-white">No hay entradas de historia clínica.</p>
         ) : (
-          entries.map(entry => {
+          entries.map((entry) => {
             const mockTreatments = [
               'Limpieza de sarro',
               'Extracción de carie',

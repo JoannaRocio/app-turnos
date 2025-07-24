@@ -19,8 +19,8 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
     fullName: '',
     documentType: '',
     documentNumber: '',
-    healthInsurance: '',
-    insurancePlan: '',
+    healthInsuranceName: '',
+    insurancePlanName: '',
     phone: '',
     note: '',
   });
@@ -33,8 +33,8 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
         fullName: '',
         documentType: '',
         documentNumber: '',
-        healthInsurance: '',
-        insurancePlan: '',
+        healthInsuranceName: '',
+        insurancePlanName: '',
         phone: '',
         note: '',
       });
@@ -48,7 +48,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
       <div className={`modal-overlay ${patient?.id ? 'edit-mode' : ''}`}>
         <div className={`modal modal-patient ${patient?.id ? 'edit-mode' : ''}`}>
           <form
-            onSubmit={e => {
+            onSubmit={(e) => {
               e.preventDefault();
               onSave(form);
             }}
@@ -58,49 +58,49 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
             <input
               type="text"
               value={form.fullName}
-              onChange={e => setForm({ ...form, fullName: e.target.value })}
+              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
               placeholder="Nombre"
             />
             <input
               type="text"
               value={form.documentType}
-              onChange={e => setForm({ ...form, documentType: e.target.value })}
+              onChange={(e) => setForm({ ...form, documentType: e.target.value })}
               placeholder="Tipo documento"
             />
             <input
               type="text"
               value={form.documentNumber}
-              onChange={e => setForm({ ...form, documentNumber: e.target.value })}
+              onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
               placeholder="Número documento"
             />
             <input
               type="text"
-              value={form.healthInsurance}
-              onChange={e => setForm({ ...form, healthInsurance: e.target.value })}
+              value={form.healthInsuranceName}
+              onChange={(e) => setForm({ ...form, healthInsuranceName: e.target.value })}
               placeholder="Obra social"
             />
             <input
               type="text"
-              value={form.insurancePlan}
-              onChange={e => setForm({ ...form, insurancePlan: e.target.value })}
+              value={form.insurancePlanName}
+              onChange={(e) => setForm({ ...form, insurancePlanName: e.target.value })}
               placeholder="Plan"
             />
             <input
               type="number"
               value={form.phone}
-              onChange={e => setForm({ ...form, phone: e.target.value })}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
               placeholder="Teléfono"
             />
             <input
               type="email"
               value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
               placeholder="Correo electrónico"
             />
             <input
               type="text"
               value={form.note}
-              onChange={e => setForm({ ...form, note: e.target.value })}
+              onChange={(e) => setForm({ ...form, note: e.target.value })}
               placeholder="Notas"
             />
             <div className="modal-buttons">

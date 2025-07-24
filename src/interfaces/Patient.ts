@@ -3,8 +3,8 @@ export interface Patient {
   fullName: string;
   documentType: string;
   documentNumber: string;
-  healthInsurance: string;
-  insurancePlan: string;
+  healthInsuranceName: string;
+  insurancePlanName: string;
   phone: string;
   email: string;
   registrationDate: string | null;

@@ -309,7 +309,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                         <td>{appt?.patient.fullName ?? '-'}</td>
                         <td>{appt?.patient.documentNumber ?? '-'}</td>
                         <td>{appt?.state ? '✔️' : appt ? '❌' : '-'}</td>
-                        <td>{appt?.patient.healthInsurance ?? '-'}</td>
+                        <td>{appt?.patient.healthInsuranceName ?? '-'}</td>
                         {/* <td>{appt?.patient.insurancePlan ?? "-"}</td> */}
                         {/* <td>{appt?.patient.phone ?? "-"}</td> */}
                         <td>{appt?.reason ?? '-'}</td>
