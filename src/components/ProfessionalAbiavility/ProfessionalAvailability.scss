@@ -150,4 +150,11 @@
   .btn-clear-day:not(:disabled):hover {
     background-color: #d12f2f;
   }
+
+  .save-button-container {
+    place-self: center;
+  }
   
+  .btn-availability {
+    background-color: var(--color-yellow);
+  }

@@ -75,6 +75,14 @@ const AppointmentsComponent: React.FC<Props> = ({
     onAppointmentsUpdate(professional);
   };
 
+  const getDayOfWeekString = (date: Date): string => {
+    return date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+  };
+
+  const filteredProfessionals = professionals.filter((pro) =>
+    pro.schedules?.some((s) => s.dayOfWeek === getDayOfWeekString(selectedDate))
+  );
+
   const appointmentsForSelectedDate = appointments.filter((appt) =>
     appt.dateTime.startsWith(selectedDate.toISOString().split('T')[0])
   );
@@ -358,96 +366,112 @@ const AppointmentsComponent: React.FC<Props> = ({
 
               {isModalOpen && (
                 <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
-                  <div className={`modal ${isEditMode ? 'edit-mode' : ''}`}>
+                  <div className={`custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
                     <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
-                    <form onSubmit={handleSubmit}>
-                      <label>
-                        Paciente:
-                        <input
-                          type="text"
-                          value={nameSearch}
-                          onChange={(e) => {
-                            setNameSearch(e.target.value);
-                            setDniSearch(''); // resetea el otro buscador
-                          }}
-                          list="patientsByName"
-                          placeholder="Escribí el nombre"
-                        />
-                        <datalist id="patientsByName">
-                          {filteredPatients.map((p) => (
-                            <option key={p.id} value={p.fullName} />
-                          ))}
-                        </datalist>
-                      </label>
+                    <form onSubmit={handleSubmit} className="form-turno">
+                      <div className="form-grid">
+                        <label>
+                          Paciente:
+                          <input
+                            type="text"
+                            value={nameSearch}
+                            onChange={(e) => {
+                              setNameSearch(e.target.value);
+                              setDniSearch('');
+                            }}
+                            list="patientsByName"
+                            placeholder="Escribí el nombre"
+                          />
+                          <datalist id="patientsByName">
+                            {filteredPatients.map((p) => (
+                              <option key={p.id} value={p.fullName} />
+                            ))}
+                          </datalist>
+                        </label>
 
-                      <label>
-                        DNI:
-                        <input
-                          type="text"
-                          value={dniSearch}
-                          readOnly={!!nameSearch} // Solo lectura si hay nombre seleccionado
-                          onChange={(e) => {
-                            setDniSearch(e.target.value);
-                            setNameSearch(''); // resetea el otro buscador
-                          }}
-                          list="patientsByDni"
-                          placeholder="Escribí el DNI"
-                        />
-                        <datalist id="patientsByDni">
-                          {filteredPatients.map((p) => (
-                            <option key={p.id} value={p.documentNumber} />
-                          ))}
-                        </datalist>
-                      </label>
+                        <label>
+                          DNI:
+                          <input
+                            type="text"
+                            value={dniSearch}
+                            readOnly={!!nameSearch}
+                            onChange={(e) => {
+                              setDniSearch(e.target.value);
+                              setNameSearch('');
+                            }}
+                            list="patientsByDni"
+                            placeholder="Escribí el DNI"
+                          />
+                          <datalist id="patientsByDni">
+                            {filteredPatients.map((p) => (
+                              <option key={p.id} value={p.documentNumber} />
+                            ))}
+                          </datalist>
+                        </label>
 
-                      <label>
-                        Doctor/a:
-                        <input
-                          type="text"
-                          value={selectedProfessional?.professionalName}
-                          readOnly={true}
-                        />
-                      </label>
+                        <label>
+                          Profesional:
+                          <select
+                            value={selectedProfessional?.professionalId || ''}
+                            onChange={(e) => {
+                              const pro = professionals.find(
+                                (p) => p.professionalId === Number(e.target.value)
+                              );
+                              if (pro) {
+                                setSelectedProfessional(pro);
+                              }
+                            }}
+                          >
+                            <option value="">Seleccioná un profesional</option>
+                            {filteredProfessionals.map((pro) => (
+                              <option key={pro.professionalId} value={pro.professionalId}>
+                                {pro.professionalName}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
 
-                      <label>
-                        Hora:
-                        <select name="time" value={newAppointment.time} onChange={handleChange}>
-                          {timeSlots.map((time) => (
-                            <option
-                              key={time}
-                              value={time}
-                              disabled={!!getAppointmentForTime(time)}
-                            >
-                              {time}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                        <label>
+                          Hora:
+                          <select name="time" value={newAppointment.time} onChange={handleChange}>
+                            {timeSlots.map((time) => (
+                              <option
+                                key={time}
+                                value={time}
+                                disabled={!!getAppointmentForTime(time)}
+                              >
+                                {time}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
 
-                      <label>
-                        Motivo:
-                        <input
-                          type="text"
-                          name="reason"
-                          value={newAppointment.reason}
-                          onChange={handleChange}
-                        />
-                      </label>
+                        <label className="full-width">
+                          Motivo:
+                          <input
+                            type="text"
+                            name="reason"
+                            value={newAppointment.reason}
+                            onChange={handleChange}
+                          />
+                        </label>
 
-                      <label>
-                        Notas:
-                        <textarea
-                          name="notes"
-                          value={newAppointment.notes}
-                          onChange={handleChange}
-                        />
-                      </label>
+                        <label className="full-width">
+                          Notas:
+                          <textarea
+                            name="notes"
+                            value={newAppointment.notes}
+                            onChange={handleChange}
+                          />
+                        </label>
+                      </div>
 
-                      <button type="submit">{isEditMode ? 'Actualizar' : 'Guardar'}</button>
-
-                      <button type="button" onClick={closeModal}>
-                        Cancelar
-                      </button>
+                      <div className="form-buttons">
+                        <button type="submit">{isEditMode ? 'Actualizar' : 'Guardar'}</button>
+                        <button type="button" onClick={closeModal}>
+                          Cancelar
+                        </button>
+                      </div>
                     </form>
                   </div>
                 </div>

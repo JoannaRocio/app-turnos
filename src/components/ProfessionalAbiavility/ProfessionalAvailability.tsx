@@ -227,13 +227,13 @@ const ProfessionalAvailabilityForm: React.FC<AvailabilityFormProps> = ({
             onClick={() => handleAddRange(day)}
             className="btn-add"
           >
-            <h6>+ Agregar horario</h6> {day}
+            <h6>+ Agregar horario</h6> {dayLabels[day]}
           </button>
         ))}
       </div>
 
       <div className="save-button-container">
-        <button type="button" className="btn-save" onClick={handleSubmit}>
+        <button type="button" className="btn-save btn-availability" onClick={handleSubmit}>
           Guardar disponibilidad
         </button>
       </div>

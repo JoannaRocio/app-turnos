@@ -30,7 +30,15 @@ class ProfessionalService {
       phone: item.phone ?? '-',
       specialties: item.specialties ?? '-',
       schedules: item.schedules ?? [],
+      professionalState: item.professionalState ?? '-',
     }));
+
+    // Ordenar activos primero
+    mapped.sort((a, b) => {
+      if (a.professionalState === 'ACTIVE' && b.professionalState !== 'ACTIVE') return -1;
+      if (a.professionalState !== 'ACTIVE' && b.professionalState === 'ACTIVE') return 1;
+      return 0;
+    });
 
     return mapped;
   }

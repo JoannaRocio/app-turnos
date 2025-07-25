@@ -34,22 +34,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
 
   const [savedAvailability, setSavedAvailability] = useState<Record<string, TimeRange[]>>({});
   const [errors, setErrors] = useState<Record<string, boolean>>({});
-  const [savedDays, setSavedDays] = useState<string[]>([]); // Nuevo estado para días
-
-  // useEffect(() => {
-  //   if (professional) {
-  //     setForm(professional);
-  //   } else {
-  //     setForm({
-  //       professionalName: '',
-  //       documentType: '',
-  //       documentNumber: '',
-  //       phone: '',
-  //       specialties: '',
-  //       schedules: [],
-  //     });
-  //   }
-  // }, [professional]);
+  const [savedDays, setSavedDays] = useState<string[]>([]);
 
   useEffect(() => {
     if (professional) {
@@ -119,7 +104,10 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
 
   return (
     <section>
-      <div className={`modal-overlay ${professional?.professionalId ? 'edit-mode' : ''}`}>
+      <div
+        className={`modal-overlay-professionalModal
+           ${professional?.professionalId ? 'edit-mode' : ''}`}
+      >
         <div className={`modal modal-patient ${professional?.professionalId ? 'edit-mode' : ''}`}>
           <form
             onSubmit={(e) => {
@@ -131,6 +119,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
             <h4>{professional?.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
             {/* Nombre completo */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <label htmlFor="documentType">Nombre completo</label>
               <input
                 id="professionalName"
                 type="text"
@@ -216,13 +205,6 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
               </div>
             </div>
 
-            {/* Formulario de disponibilidad horaria */}
-            {/* {professional?.professionalId !== undefined && (
-              <ProfessionalAvailabilityForm
-                professionalId={professional?.professionalId}
-                onSubmit={handleSaveAvailability}
-              />
-             */}
             {professional?.professionalId !== undefined && (
               <ProfessionalAvailabilityForm
                 professionalId={professional?.professionalId}

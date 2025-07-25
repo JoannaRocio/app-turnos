@@ -12,4 +12,5 @@ export interface Professional {
   phone: string;
   specialties: string;
   schedules: Schedule[];
+  professionalState: string;
 }

@@ -182,6 +182,8 @@ const ProfessionalsComponent: React.FC<{
             {/* <th>Horario de jornada</th> */}
             <th style={{ width: '350px' }}>Horario de jornada</th>
             <th>Especialidades</th>
+            <th>De licencia</th>
+            <th>Activo</th>
           </tr>
         </thead>
         <tbody>
@@ -191,9 +193,9 @@ const ProfessionalsComponent: React.FC<{
               onClick={() => {
                 if (!isUsuario) handleRowClick(professional);
               }}
-              className={!isUsuario ? 'clickable-row' : ''}
-              // onClick={() => handleRowClick(professional)}
-              // className="clickable-row"
+              className={`${!isUsuario ? 'clickable-row' : ''} 
+              ${professional?.professionalState !== 'ACTIVE' ? 'inactive-row' : ''} 
+              ${index % 2 === 0 ? 'bg-primary-r' : 'bg-secondary-r'}`}
             >
               <td>{professional?.professionalName || '-'}</td>
               <td>{professional?.documentType || '-'}</td>
@@ -204,6 +206,14 @@ const ProfessionalsComponent: React.FC<{
                 {Array.isArray(professional?.specialties)
                   ? professional.specialties.join(', ')
                   : professional?.specialties || '-'}
+              </td>
+              <td>-</td>
+              <td>
+                {professional
+                  ? professional.professionalState === 'ACTIVE'
+                    ? 'Activo'
+                    : 'No activo'
+                  : '-'}
               </td>
             </tr>
           ))}

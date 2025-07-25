@@ -37,6 +37,7 @@
   --color-blue-dark: #005e75;
   --color-red: #fb1212;
   --color-green: #4cfcda;
+  --color-yellow: rgb(236, 203, 93);
 }
 
 html {
@@ -218,6 +219,19 @@ a {
   color: var(--color-green);
 
 }
+
+// TABLE ROW COLOR
+
+.inactive-row {
+  background-color: #c9c6c6 !important;
+  color: #444444;
+}
+
+.inactive-cell {
+  background-color: #d2ecd9 !important;
+  color: #444444;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
