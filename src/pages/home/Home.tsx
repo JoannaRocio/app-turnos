@@ -37,7 +37,7 @@ const Home: React.FC = () => {
       }
       if (componenteActivo === 'agenda-turnos') {
         await loadPatients();
-        await loadAllProfessionals();
+        await loadActiveProfessionals();
       }
       if (componenteActivo === 'profesionales') {
         await loadAllProfessionals();
@@ -72,6 +72,25 @@ const Home: React.FC = () => {
       setPatients(data);
     } catch (err) {
       console.error('Error al traer pacientes:', err);
+    }
+  };
+
+  const loadActiveProfessionals = async () => {
+    try {
+      const data = await ProfessionalService.getAllProfessionals();
+
+      // Filtrar solo los profesionales activos
+      const activeProfessionals = data.filter(
+        (professional) => professional.professionalState === 'ACTIVE'
+      );
+
+      if (!selectedProfessional && activeProfessionals.length > 0) {
+        setSelectedProfessional(activeProfessionals[0]);
+      }
+
+      setProfessionals(activeProfessionals);
+    } catch (error) {
+      console.error('Error al cargar los profesionales activos:', error);
     }
   };
 

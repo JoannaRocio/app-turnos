@@ -97,84 +97,141 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
                 insurancePlanId: Number(form.insurancePlanId),
               });
             }}
+            className="form-paciente"
           >
             <h4>{patient?.id ? 'Editar paciente' : 'Alta de paciente'}</h4>
 
-            <input
-              type="text"
-              value={form.fullName}
-              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              placeholder="Nombre"
-            />
-            <input
-              type="text"
-              value={form.documentType}
-              onChange={(e) => setForm({ ...form, documentType: e.target.value })}
-              placeholder="Tipo documento"
-            />
-            <input
-              type="text"
-              value={form.documentNumber}
-              onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
-              placeholder="Número documento"
-            />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <label htmlFor="documentType">Nombre completo</label>
+              <input
+                id="patientName"
+                type="text"
+                value={form.fullName}
+                onChange={(e) => {
+                  const onlyLetters = e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '');
+                  setForm({ ...form, fullName: onlyLetters });
+                }}
+                placeholder="Nombre completo"
+              />
+              {!form.fullName?.trim() && <span className="field-error">Campo obligatorio</span>}
+            </div>
 
-            <select
-              value={form.healthInsuranceId}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  healthInsuranceId: e.target.value,
-                  insurancePlanId: '', // resetea plan cuando cambia obra social
-                })
-              }
-            >
-              <option value="">Seleccione una obra social</option>
-              {healthInsurances.map((insurance) => (
-                <option key={insurance.id} value={insurance.id}>
-                  {insurance.name}
-                </option>
-              ))}
-            </select>
+            <div className="form-row">
+              {/* Tipo y número de documento */}
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <label htmlFor="documentType">Tipo de documento</label>
+                  <select
+                    id="documentType"
+                    value={form.documentType}
+                    onChange={(e) => setForm({ ...form, documentType: e.target.value })}
+                  >
+                    <option value="">Tipo de documento</option>
+                    <option value="DNI">DNI</option>
+                    <option value="Libreta de Enrolamiento">Libreta de Enrolamiento</option>
+                    <option value="Libreta Cívica">Libreta Cívica</option>
+                    <option value="Cédula de Identidad">Cédula de Identidad</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="Cédula de Extranjería">Cédula de Extranjería</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                  {!form.documentType && <span className="field-error">Campo obligatorio</span>}
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Número documento</label>
+                <input
+                  type="text"
+                  value={form.documentNumber}
+                  onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
+                  placeholder="Número documento"
+                />
+                {!form.documentNumber?.trim() && (
+                  <span className="field-error">Campo obligatorio</span>
+                )}
+              </div>
+            </div>
 
-            <select
-              value={form.insurancePlanId}
-              onChange={(e) => setForm({ ...form, insurancePlanId: e.target.value })}
-              disabled={!form.healthInsuranceId}
-            >
-              <option value="">Seleccione un plan</option>
-              {healthInsurances
-                .find((h) => h.id === Number(form.healthInsuranceId))
-                ?.plans.map((plan) => (
-                  <option key={plan.id} value={plan.id}>
-                    {plan.name}
-                  </option>
-                ))}
-            </select>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Obra social</label>
+                <select
+                  value={form.healthInsuranceId}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      healthInsuranceId: e.target.value,
+                      insurancePlanId: '',
+                    })
+                  }
+                >
+                  <option value="">Seleccione una obra social</option>
+                  {healthInsurances.map((insurance) => (
+                    <option key={insurance.id} value={insurance.id}>
+                      {insurance.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Plan</label>
+                <select
+                  value={form.insurancePlanId}
+                  onChange={(e) => setForm({ ...form, insurancePlanId: e.target.value })}
+                  disabled={!form.healthInsuranceId}
+                >
+                  <option value="">Seleccione un plan</option>
+                  {healthInsurances
+                    .find((h) => h.id === Number(form.healthInsuranceId))
+                    ?.plans.map((plan) => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
 
-            <input
-              type="number"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              placeholder="Teléfono"
-            />
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="Correo electrónico"
-            />
-            <input
-              type="text"
-              value={form.note}
-              onChange={(e) => setForm({ ...form, note: e.target.value })}
-              placeholder="Notas"
-            />
-            <div className="modal-buttons">
-              <button type="submit" disabled={!form.fullName || !form.documentNumber}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Teléfono</label>
+                <input
+                  type="number"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="Teléfono"
+                />
+              </div>
+              <div className="form-group">
+                <label>Correo electrónico</label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="Correo electrónico"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Notas</label>
+              <input
+                type="text"
+                value={form.note}
+                onChange={(e) => setForm({ ...form, note: e.target.value })}
+                placeholder="Notas"
+              />
+            </div>
+
+            <div className="d-flex justify-content-center align-items-center">
+              <button
+                className="modal-buttons"
+                type="submit"
+                disabled={!form.fullName || !form.documentNumber}
+              >
                 Guardar
               </button>
-              <button type="button" onClick={onClose}>
+              <button className="modal-buttons" type="button" onClick={onClose}>
                 Cancelar
               </button>
             </div>

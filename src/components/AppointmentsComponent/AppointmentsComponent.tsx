@@ -466,9 +466,11 @@ const AppointmentsComponent: React.FC<Props> = ({
                         </label>
                       </div>
 
-                      <div className="form-buttons">
-                        <button type="submit">{isEditMode ? 'Actualizar' : 'Guardar'}</button>
-                        <button type="button" onClick={closeModal}>
+                      <div className="d-flex justify-content-center align-items-center">
+                        <button className="modal-buttons" type="submit">
+                          {isEditMode ? 'Actualizar' : 'Guardar'}
+                        </button>
+                        <button className="modal-buttons" type="button" onClick={closeModal}>
                           Cancelar
                         </button>
                       </div>

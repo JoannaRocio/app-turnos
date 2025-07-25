@@ -29,7 +29,13 @@ const HeaderComponent: React.FC = () => {
                 className={`nav-link btn ${componenteActivo === 'agenda-turnos' ? 'fw-bold' : ''}`}
                 onClick={() => setComponenteActivo('agenda-turnos')}
               >
-                <div className="title-header">Agenda de turnos</div>
+                <div
+                  className={`title-header ${
+                    componenteActivo === 'agenda-turnos' ? 'active-title' : ''
+                  }`}
+                >
+                  Agenda de turnos
+                </div>
               </button>
             </li>
 
@@ -38,7 +44,13 @@ const HeaderComponent: React.FC = () => {
                 className={`nav-link btn ${componenteActivo === 'pacientes' ? 'fw-bold' : ''}`}
                 onClick={() => setComponenteActivo('pacientes')}
               >
-                <div className="title-header">Pacientes</div>
+                <div
+                  className={`title-header ${
+                    componenteActivo === 'pacientes' ? 'active-title' : ''
+                  }`}
+                >
+                  Pacientes
+                </div>
               </button>
             </li>
 
@@ -48,7 +60,13 @@ const HeaderComponent: React.FC = () => {
                   className={`nav-link btn ${componenteActivo === 'profesionales' ? 'fw-bold' : ''}`}
                   onClick={() => setComponenteActivo('profesionales')}
                 >
-                  <div className="title-header">Profesionales</div>
+                  <div
+                    className={`title-header ${
+                      componenteActivo === 'profesionales' ? 'active-title' : ''
+                    }`}
+                  >
+                    Profesionales
+                  </div>
                 </button>
               </li>
             )}
@@ -59,7 +77,13 @@ const HeaderComponent: React.FC = () => {
                   className={`nav-link btn ${componenteActivo === 'panel-admin' ? 'fw-bold' : ''}`}
                   onClick={() => setComponenteActivo('panel-admin')}
                 >
-                  <div className="title-header">Panel admin</div>
+                  <div
+                    className={`title-header ${
+                      componenteActivo === 'panel-admin' ? 'active-title' : ''
+                    }`}
+                  >
+                    Panel Admin
+                  </div>
                 </button>
               </li>
             )}

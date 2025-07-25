@@ -7,9 +7,18 @@
 }
 
 .title-header {
-    color: var(--color-primary-light);
-
-    &:hover {
+  color: var(--color-neutral-light);
+  transition: color 0.3s ease;
+      &:hover {
         color: var(--color-secondary-light);
     }
+}
+ 
+.active-title {
+  color: var(--color-primary-dark);
+}
+
+.active-title {
+  color: var(--color-primary-hover);
+  font-weight: bold;
 }

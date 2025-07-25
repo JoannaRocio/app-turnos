@@ -161,15 +161,4 @@ select {
     resize: vertical;
     min-height: 80px;
   }
-
-  .form-buttons {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-
-    button {
-      padding: 0.5rem 1.2rem;
-    }
-  }
 }
