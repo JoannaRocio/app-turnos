@@ -1,39 +1,3 @@
-.appointments-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 1rem;
-  background-color: gainsboro;
-
-  th,
-  td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-
-  th {
-    background-color: #e9ebf1; // Header
-  }
-
-  tr {
-    height: 50px;
-    max-height: 50px;
-    font-size: 1.2rem;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #f9f9fb; // color claro
-  }
-
-  tbody tr:nth-child(odd) {
-    background-color: #eef3fd; // celeste suave
-  }
-
-  tbody tr:hover {
-    background-color: #d6eaff !important; // hover más destacado
-  }
-}
-
 .panel-professionalName {
   background: var(--color-white-light);
   width: fit-content;
@@ -88,7 +52,8 @@
 
 
 .custom-modal.edit-mode {
-  background-color: var(--color-primary-light);
+  background-color: var(--color-secondary-light);
+  color:var( --color-white-light);
 }
 
 .modal-overlay.edit-mode {

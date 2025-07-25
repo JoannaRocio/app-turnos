@@ -144,7 +144,7 @@ const ProfessionalAvailabilityForm: React.FC<AvailabilityFormProps> = ({
 
   return (
     <div className="availability-container">
-      <h5>Disponibilidad del profesional</h5>
+      <h5 className="fw-bold">Disponibilidad del profesional</h5>
       <table className="availability-table">
         <thead>
           <tr>

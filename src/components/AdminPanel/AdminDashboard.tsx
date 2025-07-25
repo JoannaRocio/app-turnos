@@ -125,7 +125,7 @@ const AdminDashboard: React.FC<{
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
-          <table className="appointments-table">
+          <table className="App-table">
             <thead>
               <tr>
                 <th>Nombre usuario</th>

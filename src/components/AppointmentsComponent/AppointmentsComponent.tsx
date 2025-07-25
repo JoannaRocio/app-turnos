@@ -294,7 +294,7 @@ const AppointmentsComponent: React.FC<Props> = ({
             </div>
 
             <div className="col-8">
-              <table className="appointments-table">
+              <table className="App-table">
                 <thead>
                   <tr>
                     <th>Hora</th>
