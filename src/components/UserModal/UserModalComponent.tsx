@@ -3,6 +3,7 @@ import './UserModalComponent.scss';
 import { User } from '../../interfaces/User';
 import { UserRole } from '../../interfaces/UserRole';
 import { Professional } from '../../interfaces/Professional';
+import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 
 interface UserModalComponentProps {
   isOpen: boolean;
@@ -23,9 +24,11 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
     username: '',
     password: '',
     email: '',
-    role: UserRole.USUARIO,
+    role: undefined,
     professionalId: undefined,
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -35,11 +38,19 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
         username: '',
         password: '',
         email: '',
-        role: UserRole.USUARIO,
+        role: undefined,
         professionalId: undefined,
       });
     }
   }, [user]);
+
+  const isFormValid =
+    !!form.username?.trim() &&
+    !!form.email?.trim() &&
+    !!form.password &&
+    form.password.length >= 3 &&
+    !!form.role &&
+    (form.role !== UserRole.USUARIO || !!form.professionalId);
 
   if (!isOpen || !form) return null;
 
@@ -49,6 +60,7 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
         <div className={`modal modal-patient ${user?.id ? 'edit-mode' : ''}`}>
           <form
             autoComplete="off"
+            className="user-form"
             onSubmit={(e) => {
               e.preventDefault();
               onSave(form);
@@ -56,57 +68,91 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
           >
             <h4>{user?.id ? 'Editar usuario' : 'Alta de usuario'}</h4>
 
-            <input
-              type="text"
-              autoComplete="username"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              placeholder="Nombre de usuario"
-            />
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={form.password ?? ''}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              placeholder="Contraseña"
-            />
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="Email"
-            />
-            <select
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value as UserRole })}
-            >
-              <option value="">Seleccione un rol</option>
-              <option value="ADMIN">ADMIN</option>
-              <option value="MODERADOR">MODERADOR</option>
-              <option value="USUARIO">USUARIO</option>
-            </select>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Nombre de usuario</label>
+                <input
+                  type="text"
+                  autoComplete="username"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  placeholder="Ingrese un nombre de usuario"
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="Ingrese un email"
+                />
+              </div>
+            </div>
+
+            <div className="form-group password-group">
+              <label>Contraseña</label>
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  value={form.password ?? ''}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Ingrese una contraseña"
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <IoMdEye size={20} /> : <IoMdEyeOff size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {form.password !== undefined &&
+              form.password.length > 0 &&
+              form.password.length < 3 && (
+                <small className="text-danger">
+                  La contraseña debe tener al menos 3 caracteres.
+                </small>
+              )}
+
+            <div className="form-group">
+              <label>Tipo de usuario</label>
+              <select
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value as UserRole })}
+              >
+                <option value="">Seleccione un rol</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="MODERADOR">MODERADOR</option>
+                <option value="USUARIO">USUARIO</option>
+              </select>
+            </div>
 
             {form.role === UserRole.USUARIO && (
-              <select
-                value={form.professionalId ?? ''}
-                onChange={(e) => setForm({ ...form, professionalId: Number(e.target.value) })}
-              >
-                <option value="">Seleccione un profesional...</option>
-                {professionals.map((prof) => (
-                  <option key={prof.professionalId} value={prof.professionalId}>
-                    {prof.professionalName}
-                  </option>
-                ))}
-              </select>
+              <div className="form-group">
+                <label>Profesional asignado</label>
+                <select
+                  value={form.professionalId ?? ''}
+                  onChange={(e) => setForm({ ...form, professionalId: Number(e.target.value) })}
+                >
+                  <option value="">Seleccione un profesional...</option>
+                  {professionals.map((prof) => (
+                    <option key={prof.professionalId} value={prof.professionalId}>
+                      {prof.professionalName}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
-            <div className="modal-buttons">
-              <button
-                type="submit"
-                disabled={!form.username || !form.email || !form.password || !form.role}
-              >
+
+            <div className="d-flex justify-content-center align-items-center">
+              <button className="modal-buttons" type="submit" disabled={!isFormValid}>
                 Guardar
               </button>
-              <button type="button" onClick={onClose}>
+              <button className="modal-buttons" type="button" onClick={onClose}>
                 Cancelar
               </button>
             </div>

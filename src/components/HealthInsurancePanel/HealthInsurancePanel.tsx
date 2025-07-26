@@ -59,7 +59,7 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   const handleDeletePlan = (id: number) => {
-    setPlans(plans.filter(p => p.id !== id));
+    setPlans(plans.filter((p) => p.id !== id));
   };
 
   const handleSavePlan = () => {
@@ -68,7 +68,7 @@ const HealthInsurancePanel: React.FC = () => {
 
     if (selectedPlan) {
       setPlans(
-        plans.map(p =>
+        plans.map((p) =>
           p.id === selectedPlan.id
             ? { ...p, name: trimmed, insuranceId: Number(selectedInsuranceForPlan) }
             : p
@@ -139,7 +139,7 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   const handleDeleteInsurance = (id: number) => {
-    setInsurances(insurances.filter(i => i.id !== id));
+    setInsurances(insurances.filter((i) => i.id !== id));
   };
 
   const handleSaveInsurance = () => {
@@ -148,7 +148,7 @@ const HealthInsurancePanel: React.FC = () => {
 
     if (selectedInsurance) {
       setInsurances(
-        insurances.map(i => (i.id === selectedInsurance.id ? { ...i, name: trimmed } : i))
+        insurances.map((i) => (i.id === selectedInsurance.id ? { ...i, name: trimmed } : i))
       );
     } else {
       setInsurances([...insurances, { id: Date.now(), name: trimmed }]);
@@ -174,7 +174,7 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   const handleDeleteService = (id: number) => {
-    setServices(services.filter(s => s.id !== id));
+    setServices(services.filter((s) => s.id !== id));
   };
 
   const handleSaveService = () => {
@@ -182,7 +182,7 @@ const HealthInsurancePanel: React.FC = () => {
     if (trimmed === '') return;
 
     if (selectedService) {
-      setServices(services.map(s => (s.id === selectedService.id ? { ...s, name: trimmed } : s)));
+      setServices(services.map((s) => (s.id === selectedService.id ? { ...s, name: trimmed } : s)));
     } else {
       setServices([...services, { id: Date.now(), name: trimmed }]);
     }
@@ -211,7 +211,7 @@ const HealthInsurancePanel: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {insurances.map(insurance => (
+                {insurances.map((insurance) => (
                   <tr key={insurance.id}>
                     <td>{insurance.name}</td>
                     <td>
@@ -251,7 +251,7 @@ const HealthInsurancePanel: React.FC = () => {
                   className="form-control form-health"
                   placeholder="Nombre de la obra social"
                   value={insuranceInput}
-                  onChange={e => setInsuranceInput(e.target.value)}
+                  onChange={(e) => setInsuranceInput(e.target.value)}
                 />
               </div>
               <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveInsurance}>
@@ -283,9 +283,9 @@ const HealthInsurancePanel: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {plans.map(plan => {
+                {plans.map((plan) => {
                   const insuranceName =
-                    insurances.find(i => i.id === plan.insuranceId)?.name || 'N/A';
+                    insurances.find((i) => i.id === plan.insuranceId)?.name || 'N/A';
                   return (
                     <tr key={plan.id}>
                       <td>{plan.name}</td>
@@ -324,10 +324,10 @@ const HealthInsurancePanel: React.FC = () => {
                 <select
                   className="form-select form-health"
                   value={selectedInsuranceForPlan}
-                  onChange={e => setSelectedInsuranceForPlan(Number(e.target.value))}
+                  onChange={(e) => setSelectedInsuranceForPlan(Number(e.target.value))}
                 >
                   <option value="">Seleccionar obra social</option>
-                  {insurances.map(i => (
+                  {insurances.map((i) => (
                     <option key={i.id} value={i.id}>
                       {i.name}
                     </option>
@@ -340,7 +340,7 @@ const HealthInsurancePanel: React.FC = () => {
                   className="form-control form-health"
                   placeholder="Nombre del plan"
                   value={planInput}
-                  onChange={e => setPlanInput(e.target.value)}
+                  onChange={(e) => setPlanInput(e.target.value)}
                 />
               </div>
 
@@ -377,7 +377,7 @@ const HealthInsurancePanel: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {services.map(service => (
+                {services.map((service) => (
                   <tr key={service.id}>
                     <td>{service.name}</td>
                     <td>
@@ -417,7 +417,7 @@ const HealthInsurancePanel: React.FC = () => {
                   className="form-control form-health"
                   placeholder="Nombre del servicio"
                   value={serviceInput}
-                  onChange={e => setServiceInput(e.target.value)}
+                  onChange={(e) => setServiceInput(e.target.value)}
                 />
               </div>
               <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveService}>
@@ -447,10 +447,10 @@ const HealthInsurancePanel: React.FC = () => {
                 <select
                   className="form-select form-health"
                   value={selectedInsuranceId}
-                  onChange={e => setSelectedInsuranceId(Number(e.target.value))}
+                  onChange={(e) => setSelectedInsuranceId(Number(e.target.value))}
                 >
                   <option value="">Seleccionar obra social</option>
-                  {insurances.map(i => (
+                  {insurances.map((i) => (
                     <option key={i.id} value={i.id}>
                       {i.name}
                     </option>
@@ -461,10 +461,10 @@ const HealthInsurancePanel: React.FC = () => {
                 <select
                   className="form-select form-health"
                   value={selectedServiceId}
-                  onChange={e => setSelectedServiceId(Number(e.target.value))}
+                  onChange={(e) => setSelectedServiceId(Number(e.target.value))}
                 >
                   <option value="">Seleccionar servicio</option>
-                  {services.map(s => (
+                  {services.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
                     </option>
@@ -477,7 +477,7 @@ const HealthInsurancePanel: React.FC = () => {
                   className="form-control form-health"
                   placeholder="Monto / Arancel"
                   value={amountInput}
-                  onChange={e => setAmountInput(e.target.value)}
+                  onChange={(e) => setAmountInput(e.target.value)}
                 />
               </div>
               <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveArancel}>
@@ -509,10 +509,10 @@ const HealthInsurancePanel: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {aranceles.map(a => {
+                  {aranceles.map((a) => {
                     const insuranceName =
-                      insurances.find(i => i.id === a.insuranceId)?.name || 'N/A';
-                    const serviceName = services.find(s => s.id === a.serviceId)?.name || 'N/A';
+                      insurances.find((i) => i.id === a.insuranceId)?.name || 'N/A';
+                    const serviceName = services.find((s) => s.id === a.serviceId)?.name || 'N/A';
 
                     return (
                       <tr key={a.id}>

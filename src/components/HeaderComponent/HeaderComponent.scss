@@ -4,14 +4,33 @@
     padding: 1rem;
     font-size: 2rem;
     color: var(--color-primary-light);
+    box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.2);
 }
 
 .title-header {
   color: var(--color-neutral-light);
+  position: relative;
+  display: inline-block;
   transition: color 0.3s ease;
-      &:hover {
-        color: var(--color-secondary-light);
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--color-secondary-light);
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    color: var(--color-secondary-light);
+
+    &::after {
+      width: 100%;
     }
+  }
 }
  
 .active-title {

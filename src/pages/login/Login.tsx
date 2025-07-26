@@ -59,7 +59,7 @@ const Login: React.FC = () => {
                     type="text"
                     id="user"
                     value={username}
-                    onChange={e => setUser(e.target.value)}
+                    onChange={(e) => setUser(e.target.value)}
                   />
                 </div>
 
@@ -70,11 +70,11 @@ const Login: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       id="password"
                       value={password}
-                      onChange={e => setPassword(e.target.value)}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(prev => !prev)}
+                      onClick={() => setShowPassword((prev) => !prev)}
                       className="btn-show-password"
                     >
                       {showPassword ? <IoMdEye size={20} /> : <IoMdEyeOff size={20} />}

@@ -160,7 +160,7 @@ a {
   &:hover {
       background-color: var(--color-tertiary-disabled) !important;
       font-weight: 500;
-      border-color: var(--color-primary-light);
+      border:1px solid var(--color-primary-light);
   }
 }
 
@@ -169,19 +169,25 @@ a {
   transition: 0.5s !important;
   color: var(--color-primary-light);
   border-radius: 1rem;
-
   background-color: var(--color-white-light);
   &:hover {
       background-color: var(--color-primary-light) !important;
       font-weight: 500;
       border-color: var(--color-white-light);
       color: var(--color-white-light);
+      border: 1px solid var(--color-white-light);
   }
   margin-left: 2rem;
   margin-right: 1rem;
   height: fit-content;
   width: 130px;
   font-weight: 500;
+
+    &.active {
+    background-color: var(--color-primary-hover); // color de fondo cuando está activo
+    color: var(--color-white-light);               // texto blanco para contraste
+    border-color: var(--color-white-light);
+  }
 }
 
 .modal-buttons {

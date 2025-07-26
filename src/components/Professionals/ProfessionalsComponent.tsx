@@ -194,8 +194,8 @@ const ProfessionalsComponent: React.FC<{
                 if (!isUsuario) handleRowClick(professional);
               }}
               className={`${!isUsuario ? 'clickable-row' : ''} 
-              ${professional?.professionalState !== 'ACTIVE' ? 'inactive-row' : ''} 
-              ${index % 2 === 0 ? 'bg-primary-r' : 'bg-secondary-r'}`}
+                            ${professional?.professionalState !== 'ACTIVE' ? 'inactive-row' : ''} 
+                            ${index % 2 === 0 ? 'bg-primary-r' : 'bg-secondary-r'}`}
             >
               <td>{professional?.professionalName || '-'}</td>
               <td>{professional?.documentType || '-'}</td>
