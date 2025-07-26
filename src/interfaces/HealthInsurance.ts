@@ -1,4 +1,4 @@
-export interface HealthInsurancePlan {
+export interface Plan {
   id: number;
   name: string;
 }
@@ -10,5 +10,7 @@ export interface HealthInsurance {
   phone: string;
   note: string;
   isActive: boolean;
-  plans: HealthInsurancePlan[];
+  plans: Plan[];
 }
+
+export type NewHealthInsurance = Omit<HealthInsurance, 'id' | 'isActive' | 'plans'>;

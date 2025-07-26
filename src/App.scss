@@ -184,7 +184,7 @@ a {
   font-weight: 500;
 
     &.active {
-    background-color: var(--color-primary-hover); // color de fondo cuando está activo
+    background-color: var(--color-primary-dark); // color de fondo cuando está activo
     color: var(--color-white-light);               // texto blanco para contraste
     border-color: var(--color-white-light);
   }

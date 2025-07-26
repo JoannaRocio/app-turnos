@@ -1,27 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './HealthInsurancePanel.scss';
-
-interface HealthInsurance {
-  id: number;
-  name: string;
-}
-
-interface Service {
-  id: number;
-  name: string;
-}
-
-const mockInsurances: HealthInsurance[] = [
-  { id: 1, name: 'OSDE' },
-  { id: 2, name: 'Swiss Medical' },
-  { id: 3, name: 'Galeno' },
-];
-
-const mockServices: Service[] = [
-  { id: 1, name: 'Limpieza de sarro' },
-  { id: 2, name: 'Extracción de muela' },
-  { id: 3, name: 'Tratamiento de conducto' },
-];
+import { HealthInsurance, Plan } from '../../interfaces/HealthInsurance';
+import HealthInsuranceService from '../../services/HealthInsuranceService';
 
 type ArancelEntry = {
   id: number;
@@ -30,31 +10,45 @@ type ArancelEntry = {
   amount: number;
 };
 
-interface Plan {
+interface Service {
   id: number;
-  insuranceId: number; // Relación con la obra social
   name: string;
 }
 
-const mockPlans: Plan[] = [
-  { id: 1, insuranceId: 1, name: 'OSDE 210' },
-  { id: 2, insuranceId: 1, name: 'OSDE 310' },
-  { id: 3, insuranceId: 2, name: 'SMG Classic' },
-  { id: 4, insuranceId: 2, name: 'SMG Premium' },
-  { id: 5, insuranceId: 3, name: 'Galeno Azul' },
-  { id: 6, insuranceId: 3, name: 'Galeno Oro' },
+const mockServices: Service[] = [
+  { id: 1, name: 'Limpieza de sarro' },
+  { id: 2, name: 'Extracción de muela' },
+  { id: 3, name: 'Tratamiento de conducto' },
 ];
 
 const HealthInsurancePanel: React.FC = () => {
   // Planes
-  const [plans, setPlans] = useState<Plan[]>(mockPlans);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [selectedInsuranceForPlan, setSelectedInsuranceForPlan] = useState<number | ''>('');
   const [planInput, setPlanInput] = useState('');
 
+  // useEffect(() => {
+  //   fetch('http://localhost:8080/api/health-insurances')
+  //     .then((res) => res.json())
+  //     .then((data: HealthInsurance[]) => {
+  //       setInsurances(data);
+  //       const extractedPlans = data.flatMap((ins) =>
+  //         ins.plans.map((plan) => ({
+  //           ...plan,
+  //           insuranceId: ins.id,
+  //         }))
+  //       );
+  //       setPlans(extractedPlans);
+  //     })
+  //     .catch((err) => {
+  //       console.error('Error al cargar obras sociales:', err);
+  //     });
+  // }, []);
+
   const handleEditPlan = (plan: Plan) => {
     setSelectedPlan(plan);
-    setSelectedInsuranceForPlan(plan.insuranceId);
+    setSelectedInsuranceForPlan(plan.id);
     setPlanInput(plan.name);
   };
 
@@ -78,9 +72,9 @@ const HealthInsurancePanel: React.FC = () => {
       setPlans([
         ...plans,
         {
-          id: Date.now(),
+          // id: Date.now(),
           name: trimmed,
-          insuranceId: Number(selectedInsuranceForPlan),
+          id: Number(selectedInsuranceForPlan),
         },
       ]);
     }
@@ -124,7 +118,10 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   // Obras Sociales
-  const [insurances, setInsurances] = useState<HealthInsurance[]>(mockInsurances);
+  const [insurances, setInsurances] = useState<HealthInsurance[]>([]);
+  const [insuranceContactEmail, setInsuranceContactEmail] = useState('');
+  const [insurancePhone, setInsurancePhone] = useState('');
+  const [insuranceNote, setInsuranceNote] = useState('');
   const [selectedInsurance, setSelectedInsurance] = useState<HealthInsurance | null>(null);
   const [insuranceInput, setInsuranceInput] = useState('');
 
@@ -142,20 +139,56 @@ const HealthInsurancePanel: React.FC = () => {
     setInsurances(insurances.filter((i) => i.id !== id));
   };
 
-  const handleSaveInsurance = () => {
+  const handleSaveInsurance = async () => {
     const trimmed = insuranceInput.trim();
     if (trimmed === '') return;
 
-    if (selectedInsurance) {
-      setInsurances(
-        insurances.map((i) => (i.id === selectedInsurance.id ? { ...i, name: trimmed } : i))
-      );
-    } else {
-      setInsurances([...insurances, { id: Date.now(), name: trimmed }]);
-    }
+    const newInsurance = {
+      name: trimmed,
+      contactEmail: insuranceContactEmail,
+      phone: insurancePhone,
+      note: insuranceNote,
+      isActive: true,
+      plans: [],
+    };
 
-    setSelectedInsurance(null);
-    setInsuranceInput('');
+    try {
+      if (selectedInsurance) {
+        alert('Edición de obra social aún no implementada.');
+      } else {
+        const created = await HealthInsuranceService.create(newInsurance);
+        setInsurances([...insurances, created]);
+
+        // Reset
+        setInsuranceInput('');
+        setInsuranceContactEmail('');
+        setInsurancePhone('');
+        setInsuranceNote('');
+        setSelectedInsurance(null);
+      }
+    } catch (error: any) {
+      console.error('Error en handleSaveInsurance:', error.message);
+      // Solo mostrar si realmente fue un error de red o similar
+      if (!error.message.includes('Obra social creada con éxito')) {
+        alert('❌ Error al guardar la obra social. Ver consola para más detalles.');
+      }
+    }
+  };
+
+  const handleToggleActive = async (id: number, isActive: boolean) => {
+    try {
+      if (isActive) {
+        await HealthInsuranceService.disable(id);
+      } else {
+        await HealthInsuranceService.enable(id);
+      }
+
+      // Actualizar lista en frontend
+      setInsurances((prev) => prev.map((i) => (i.id === id ? { ...i, isActive: !isActive } : i)));
+    } catch (error: any) {
+      console.error('Error al cambiar estado:', error.message);
+      alert('❌ Error al cambiar estado de la obra social.');
+    }
   };
 
   // Servicios
@@ -191,6 +224,23 @@ const HealthInsurancePanel: React.FC = () => {
     setServiceInput('');
   };
 
+  useEffect(() => {
+    HealthInsuranceService.getAll()
+      .then((sorted) => {
+        setInsurances(sorted);
+        const extractedPlans = sorted.flatMap((ins) =>
+          ins.plans.map((plan) => ({
+            ...plan,
+            insuranceId: ins.id,
+          }))
+        );
+        setPlans(extractedPlans);
+      })
+      .catch((err) => {
+        console.error('Error al cargar obras sociales:', err);
+      });
+  }, []);
+
   return (
     <div className="container mt-5">
       {/* ---------------------- OBRAS SOCIALES ---------------------- */}
@@ -212,8 +262,31 @@ const HealthInsurancePanel: React.FC = () => {
               </thead>
               <tbody>
                 {insurances.map((insurance) => (
-                  <tr key={insurance.id}>
-                    <td>{insurance.name}</td>
+                  <tr
+                    key={insurance.id}
+                    className={!insurance.isActive ? 'inactive-insurance' : ''}
+                  >
+                    <td>
+                      <div>
+                        <strong>{insurance.name}</strong>
+                        <br />
+                        {(insurance.contactEmail || insurance.phone) && (
+                          <small>
+                            {insurance.contactEmail}
+                            {insurance.contactEmail && insurance.phone && ' | '}
+                            {insurance.phone}
+                          </small>
+                        )}
+                        <br />
+                        <em>{insurance.note}</em>
+                        <br />
+                        <span
+                          className={`badge ${insurance.isActive ? 'bg-success' : 'bg-secondary'}`}
+                        >
+                          {insurance.isActive ? 'Activa' : 'Inactiva'}
+                        </span>
+                      </div>
+                    </td>
                     <td>
                       <div className="d-flex justify-content-center">
                         <button
@@ -223,10 +296,10 @@ const HealthInsurancePanel: React.FC = () => {
                           Editar
                         </button>
                         <button
-                          className="btn btn-danger btn-lg btn-health"
-                          onClick={() => handleDeleteInsurance(insurance.id)}
+                          className={`btn btn-lg btn-health btn-activar ${insurance.isActive ? 'btn-danger' : 'btn-success'}`}
+                          onClick={() => handleToggleActive(insurance.id, insurance.isActive)}
                         >
-                          Eliminar
+                          {insurance.isActive ? 'Desactivar' : 'Activar'}
                         </button>
                       </div>
                     </td>
@@ -254,7 +327,37 @@ const HealthInsurancePanel: React.FC = () => {
                   onChange={(e) => setInsuranceInput(e.target.value)}
                 />
               </div>
-              <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveInsurance}>
+              <div className="mb-3">
+                <input
+                  type="email"
+                  className="form-control form-health"
+                  placeholder="Email de contacto"
+                  value={insuranceContactEmail}
+                  onChange={(e) => setInsuranceContactEmail(e.target.value)}
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control form-health"
+                  placeholder="Teléfono"
+                  value={insurancePhone}
+                  onChange={(e) => setInsurancePhone(e.target.value)}
+                />
+              </div>
+              <div className="mb-3">
+                <textarea
+                  className="form-control form-health"
+                  placeholder="Nota"
+                  value={insuranceNote}
+                  onChange={(e) => setInsuranceNote(e.target.value)}
+                />
+              </div>
+              <button
+                className="btn btn-primary btn-health btn-lg"
+                onClick={handleSaveInsurance}
+                disabled={insuranceInput.trim() === ''}
+              >
                 {selectedInsurance ? 'Guardar cambios' : 'Agregar'}
               </button>
             </div>
@@ -284,8 +387,7 @@ const HealthInsurancePanel: React.FC = () => {
               </thead>
               <tbody>
                 {plans.map((plan) => {
-                  const insuranceName =
-                    insurances.find((i) => i.id === plan.insuranceId)?.name || 'N/A';
+                  const insuranceName = insurances.find((i) => i.id === plan.id)?.name || 'N/A';
                   return (
                     <tr key={plan.id}>
                       <td>{plan.name}</td>
