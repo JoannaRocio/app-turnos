@@ -20,8 +20,11 @@ const HeaderComponent: React.FC = () => {
   return (
     <header className="container-header">
       <div className="container d-flex justify-content-between align-items-center">
-        <h2>Turnos APP</h2>
-
+        <img
+          src="/images/OdontoTurnoIcon.png"
+          alt="Odonto Turno"
+          className="img-fluid img-odontoTurno"
+        />
         <nav>
           <ul className="nav">
             <li className="nav-item">

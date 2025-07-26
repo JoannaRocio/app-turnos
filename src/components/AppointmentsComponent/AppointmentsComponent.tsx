@@ -265,15 +265,19 @@ const AppointmentsComponent: React.FC<Props> = ({
   return (
     <>
       <section>
-        <h2 className="text-white">Agenda de turnos</h2>
-        <h3 className="panel-professionalName">
-          {selectedProfessional?.professionalName ?? professionals[0]?.professionalName}{' '}
-          {selectedDate.toLocaleDateString('es-AR', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-          })}
-        </h3>
+        <div>
+          <h3 className="App-main-title text-white">Agenda de turnos</h3>
+          <h4 className="schedule-title">
+            <i className="fas fa-user-md"></i>
+            {selectedProfessional?.professionalName ?? professionals[0]?.professionalName}
+            {' - '}
+            {selectedDate.toLocaleDateString('es-AR', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+            })}
+          </h4>
+        </div>
       </section>
 
       {showClinicalHistory && patientData && selectedProfessional?.professionalId !== undefined ? (

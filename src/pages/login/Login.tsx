@@ -44,6 +44,13 @@ const Login: React.FC = () => {
       <div className="row justify-content-center">
         <div className="col-12 container-formLogin">
           <div className="row">
+            <div className="text-center">
+              <img
+                src="/images/diente.png"
+                alt="Odonto Turno"
+                className="img-fluid img-iconDiente"
+              />
+            </div>
             <div className="col pb-4">
               <h3 className="text-center">Iniciar sesión</h3>
             </div>
@@ -82,7 +89,9 @@ const Login: React.FC = () => {
                   </div>
                 </div>
 
-                <a href="/Recuperar-contraseña">¿Olvidaste tu contraseña?</a>
+                <a className="link-auth" href="/Recuperar-contraseña">
+                  ¿Olvidaste tu contraseña?
+                </a>
 
                 <button type="submit" className="submit-button">
                   Ingresar

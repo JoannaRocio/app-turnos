@@ -79,28 +79,66 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   const [entries, setEntries] = useState(data);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [notes, setNotes] = useState('');
 
   const handleSave = async () => {
     if (!newEntry.trim()) return;
 
     try {
       setLoading(true);
-      console.log(patient, newEntry, 'que hay');
+      setError('');
+
+      // 1. Crear historia clínica (no devuelve ID)
       await ClinicalHistoryService.createClinicalHistory(
         patient,
         newEntry,
         professionalId,
         selectedTreatments
       );
+
+      // 2. Volver a obtener la historia clínica
       const updated = await ClinicalHistoryService.getOrCreate(patient, professionalId);
       setEntries(updated);
+
+      // 3. Buscar la entrada más reciente para obtener su ID
+      const latestEntry = Array.isArray(updated) ? updated[updated.length - 1] : null;
+
+      if (latestEntry?.id && uploadedFiles.length > 0) {
+        for (const file of uploadedFiles) {
+          await ClinicalHistoryService.uploadFile(latestEntry.id, file);
+        }
+      }
+
+      // 4. Reset
       setNewEntry('');
-      setError('');
+      setUploadedFiles([]);
+      setSelectedTreatments([]);
     } catch (err: any) {
-      setError(err.message);
+      console.error(err);
+      setError(err.message || 'Error al guardar la entrada clínica.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Eliminar archivos
+
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+
+      // Evitar archivos duplicados (opcional)
+      const combined = [...uploadedFiles, ...newFiles];
+      const uniqueFiles = Array.from(new Map(combined.map((f) => [f.name + f.size, f])).values());
+
+      setUploadedFiles(uniqueFiles);
+    }
+  };
+
+  const handleRemoveFile = (indexToRemove: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
   };
 
   return (
@@ -155,19 +193,18 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         </div>
       </div>
 
-      <div className="mb-4">
-        <h3 className="text-white">Agregar nueva entrada</h3>
+      <div className="card shadow-lg p-4 mb-5 bg-body rounded">
+        <h3 className="mb-4 clinical-title">📝 Nueva entrada clínica</h3>
 
         {/* Tratamiento */}
-        {/* {patient.healthInsuranceName && patient.insurancePlanName && ( */}
-        <div className="mb-3">
-          <label htmlFor="treatmentSelect" className="form-label">
-            <h4 className="text-white">Tratamientos disponibles:</h4>
+        <div className="mb-4">
+          <label htmlFor="treatmentSelect" className="form-label clinical-subtitle fw-bold fs-3">
+            Tratamientos disponibles:
           </label>
-          <div className="input-group mb-2">
+          <div className="input-group">
             <select
               id="treatmentSelect"
-              className="form-select form-clinicalHistory"
+              className="form-select form-select-lg"
               value={selectedId}
               onChange={(e) => setSelectedId(Number(e.target.value))}
             >
@@ -178,54 +215,106 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                 </option>
               ))}
             </select>
+            <button
+              className="btn btn-primary btn-lg"
+              type="button"
+              onClick={handleAddTreatment}
+              disabled={!selectedId}
+            >
+              Agregar
+            </button>
           </div>
+        </div>
 
-          <button
-            className="btn btn-primary btn-lg btn-guardar-clinicalHistory mb-2"
-            type="button"
-            onClick={handleAddTreatment}
-            disabled={!selectedId}
-          >
-            Agregar tratamiento
-          </button>
-
-          {selectedTreatments.length > 0 && (
+        {/* Tratamientos seleccionados */}
+        {selectedTreatments.length > 0 && (
+          <div className="mb-4">
+            <label className="form-label clinical-subtitle fw-bold fs-4">
+              Tratamientos seleccionados:
+            </label>
             <div className="d-flex flex-wrap gap-2">
               {selectedTreatments.map((id) => {
                 const treatment = availableTreatments.find((t) => t.id === id);
                 return (
-                  <span key={id} className="badge bg-secondary d-flex align-items-center fs-3">
+                  <span key={id} className="badge bg-secondary fs-5 d-flex align-items-center">
                     {treatment?.name || 'Tratamiento'}
                     <button
                       type="button"
                       className="btn-close btn-close-white ms-2"
                       aria-label="Eliminar"
                       onClick={() => handleRemoveTreatment(id)}
-                      style={{ fontSize: '0.6rem' }}
+                      style={{ fontSize: '1rem' }}
                     ></button>
                   </span>
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* Anotaciones */}
+        <div className="mb-4">
+          <label htmlFor="notes" className="form-label clinical-subtitle fw-bold fs-3">
+            Anotaciones del profesional:
+          </label>
+          <textarea
+            id="notes"
+            className="form-control fs-4"
+            rows={4}
+            placeholder="Escriba aquí las observaciones clínicas, evolución, recomendaciones, etc."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          ></textarea>
+        </div>
+
+        {/* Subida de archivos */}
+        <div className="mb-4">
+          <label htmlFor="attachments" className="form-label clinical-subtitle fw-bold fs-3">
+            Adjuntar archivos:
+          </label>
+          <input
+            id="attachments"
+            type="file"
+            className="form-control fs-4"
+            accept=".pdf, image/*"
+            multiple
+            onChange={handleFileUpload}
+          />
+          <div className="form-text">Podés subir archivos PDF o imágenes (JPG, PNG).</div>
+
+          {uploadedFiles.length > 0 && (
+            <ul className="list-group mt-3">
+              {uploadedFiles.map((file, index) => (
+                <li
+                  key={index}
+                  className="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  <span className="fs-5">{file.name}</span>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-danger"
+                    onClick={() => handleRemoveFile(index)}
+                  >
+                    Eliminar
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
-        {/* Descripción */}
-        <textarea
-          className="form-control textArea-clinialHistory mb-2"
-          value={newEntry}
-          onChange={(e) => setNewEntry(e.target.value)}
-          rows={4}
-          placeholder="Descripción de la atención..."
-        />
-        <button
-          className="btn btn-warning btn-lg btn-guardar-clinicalHistory"
-          onClick={handleSave}
-          disabled={loading}
-        >
-          {loading ? 'Guardando...' : 'Guardar'}
-        </button>
-        {error && <div className="alert alert-danger mt-2">{error}</div>}
+        {/* Botón guardar entrada */}
+        <div className="text-end">
+          <button
+            className="btn btn-success btn-lg fs-4"
+            onClick={handleSave}
+            disabled={
+              selectedTreatments.length === 0 && notes.trim() === '' && !uploadedFiles.length
+            }
+          >
+            Guardar entrada clínica
+          </button>
+        </div>
       </div>
 
       <div>

@@ -70,43 +70,30 @@ const AdminDashboard: React.FC<{
 
   return (
     <section>
-      <h2 className="text-white">Panel de administrador</h2>
+      <div className="d-flex justify-content-between admin-panel">
+        <h3 className="App-main-title text-white">Panel de administrador</h3>
 
-      <div className="tabs mb-4">
-        <button
-          className={`App-buttonTertiary ${activeTab === 'usuarios' ? 'active' : ''}`}
-          onClick={() => setActiveTab('usuarios')}
-        >
-          Usuarios
-        </button>
-        <button
-          className={`App-buttonTertiary ${activeTab === 'metricas' ? 'active' : ''}`}
-          onClick={() => setActiveTab('metricas')}
-        >
-          Métricas
-        </button>
-        <button
-          className={`App-buttonTertiary ${activeTab === 'obrasSociales' ? 'active' : ''}`}
-          onClick={() => setActiveTab('obrasSociales')}
-        >
-          Obras Sociales
-        </button>
-      </div>
-
-      {/* <div className="tabs mb-4">
+        <div className="tabs">
           <button
-            className={`tab-button ${activeTab === "usuarios" ? "active" : ""}`}
-            onClick={() => setActiveTab("usuarios")}
+            className={`App-buttonTertiary ${activeTab === 'usuarios' ? 'active' : ''}`}
+            onClick={() => setActiveTab('usuarios')}
           >
             Usuarios
           </button>
           <button
-            className={`tab-button ${activeTab === "metricas" ? "active" : ""}`}
-            onClick={() => setActiveTab("metricas")}
+            className={`App-buttonTertiary ${activeTab === 'metricas' ? 'active' : ''}`}
+            onClick={() => setActiveTab('metricas')}
           >
             Métricas
           </button>
-        </div> */}
+          <button
+            className={`App-buttonTertiary ${activeTab === 'obrasSociales' ? 'active' : ''}`}
+            onClick={() => setActiveTab('obrasSociales')}
+          >
+            Obras Sociales
+          </button>
+        </div>
+      </div>
 
       {activeTab === 'usuarios' && (
         <>

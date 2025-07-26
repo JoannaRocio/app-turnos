@@ -153,10 +153,8 @@ const ProfessionalsComponent: React.FC<{
 
   return (
     <section>
-      <h2 className="text-white">Listado de profesionales</h2>
-
       <div className="d-flex justify-content-between">
-        <h3 className="text-white">Profesionales</h3>
+        <h3 className="App-main-title text-white">Listado de profesionales</h3>
         {!isUsuario && (
           <button className="btn App-buttonTertiary" onClick={handleNewProfessional}>
             Nuevo

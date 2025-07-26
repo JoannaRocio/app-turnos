@@ -69,11 +69,11 @@ const ResetPassword: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       id="password"
                       value={password}
-                      onChange={e => setPassword(e.target.value)}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(prev => !prev)}
+                      onClick={() => setShowPassword((prev) => !prev)}
                       className="btn-show-password"
                     >
                       {showPassword ? <IoMdEye size={20} /> : <IoMdEyeOff size={20} />}
@@ -86,11 +86,11 @@ const ResetPassword: React.FC = () => {
                       type={showPassword2 ? 'text' : 'password'}
                       id="password2"
                       value={password2}
-                      onChange={e => setPassword2(e.target.value)}
+                      onChange={(e) => setPassword2(e.target.value)}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword2(prev => !prev)}
+                      onClick={() => setShowPassword2((prev) => !prev)}
                       className="btn-show-password"
                     >
                       {showPassword2 ? <IoMdEye size={20} /> : <IoMdEyeOff size={20} />}

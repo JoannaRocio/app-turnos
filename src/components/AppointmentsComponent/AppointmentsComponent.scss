@@ -1,9 +1,3 @@
-.panel-professionalName {
-  background: var(--color-white-light);
-  width: fit-content;
-  border-radius: 1rem;
-}
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -50,6 +44,18 @@
   }
 }
 
+.schedule-title {
+  width: fit-content;
+  background-color: #ffffff;
+  color: var(--color-primary-dark);
+  // padding: 1rem 2rem;
+  padding: 1rem 1rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+  font-size: 2rem;
+  margin: 0rem 1rem .6rem;
+}
 
 .custom-modal.edit-mode {
   background-color: var(--color-secondary-light);

@@ -62,7 +62,7 @@ const PasswordRecovery: React.FC = () => {
                     type="text"
                     id="user"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
                 <div className="text-center">

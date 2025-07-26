@@ -119,10 +119,8 @@ const PatientsComponent: React.FC<{
 
   return (
     <section>
-      <h2 className="text-white">Listado de pacientes</h2>
-
       <div className="d-flex justify-content-between">
-        <h3 className="text-white">Pacientes</h3>
+        <h3 className="App-main-title text-white">Listado de pacientes</h3>
         {role !== 'USUARIO' && (
           <button className="btn App-buttonTertiary" onClick={handleNewPatient}>
             Nuevo
