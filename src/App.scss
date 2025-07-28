@@ -51,8 +51,8 @@ body {
   font-size: 1.6rem; /* Tamaño base = 16px */
   line-height: 1.5;
 
-  background: linear-gradient(#007693 100%);
-  // background: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark), var(--color-tertiary-light));
+  // background: linear-gradient(#007693 100%);
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark), #79d3e7) !important;
   background-size: cover;
   background-repeat: no-repeat;
   min-height: 100vh;

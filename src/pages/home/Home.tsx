@@ -110,11 +110,9 @@ const Home: React.FC = () => {
 
   const loadAppointments = async (selectedProfessional?: Professional) => {
     try {
-      const data = await ProfessionalService.getAllProfessionals();
-      setProfessionals(data);
-
-      if (!selectedProfessional && data.length > 0) {
-        selectedProfessional = data[0];
+      // Eliminamos la carga de profesionales aquí
+      if (!selectedProfessional && professionals.length > 0) {
+        selectedProfessional = professionals[0];
       }
 
       if (selectedProfessional) {
@@ -131,7 +129,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <section className="home-section">
+    <section>
       {componenteActivo === 'pacientes' &&
         ['USUARIO', 'MODERADOR', 'ADMIN'].includes(role) &&
         selectedProfessional?.professionalId !== undefined && (
