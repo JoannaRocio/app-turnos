@@ -210,7 +210,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newAppointment.documentNumber || !newAppointment.time || !newAppointment.reason) {
+    if (!newAppointment.patientId || !newAppointment.documentNumber || !newAppointment.time) {
       alert('Por favor, completá todos los campos obligatorios.');
       return;
     }
