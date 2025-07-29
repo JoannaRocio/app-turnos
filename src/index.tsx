@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom'; // Importar Router
+import { DataProvider } from './context/DataContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -15,6 +16,8 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <App />
+    <DataProvider>
+      <App />
+    </DataProvider>
   </React.StrictMode>
 );

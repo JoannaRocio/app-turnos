@@ -7,16 +7,13 @@ import UserModalComponent from '../UserModal/UserModalComponent';
 import MetricsComponent from '../MetricsComponent/MetricsComponent';
 import HealthInsurancePanel from '../HealthInsurancePanel/HealthInsurancePanel';
 import { Professional } from '../../interfaces/Professional';
+import { useDataContext } from '../../context/DataContext';
 
-const AdminDashboard: React.FC<{
-  users: User[];
-  professionals: Professional[];
-  reloadUsers: () => void;
-}> = ({ users, professionals, reloadUsers }) => {
+const AdminDashboard: React.FC = () => {
+  const { users, professionals, loadUsers: reloadUsers } = useDataContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  // const [activeTab, setActiveTab] = useState<"usuarios" | "metricas">("usuarios");
   const [activeTab, setActiveTab] = useState<'usuarios' | 'metricas' | 'obrasSociales'>('usuarios');
 
   const handleRowClick = (user: User) => {

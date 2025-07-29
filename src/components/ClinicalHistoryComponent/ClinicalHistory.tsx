@@ -75,14 +75,13 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   };
 
   // Entrada nueva
-  const [newEntry, setNewEntry] = useState('');
   const [entries, setEntries] = useState(data);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [notes, setNotes] = useState('');
 
   const handleSave = async () => {
-    if (!newEntry.trim()) return;
+    if (!notes.trim()) return;
 
     try {
       setLoading(true);
@@ -91,7 +90,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
       // 1. Crear historia clínica (no devuelve ID)
       await ClinicalHistoryService.createClinicalHistory(
         patient,
-        newEntry,
+        notes,
         professionalId,
         selectedTreatments
       );
@@ -110,7 +109,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
       }
 
       // 4. Reset
-      setNewEntry('');
+      setNotes('');
       setUploadedFiles([]);
       setSelectedTreatments([]);
     } catch (err: any) {

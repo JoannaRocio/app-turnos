@@ -72,8 +72,12 @@ const AppointmentsComponent: React.FC<Props> = ({
 
   const handleProfessionalSelect = (professional: Professional) => {
     setSelectedProfessional(professional);
-    onAppointmentsUpdate(professional);
+    onAppointmentsUpdate(professional); // Esto actualiza los turnos
   };
+
+  const appointmentsForSelectedDate = appointments.filter((appt) =>
+    appt.dateTime.startsWith(selectedDate.toISOString().split('T')[0])
+  );
 
   const getDayOfWeekString = (date: Date): string => {
     return date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
@@ -83,9 +87,9 @@ const AppointmentsComponent: React.FC<Props> = ({
     pro.schedules?.some((s) => s.dayOfWeek === getDayOfWeekString(selectedDate))
   );
 
-  const appointmentsForSelectedDate = appointments.filter((appt) =>
-    appt.dateTime.startsWith(selectedDate.toISOString().split('T')[0])
-  );
+  // const appointmentsForSelectedDate = appointments.filter((appt) =>
+  //   appt.dateTime.startsWith(selectedDate.toISOString().split('T')[0])
+  // );
 
   const confirmDelete = (appt: any, time: string) => {
     setCurrentAppointment(appt);
@@ -223,10 +227,14 @@ const AppointmentsComponent: React.FC<Props> = ({
     try {
       if (isEditMode) {
         await AppointmentService.updateAppointment(newAppointment.appointmentId, appointmentToSave);
-        onAppointmentsUpdate(selectedProfessional);
+        if (selectedProfessional?.documentNumber) {
+          onAppointmentsUpdate(selectedProfessional.documentNumber);
+        }
       } else {
         await AppointmentService.createAppointment(appointmentToSave);
-        onAppointmentsUpdate(selectedProfessional);
+        if (selectedProfessional?.documentNumber) {
+          onAppointmentsUpdate(selectedProfessional.documentNumber);
+        }
       }
 
       closeModal();
@@ -244,7 +252,9 @@ const AppointmentsComponent: React.FC<Props> = ({
       alert('Turno eliminado correctamente.');
       setShowConfirm(false);
       setApptToDelete(null);
-      onAppointmentsUpdate(selectedProfessional);
+      if (selectedProfessional?.documentNumber) {
+        onAppointmentsUpdate(selectedProfessional.documentNumber);
+      }
     } catch (error) {
       setCurrentAppointment(null);
       console.error('Error eliminando el turno:', error);

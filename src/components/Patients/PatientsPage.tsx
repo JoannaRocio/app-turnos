@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Patient } from '../../interfaces/Patient';
 import './PatientsPage.scss';
 import PatientModalComponent from '../PatientModal/PatientModalComponent';
@@ -9,18 +9,21 @@ import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import ClinicalHistoryService from '../../services/ClinicalHistoryService';
 import { Appointment } from '../../interfaces/Appointment';
 import ClinicalHistoryComponent from '../ClinicalHistoryComponent/ClinicalHistory';
+import { useDataContext } from '../../context/DataContext';
 
-const PatientsComponent: React.FC<{
-  patients: Patient[];
+interface Props {
   professionalId: number;
-  reloadPatients: () => void;
-}> = ({ patients, professionalId, reloadPatients }) => {
+}
+
+const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
+  const { patients, loadPatients } = useDataContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Partial<Patient> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { userRole } = useAuth();
   const role = userRole ?? '';
-  const isUsuario = userRole === 'USUARIO';
+  const isUsuario = role === 'USUARIO';
+
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
@@ -33,16 +36,13 @@ const PatientsComponent: React.FC<{
     setModalOpen(true);
   };
 
-  if (!patients) {
-    return <p className="text-white">Cargando pacientes...</p>;
-  }
   const filteredPatients = patients.filter((p) => {
     const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
     const dniMatch = p.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
   });
 
-  const openClinicalHistory = async (patient: any) => {
+  const openClinicalHistory = async (patient: Patient) => {
     try {
       const data = await ClinicalHistoryService.getOrCreate(patient, professionalId);
       setShowClinicalHistory(true);
@@ -56,7 +56,7 @@ const PatientsComponent: React.FC<{
   const handleSave = async (patientData: Partial<Patient>) => {
     try {
       const payload = {
-        id: patientData.id, // este puede ser undefined para creación
+        id: patientData.id,
         fullName: patientData.fullName,
         documentType: patientData.documentType,
         documentNumber: patientData.documentNumber,
@@ -75,7 +75,7 @@ const PatientsComponent: React.FC<{
         alert('Paciente creado con éxito');
       }
 
-      reloadPatients();
+      await loadPatients(); // 🔁 recarga desde el contexto
       setModalOpen(false);
       setSelectedPatient(null);
     } catch (error) {
@@ -98,10 +98,6 @@ const PatientsComponent: React.FC<{
     setModalOpen(true);
   };
 
-  if (!patients || patients.length === 0) {
-    return <p className="text-white">No hay pacientes disponibles.</p>;
-  }
-
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // 🔐 Esto evita que el click llegue al <tr>
   };
@@ -115,6 +111,10 @@ const PatientsComponent: React.FC<{
         onBack={() => setShowClinicalHistory(false)}
       />
     );
+  }
+
+  if (patients.length === 0) {
+    return <p className="text-white">No hay pacientes disponibles.</p>;
   }
 
   return (
