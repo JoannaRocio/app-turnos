@@ -16,7 +16,7 @@ interface Props {
 }
 
 const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
-  const { patients, loadPatients } = useDataContext();
+  const { patients, loadPatients, reloadPatients } = useDataContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Partial<Patient> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -63,9 +63,12 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         phone: patientData.phone,
         email: patientData.email,
         note: patientData.note,
-        healthInsuranceId: patientData.healthInsuranceId,
-        insurancePlanId: patientData.insurancePlanId,
+        healthInsuranceId:
+          patientData.healthInsuranceId === 0 ? null : patientData.healthInsuranceId,
+        insurancePlanId: patientData.insurancePlanId === 0 ? null : patientData.insurancePlanId,
       };
+
+      console.log(payload);
 
       if (patientData.id) {
         await PatientService.updatePatient(patientData.id, payload);
@@ -75,7 +78,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         alert('Paciente creado con éxito');
       }
 
-      await loadPatients(); // 🔁 recarga desde el contexto
+      await reloadPatients(); // 🔁 recarga desde el contexto
       setModalOpen(false);
       setSelectedPatient(null);
     } catch (error) {

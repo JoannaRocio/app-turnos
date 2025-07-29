@@ -18,6 +18,7 @@ interface DataContextType {
   loadUsers: () => Promise<void>;
   loadAppointments: (dni: string) => Promise<void>;
   reloadUsers: () => Promise<void>;
+  reloadPatients: () => Promise<void>;
   reloadAppointments: (dni: string) => Promise<void>;
   clearAppointments: () => void;
 }
@@ -68,6 +69,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsUsersLoaded(true);
     } catch (error) {
       console.error('Error al cargar usuarios:', error);
+    }
+  };
+
+  const reloadPatients = async () => {
+    try {
+      const data = await PatientService.getAll();
+      setPatients(data);
+      setIsPatientsLoaded(true);
+    } catch (error) {
+      console.error('Error al cargar pacientes:', error);
     }
   };
 
@@ -127,6 +138,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loadUsers,
         loadAppointments,
         reloadUsers,
+        reloadPatients,
         reloadAppointments,
         clearAppointments,
       }}
