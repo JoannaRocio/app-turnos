@@ -228,12 +228,12 @@ const AppointmentsComponent: React.FC<Props> = ({
       if (isEditMode) {
         await AppointmentService.updateAppointment(newAppointment.appointmentId, appointmentToSave);
         if (selectedProfessional?.documentNumber) {
-          onAppointmentsUpdate(selectedProfessional.documentNumber);
+          onAppointmentsUpdate(selectedProfessional);
         }
       } else {
         await AppointmentService.createAppointment(appointmentToSave);
         if (selectedProfessional?.documentNumber) {
-          onAppointmentsUpdate(selectedProfessional.documentNumber);
+          onAppointmentsUpdate(selectedProfessional);
         }
       }
 
