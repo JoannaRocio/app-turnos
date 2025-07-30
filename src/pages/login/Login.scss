@@ -16,7 +16,9 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 
     input {
-    transition: border 0.3s ease, box-shadow 0.3s ease;
+      transition:
+        border 0.3s ease,
+        box-shadow 0.3s ease;
 
       &:hover {
         border-color: var(--color-blue-sky);
@@ -26,7 +28,7 @@
         border-color: #007bff; // azul más fuerte
         outline: none;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); // glow azul suave
-      } 
+      }
     }
   }
 
@@ -86,4 +88,3 @@
     height: 3rem;
   }
 }
-  

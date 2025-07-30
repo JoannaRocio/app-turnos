@@ -26,9 +26,10 @@ function AppRoutes() {
       {isAuthenticated && !isHiddenHeaderRoute && <HeaderComponent />}
 
       <Routes>
-        <Route path="/Inicio-sesion" element={<Login />} />
-
-        {/* <Route path="/Inicio-sesion" element={isAuthenticated ? <Navigate to="/Home" /> : <Login />} /> */}
+        <Route
+          path="/Inicio-sesion"
+          element={isAuthenticated ? <Navigate to="/Home" /> : <Login />}
+        />
         <Route
           path="/Recuperar-contraseña"
           element={isAuthenticated ? <Navigate to="/Home" /> : <PasswordRecovery />}

@@ -9,6 +9,7 @@ interface PatientModalComponentProps {
   onClose: () => void;
   patient: Partial<Patient> | null;
   onSave: (updated: Partial<Patient>) => void;
+  isUpdating: boolean;
 }
 
 const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
@@ -16,6 +17,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
   onClose,
   patient,
   onSave,
+  isUpdating,
 }) => {
   const [form, setForm] = useState<{
     id?: number;
@@ -227,7 +229,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
               <button
                 className="modal-buttons"
                 type="submit"
-                disabled={!form.fullName || !form.documentNumber}
+                disabled={!form.fullName || !form.documentNumber || isUpdating}
               >
                 Guardar
               </button>

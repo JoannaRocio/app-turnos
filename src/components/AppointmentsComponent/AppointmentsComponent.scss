@@ -54,12 +54,12 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-weight: 500;
   font-size: 2rem;
-  margin: 0rem 1rem .6rem;
+  margin: 0rem 1rem 0.6rem;
 }
 
 .custom-modal.edit-mode {
   background-color: var(--color-secondary-light);
-  color:var( --color-white-light);
+  color: var(--color-white-light);
 }
 
 .modal-overlay.edit-mode {

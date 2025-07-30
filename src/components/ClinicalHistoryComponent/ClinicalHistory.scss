@@ -1,13 +1,13 @@
 .section-clinical {
-    background-color: var(--color-tertiary-dark);
+  background-color: var(--color-tertiary-dark);
 }
 
 .clinical-history-container {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    font-family: "Segoe UI", sans-serif;
-    background-color: var(--color-tertiary-hover);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--color-tertiary-hover);
 }
 
 .back-button {
@@ -20,7 +20,7 @@
   cursor: pointer;
 
   &:hover {
-      background: var(--color-secondary-hover);
+    background: var(--color-secondary-hover);
   }
 }
 

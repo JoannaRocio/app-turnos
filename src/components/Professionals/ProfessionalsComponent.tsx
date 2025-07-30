@@ -1,17 +1,9 @@
-import React, { createContext, useContext, useState } from 'react';
-import { Patient } from '../../interfaces/Patient';
+import React, { useState } from 'react';
 import './ProfessionalsComponent.scss';
-import PatientModalComponent from '../PatientModal/PatientModalComponent';
 import { Professional } from '../../interfaces/Professional';
 import ProfessionalService from '../../services/ProfessionalService';
 import ProfessionalModal from '../ProfessionalModal/ProfessionalModal';
-import { User } from '../../interfaces/User';
 import { useAuth } from '../../context/ContextAuth';
-
-interface Props {
-  professionals: Professional[];
-  onProfessionalSelect: () => void;
-}
 
 const ProfessionalsComponent: React.FC<{
   professionals: Professional[];
@@ -24,13 +16,12 @@ const ProfessionalsComponent: React.FC<{
   const { userRole } = useAuth();
   const isUsuario = userRole === 'USUARIO';
   const [showEditModal, setShowEditModal] = useState(false);
+  const [, setIsUpdating] = useState(false);
 
   const handleRowClick = (professional: Professional) => {
     setSelectedProfessional(professional);
     setShowEditModal(true);
   };
-
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(); // ej: "MONDAY"
 
   const formatSchedulesByDay = (schedules: Professional['schedules']): React.ReactNode => {
     if (!schedules || schedules.length === 0) return '-';
@@ -107,6 +98,7 @@ const ProfessionalsComponent: React.FC<{
   };
 
   const handleSave = async (professionalData: Partial<Professional>) => {
+    setIsUpdating(true);
     try {
       if (professionalData.professionalId) {
         await ProfessionalService.updateProfessional(
@@ -124,8 +116,10 @@ const ProfessionalsComponent: React.FC<{
       reloadProfessional();
       setShowEditModal(false);
       setSelectedProfessional(null);
+      setIsUpdating(false);
     } catch (error: any) {
       console.error(error);
+      setIsUpdating(false);
       alert(error.message ?? 'Error inesperado al guardar el profesional');
     }
   };

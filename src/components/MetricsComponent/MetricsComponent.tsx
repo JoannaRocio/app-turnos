@@ -141,7 +141,7 @@ const MetricsComponent = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  tickFormatter={date =>
+                  tickFormatter={(date) =>
                     new Date(date).toLocaleDateString('es-AR', {
                       day: '2-digit',
                       month: 'short',
@@ -151,7 +151,9 @@ const MetricsComponent = () => {
                 <YAxis allowDecimals={false} />
                 <Tooltip
                   formatter={(value: number) => [`${value} turnos`, 'Cantidad']}
-                  labelFormatter={label => `Fecha: ${new Date(label).toLocaleDateString('es-AR')}`}
+                  labelFormatter={(label) =>
+                    `Fecha: ${new Date(label).toLocaleDateString('es-AR')}`
+                  }
                 />
                 <Line
                   type="monotone"

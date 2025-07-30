@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Patient } from '../../interfaces/Patient';
 import './PatientsPage.scss';
 import PatientModalComponent from '../PatientModal/PatientModalComponent';
@@ -13,6 +13,7 @@ import { useDataContext } from '../../context/DataContext';
 
 interface Props {
   professionalId: number;
+  reloadPatients: () => void;
 }
 
 const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
@@ -23,13 +24,13 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
   const { userRole } = useAuth();
   const role = userRole ?? '';
   const isUsuario = role === 'USUARIO';
-
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
   const [showClinicalHistory, setShowClinicalHistory] = useState(false);
   const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
   const [patientData, setPatientData] = useState<Patient | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleRowClick = (patient: Patient) => {
     setSelectedPatient(patient);
@@ -54,6 +55,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
   };
 
   const handleSave = async (patientData: Partial<Patient>) => {
+    setIsUpdating(true);
     try {
       const payload = {
         id: patientData.id,
@@ -68,8 +70,6 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         insurancePlanId: patientData.insurancePlanId === 0 ? null : patientData.insurancePlanId,
       };
 
-      console.log(payload);
-
       if (patientData.id) {
         await PatientService.updatePatient(patientData.id, payload);
         alert('Paciente actualizado con éxito');
@@ -78,10 +78,12 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         alert('Paciente creado con éxito');
       }
 
-      await reloadPatients(); // 🔁 recarga desde el contexto
+      await reloadPatients();
       setModalOpen(false);
       setSelectedPatient(null);
+      setIsUpdating(false);
     } catch (error) {
+      setIsUpdating(false);
       console.error('Error al guardar paciente:', error);
     }
   };
@@ -102,7 +104,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 🔐 Esto evita que el click llegue al <tr>
+    e.stopPropagation();
   };
 
   if (showClinicalHistory && patientData) {
@@ -176,8 +178,6 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
                   isOpen={activeDropdownIndex === index}
                   onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                   onView={() => openClinicalHistory(patient)}
-                  // onEdit={() => openModalForTime(time)}
-                  // onDelete={() => confirmDelete(patient)}
                 />
               </td>
             </tr>
@@ -190,6 +190,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         onClose={() => setModalOpen(false)}
         patient={selectedPatient}
         onSave={handleSave}
+        isUpdating={isUpdating}
       />
     </section>
   );

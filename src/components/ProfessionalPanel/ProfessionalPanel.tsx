@@ -5,11 +5,16 @@ import { Professional } from '../../interfaces/Professional';
 interface Props {
   professionals: Professional[];
   onProfessionalSelect: (professional: Professional) => void;
+  selectedProfessional?: Professional;
 }
 
-const ProfessionalPanel: React.FC<Props> = ({ professionals, onProfessionalSelect }) => {
+const ProfessionalPanel: React.FC<Props> = ({
+  professionals,
+  onProfessionalSelect,
+  selectedProfessional,
+}) => {
   const handleRowClick = (professional: Professional) => {
-    onProfessionalSelect(professional); // ← acá se envía al padre
+    onProfessionalSelect(professional);
   };
 
   return (
@@ -17,7 +22,9 @@ const ProfessionalPanel: React.FC<Props> = ({ professionals, onProfessionalSelec
       {professionals.map((pro: Professional) => (
         <div
           key={pro.professionalId}
-          className="professional-card"
+          className={`professional-card ${
+            selectedProfessional?.professionalId === pro.professionalId ? 'active' : ''
+          }`}
           onClick={() => handleRowClick(pro)}
         >
           <img src="/images/profile-pic.png" alt="Foto perfil" />

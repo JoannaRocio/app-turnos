@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ProfessionalModal.scss';
 import { Professional } from '../../interfaces/Professional';
-import ProfessionalAvailabilityForm from '../ProfessionalAbiavility/ProfessionalAvailability';
+import ProfessionalAvailabilityForm, {
+  AvailabilityFormRef,
+} from '../ProfessionalAbiavility/ProfessionalAvailability';
 import { daysOfWeek } from '../../constants/daysOfWeek';
 
 interface ProfessionalModalProps {
@@ -33,14 +35,12 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
   });
 
   const [savedAvailability, setSavedAvailability] = useState<Record<string, TimeRange[]>>({});
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
-  const [savedDays, setSavedDays] = useState<string[]>([]);
+  const availabilityRef = useRef<AvailabilityFormRef>(null);
 
   useEffect(() => {
     if (professional) {
       setForm(professional);
 
-      // Convertimos schedules a availability agrupado por día
       const availabilityMap: Record<string, TimeRange[]> = {};
       daysOfWeek.forEach((day) => {
         availabilityMap[day] = [];
@@ -48,15 +48,14 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
 
       professional.schedules?.forEach((s) => {
         const day = s.dayOfWeek;
-        const start = s.startTime?.slice(0, 5); // HH:MM
-        const end = s.endTime?.slice(0, 5); // HH:MM
+        const start = s.startTime?.slice(0, 5);
+        const end = s.endTime?.slice(0, 5);
 
         if (day && start && end) {
           availabilityMap[day].push({ start_time: start, end_time: end });
         }
       });
 
-      // Si algún día quedó vacío, aseguramos un slot en blanco
       daysOfWeek.forEach((day) => {
         if (availabilityMap[day].length === 0) {
           availabilityMap[day] = [{ start_time: '', end_time: '' }];
@@ -69,55 +68,34 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
 
   if (!isOpen || !form) return null;
 
-  const handleSaveAvailability = (data: any[]) => {
-    const formattedSchedules = data.map((entry) => ({
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const entries = availabilityRef.current?.getAvailabilityData() || [];
+    const formattedSchedules = entries.map((entry) => ({
       dayOfWeek: entry.day_of_week,
       startTime: entry.start_time,
       endTime: entry.end_time,
     }));
 
-    console.log('Formatted schedules:', formattedSchedules);
-
-    setForm((prev) => ({
-      ...prev,
+    const updatedForm = {
+      ...form,
       schedules: formattedSchedules,
-    }));
+    };
 
-    const availabilityByDay: Record<string, TimeRange[]> = {};
-
-    daysOfWeek.forEach((day) => {
-      availabilityByDay[day] = [];
-    });
-
-    formattedSchedules.forEach((schedule) => {
-      const { dayOfWeek, startTime, endTime } = schedule;
-      if (availabilityByDay[dayOfWeek]) {
-        availabilityByDay[dayOfWeek].push({
-          start_time: startTime.slice(0, 5),
-          end_time: endTime.slice(0, 5),
-        });
-      }
-    });
-
-    setSavedAvailability(availabilityByDay);
+    setForm(updatedForm);
+    onSave(updatedForm);
   };
 
   return (
     <section>
       <div
-        className={`modal-overlay-professionalModal
-           ${professional?.professionalId ? 'edit-mode' : ''}`}
+        className={`modal-overlay-professionalModal ${professional?.professionalId ? 'edit-mode' : ''}`}
       >
         <div className={`modal modal-patient ${professional?.professionalId ? 'edit-mode' : ''}`}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              console.log('Form al guardar:', form); // ← esto debería mostrar los schedules
-              onSave(form);
-            }}
-          >
+          <form onSubmit={handleSubmit}>
             <h4>{professional?.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
-            {/* Nombre completo */}
+
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label htmlFor="documentType">Nombre completo</label>
               <input
@@ -134,7 +112,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                 <span className="field-error">Campo obligatorio</span>
               )}
             </div>
-            {/* Tipo y número de documento */}
+
             <div style={{ display: 'flex', gap: '1rem' }}>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <label htmlFor="documentType">Tipo de documento</label>
@@ -171,7 +149,6 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
             </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
-              {/* Teléfono */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <label htmlFor="phone">Teléfono</label>
                 <input
@@ -181,14 +158,13 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                   title="Solo se permiten números sin espacios"
                   value={form.phone}
                   onChange={(e) => {
-                    const onlyNumbers = e.target.value.replace(/\D/g, ''); // elimina todo lo que no sea número
+                    const onlyNumbers = e.target.value.replace(/\D/g, '');
                     setForm({ ...form, phone: onlyNumbers });
                   }}
                   placeholder="Teléfono"
                 />
               </div>
 
-              {/* Especialidades */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <label htmlFor="specialties">Especialidad</label>
                 <select
@@ -207,8 +183,8 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
 
             {professional?.professionalId !== undefined && (
               <ProfessionalAvailabilityForm
-                professionalId={professional?.professionalId}
-                onSubmit={handleSaveAvailability}
+                ref={availabilityRef}
+                professionalId={professional.professionalId}
                 initialAvailability={savedAvailability}
               />
             )}

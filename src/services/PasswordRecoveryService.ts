@@ -21,7 +21,7 @@ class PasswordRecoveryService {
       {
         method: 'POST',
       }
-    ).then(res => {
+    ).then((res) => {
       if (!res.ok) {
         throw new Error('Error al cambiar la contraseña');
       }

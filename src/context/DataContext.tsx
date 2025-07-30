@@ -20,6 +20,7 @@ interface DataContextType {
   reloadUsers: () => Promise<void>;
   reloadPatients: () => Promise<void>;
   reloadAppointments: (dni: string) => Promise<void>;
+  reloadProfessionals: () => Promise<void>;
   clearAppointments: () => void;
 }
 
@@ -34,12 +35,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isUsersLoaded, setIsUsersLoaded] = useState(false);
   const [isPatientsLoaded, setIsPatientsLoaded] = useState(false);
   const [isProfessionalsLoaded, setIsProfessionalsLoaded] = useState(false);
-  const [isAppointmentsLoaded, setIsAppointmentsLoaded] = useState(false);
 
-  const [loadedAppointment, setLoadedAppointment] = useState<string | null>(null);
+  const [, setLoadedAppointment] = useState<string | null>(null);
 
   const loadPatients = async () => {
     if (isPatientsLoaded) return;
+    try {
+      const response = await PatientService.getAll();
+      setPatients(response);
+      setIsPatientsLoaded(true);
+    } catch (error) {
+      console.error('Error al cargar pacientes:', error);
+    }
+  };
+
+  const reloadPatients = async () => {
     try {
       const data = await PatientService.getAll();
       setPatients(data);
@@ -61,6 +71,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const reloadProfessionals = async () => {
+    try {
+      const data = await ProfessionalService.getAllProfessionals();
+      const active = data.filter((p) => p.professionalState === 'ACTIVE');
+      setProfessionals(active);
+      setIsProfessionalsLoaded(true);
+    } catch (error) {
+      console.error('Error al cargar profesionales:', error);
+    }
+  };
+
   const loadUsers = async () => {
     if (isUsersLoaded) return;
     try {
@@ -69,16 +90,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsUsersLoaded(true);
     } catch (error) {
       console.error('Error al cargar usuarios:', error);
-    }
-  };
-
-  const reloadPatients = async () => {
-    try {
-      const data = await PatientService.getAll();
-      setPatients(data);
-      setIsPatientsLoaded(true);
-    } catch (error) {
-      console.error('Error al cargar pacientes:', error);
     }
   };
 
@@ -139,6 +150,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loadAppointments,
         reloadUsers,
         reloadPatients,
+        reloadProfessionals,
         reloadAppointments,
         clearAppointments,
       }}

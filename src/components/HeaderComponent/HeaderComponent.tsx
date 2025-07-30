@@ -24,6 +24,8 @@ const HeaderComponent: React.FC = () => {
           src="/images/OdontoTurnoIcon.png"
           alt="Odonto Turno"
           className="img-fluid img-odontoTurno"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setComponenteActivo('agenda-turnos')}
         />
         <nav>
           <ul className="nav">

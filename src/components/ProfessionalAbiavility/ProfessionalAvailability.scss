@@ -1,164 +1,164 @@
 .availability-container {
-    // max-width: 720px;
-    max-width: -webkit-fill-available;
-    margin: 1.5rem auto;
-    padding: 1rem 1.5rem;
-    background: #f9fafd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #222;
-  }
-  
-  h2 {
+  // max-width: 720px;
+  max-width: -webkit-fill-available;
+  margin: 1.5rem auto;
+  padding: 1rem 1.5rem;
+  background: #f9fafd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+h2 {
+  text-align: center;
+  color: #007693;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.availability-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.25rem;
+  table-layout: fixed;
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 0.5rem 0.75rem;
     text-align: center;
-    color: #007693;
-    margin-bottom: 1.5rem;
-    font-weight: 700;
-  }
-  
-  .availability-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1.25rem;
-    table-layout: fixed;
-  
-    th,
-    td {
-      border: 1px solid #ddd;
-      padding: 0.5rem 0.75rem;
-      text-align: center;
-      vertical-align: middle;
-    }
-  
-    th {
-      background-color: #007693;
-      color: white;
-      font-weight: 700;
-    }
-  
-    .day-label {
-      font-weight: 700;
-      background-color: #e0f0f4;
-    }
-      
-    input[type='time'],
-    input[list='horarios'] {
-      width: 100%;
-      max-width: 90px;
-      padding: 0.25rem 0.5rem;
-      font-size: 1.3rem;
-      border-radius: 4px;
-      border: 1px solid #bbb;
-      text-align: center;
-      box-sizing: border-box; // evita que el padding sume al ancho total
-    }
-  }
-  
-  .add-buttons-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    justify-content: center;
-    margin-bottom: 1.25rem;
-  
-    button.btn-add {
-      background-color: #007693;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      flex: 1 0 140px;
-      transition: background-color 0.3s ease;
-    }
-  
-    button.btn-add:hover {
-      background-color: #005e75;
-    }
+    vertical-align: middle;
   }
 
-  .availability-table tbody tr:nth-child(odd) {
-    background-color: #dee9f5; // celeste claro
-  }
-  
-  .availability-table tbody tr:nth-child(even) {
-    background-color: #ffffff; // blanco
-  }
-  
-  .btn-remove {
-    background-color: #e55353;
-    border: none;
+  th {
+    background-color: #007693;
     color: white;
     font-weight: 700;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    transition: background-color 0.3s ease;
-    vertical-align: bottom;
-    width: 3rem;
-    height: 2.4rem;
   }
-  
-  .btn-remove:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+
+  .day-label {
+    font-weight: 700;
+    background-color: #e0f0f4;
   }
-  
-  .btn-remove:not(:disabled):hover {
-    background-color: #d12f2f;
-  }
-  
-  .btn-submit {
+
+  input[type='time'],
+  input[list='horarios'] {
     width: 100%;
+    max-width: 90px;
+    padding: 0.25rem 0.5rem;
+    font-size: 1.3rem;
+    border-radius: 4px;
+    border: 1px solid #bbb;
+    text-align: center;
+    box-sizing: border-box; // evita que el padding sume al ancho total
+  }
+}
+
+.add-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+
+  button.btn-add {
     background-color: #007693;
     color: white;
     border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
     cursor: pointer;
+    font-weight: 600;
+    flex: 1 0 140px;
     transition: background-color 0.3s ease;
   }
-  
-  .btn-submit:hover {
+
+  button.btn-add:hover {
     background-color: #005e75;
   }
+}
 
-  .btn-clear-day {
-    background-color: #666;
-    color: white;
-    border: none;
-    margin-left: 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-    width: 3rem;
-    height: 2.4rem;
-    vertical-align: bottom;
-  }
-  
-  .btn-clear-day:hover {
-    background-color: #444;
-  }
+.availability-table tbody tr:nth-child(odd) {
+  background-color: #dee9f5; // celeste claro
+}
 
-  .btn-clear-day:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-  
-  .btn-clear-day:not(:disabled):hover {
-    background-color: #d12f2f;
-  }
+.availability-table tbody tr:nth-child(even) {
+  background-color: #ffffff; // blanco
+}
 
-  .save-button-container {
-    place-self: center;
-  }
-  
-  .btn-availability {
-    background-color: var(--color-yellow);
-  }
+.btn-remove {
+  background-color: #e55353;
+  border: none;
+  color: white;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: background-color 0.3s ease;
+  vertical-align: bottom;
+  width: 3rem;
+  height: 2.4rem;
+}
+
+.btn-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-remove:not(:disabled):hover {
+  background-color: #d12f2f;
+}
+
+.btn-submit {
+  width: 100%;
+  background-color: #007693;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #005e75;
+}
+
+.btn-clear-day {
+  background-color: #666;
+  color: white;
+  border: none;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  width: 3rem;
+  height: 2.4rem;
+  vertical-align: bottom;
+}
+
+.btn-clear-day:hover {
+  background-color: #444;
+}
+
+.btn-clear-day:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-clear-day:not(:disabled):hover {
+  background-color: #d12f2f;
+}
+
+.save-button-container {
+  place-self: center;
+}
+
+.btn-availability {
+  background-color: var(--color-yellow);
+}

@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import './AppointmentsComponent.scss';
 import { Appointment } from '../../interfaces/Appointment';
-import { IoIosExpand, IoIosRemoveCircleOutline } from 'react-icons/io';
 import ConfirmModal from '../ConfirmModal/ConfirmModalComponent';
 import AppointmentService from '../../services/AppointmentService';
 import ProfessionalPanel from '../ProfessionalPanel/ProfessionalPanel';
 import CalendarComponent from '../CalendarComponent/CalendarComponent';
 import { Patient } from '../../interfaces/Patient';
 import { Professional } from '../../interfaces/Professional';
-import Dropdown from 'react-bootstrap/esm/Dropdown';
-import { FiMoreVertical } from 'react-icons/fi';
 import ClinicalHistoryComponent from '../ClinicalHistoryComponent/ClinicalHistory';
 import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import ClinicalHistoryService from '../../services/ClinicalHistoryService';
@@ -52,12 +49,12 @@ const AppointmentsComponent: React.FC<Props> = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  // const [selectedProfessional, setSelectedProfessional] = useState('');
   const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
   const [showClinicalHistory, setShowClinicalHistory] = useState(false);
   const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
   const [patientData, setPatientData] = useState<Patient | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const [apptToDelete, setApptToDelete] = useState<{
     appointmentId: number;
@@ -72,7 +69,7 @@ const AppointmentsComponent: React.FC<Props> = ({
 
   const handleProfessionalSelect = (professional: Professional) => {
     setSelectedProfessional(professional);
-    onAppointmentsUpdate(professional); // Esto actualiza los turnos
+    onAppointmentsUpdate(professional);
   };
 
   const appointmentsForSelectedDate = appointments.filter((appt) =>
@@ -86,10 +83,6 @@ const AppointmentsComponent: React.FC<Props> = ({
   const filteredProfessionals = professionals.filter((pro) =>
     pro.schedules?.some((s) => s.dayOfWeek === getDayOfWeekString(selectedDate))
   );
-
-  // const appointmentsForSelectedDate = appointments.filter((appt) =>
-  //   appt.dateTime.startsWith(selectedDate.toISOString().split('T')[0])
-  // );
 
   const confirmDelete = (appt: any, time: string) => {
     setCurrentAppointment(appt);
@@ -117,20 +110,24 @@ const AppointmentsComponent: React.FC<Props> = ({
   });
 
   useEffect(() => {
-    if (isEditMode && currentAppointment) {
-      console.log(currentAppointment, 'currentAppointment');
-      const patient = patients.find((p) => p.id === currentAppointment.patient.id);
-      if (patient) {
-        setNameSearch(patient.fullName);
-        setDniSearch(patient.documentNumber);
-      }
+    if (isEditMode && currentAppointment?.patient) {
+      setNameSearch(currentAppointment.patient.fullName ?? '');
+      setDniSearch(currentAppointment.patient.documentNumber ?? '');
+
+      setNewAppointment((prev) => ({
+        ...prev,
+        patientId: currentAppointment?.patient.id ?? 0,
+        documentNumber: currentAppointment?.patient.documentNumber ?? '',
+      }));
     } else {
       setNameSearch('');
       setDniSearch('');
     }
-  }, [isModalOpen, isEditMode, currentAppointment, patients]);
+  }, [isModalOpen, isEditMode, currentAppointment]);
 
   useEffect(() => {
+    if (isEditMode) return;
+
     const matchByName = nameSearch
       ? patients.find((p) => p.fullName?.toLowerCase().includes(nameSearch.toLowerCase()))
       : null;
@@ -139,19 +136,15 @@ const AppointmentsComponent: React.FC<Props> = ({
       ? patients.find((p) => p.documentNumber?.includes(dniSearch))
       : null;
 
-    // Si se encuentra por nombre y no se buscó por DNI
     if (matchByName && !dniSearch) {
       setNewAppointment((prev) => ({
         ...prev,
-        patientId: matchByName.id ?? 0, // <- evita undefined
+        patientId: matchByName.id ?? 0,
         documentNumber: matchByName.documentNumber ?? '',
         patientName: matchByName.fullName ?? '',
       }));
       setDniSearch(matchByName.documentNumber ?? '');
-    }
-
-    // Si se encuentra por DNI y no se buscó por nombre
-    else if (matchByDni && !nameSearch) {
+    } else if (matchByDni && !nameSearch) {
       setNewAppointment((prev) => ({
         ...prev,
         patientId: matchByDni.id ?? 0,
@@ -160,7 +153,13 @@ const AppointmentsComponent: React.FC<Props> = ({
       }));
       setNameSearch(matchByDni.fullName ?? '');
     }
-  }, [nameSearch, dniSearch, patients]);
+  }, [nameSearch, dniSearch, patients, isEditMode]);
+
+  useEffect(() => {
+    if (!selectedProfessional && professionals.length > 0) {
+      setSelectedProfessional(professionals[0]);
+    }
+  }, [professionals]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -176,9 +175,14 @@ const AppointmentsComponent: React.FC<Props> = ({
 
     if (apptExists) {
       setIsEditMode(true);
+      setCurrentAppointment(apptExists);
+
+      setNameSearch(apptExists.patient.fullName ?? '');
+      setDniSearch(apptExists.patient.documentNumber ?? '');
+
       setNewAppointment({
         appointmentId: apptExists.appointmentId,
-        patientId: 0,
+        patientId: apptExists.patient.id ?? 0,
         documentNumber: apptExists.patient.documentNumber,
         time: time,
         reason: appointment?.reason ?? '-',
@@ -208,6 +212,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setIsUpdating(true);
     e.preventDefault();
 
     if (!newAppointment.patientId || !newAppointment.documentNumber || !newAppointment.time) {
@@ -237,8 +242,10 @@ const AppointmentsComponent: React.FC<Props> = ({
         }
       }
 
+      setIsUpdating(false);
       closeModal();
     } catch (error) {
+      setIsUpdating(false);
       alert(error);
     }
   };
@@ -304,6 +311,7 @@ const AppointmentsComponent: React.FC<Props> = ({
               <ProfessionalPanel
                 professionals={professionals}
                 onProfessionalSelect={handleProfessionalSelect}
+                selectedProfessional={selectedProfessional}
               />
             </div>
 
@@ -389,9 +397,10 @@ const AppointmentsComponent: React.FC<Props> = ({
                           <input
                             type="text"
                             value={nameSearch}
+                            readOnly={!!nameSearch}
                             onChange={(e) => {
                               setNameSearch(e.target.value);
-                              setDniSearch('');
+                              if (!isEditMode) setDniSearch('');
                             }}
                             list="patientsByName"
                             placeholder="Escribí el nombre"
@@ -411,7 +420,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                             readOnly={!!nameSearch}
                             onChange={(e) => {
                               setDniSearch(e.target.value);
-                              setNameSearch('');
+                              if (!isEditMode) setNameSearch('');
                             }}
                             list="patientsByDni"
                             placeholder="Escribí el DNI"
@@ -481,7 +490,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                       </div>
 
                       <div className="d-flex justify-content-center align-items-center">
-                        <button className="modal-buttons" type="submit">
+                        <button className="modal-buttons" type="submit" disabled={isUpdating}>
                           {isEditMode ? 'Actualizar' : 'Guardar'}
                         </button>
                         <button className="modal-buttons" type="button" onClick={closeModal}>

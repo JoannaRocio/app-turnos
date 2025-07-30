@@ -1,60 +1,72 @@
 .professional-panel {
-    max-height: 600px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: small;
-    padding: .2rem;
+  max-height: 600px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: small;
+  padding: 0.2rem;
 }
 
 .professional-card:hover {
-    background-color: var(--color-secondary-light);
-    color: var(--color-white-hover);
-    border: 2px solid var(--color-white-hover);
+  background-color: var(--color-secondary-light);
+  color: var(--color-white-hover);
+  border: 2px solid var(--color-white-hover);
 }
 
 .professional-card {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--color-secondary-light);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: 0.3s;
+
+  .info {
     display: flex;
-    align-items: center;
-    background-color: #f5f5f5;
-    padding: 10px;
-    border-radius: 10px;
-    border: 2px solid var(--color-secondary-light);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: 0.3s;
+    flex-direction: column;
+  }
 
-    .info {
-        display: flex;
-        flex-direction: column;
-      }
-    
-      .dni {
-        color: #666;
-        font-size: 0.9em;
-    }
+  .dni {
+    color: #666;
+    font-size: 0.9em;
+  }
 
-    &:hover {
-        .info .dni {
-            color: var(--color-white-hover);
-        }
+  &:hover {
+    .info .dni {
+      color: var(--color-white-hover);
     }
+  }
+
+  &.active {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-white-hover);
+    border: 2px solid var(--color-white-hover);
+
+    color: white;
+
+    .dni {
+      color: white;
+    }
+  }
 }
 
 .professional-card img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: .8rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.8rem;
 }
 
 .name {
-    font-weight: bold;
-    margin-bottom: 4px;
-    font-size: 1.3rem;
-    text-overflow: ellipsis;
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 1.3rem;
+  text-overflow: ellipsis;
 }
