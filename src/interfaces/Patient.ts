@@ -7,6 +7,7 @@ export interface Patient {
   insurancePlanId: number;
   healthInsuranceName: string;
   insurancePlanName: string;
+  affiliateNumber: number;
   phone: string;
   email: string;
   registrationDate: string | null;

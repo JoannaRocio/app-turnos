@@ -26,6 +26,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
     documentNumber: string;
     healthInsuranceId: string;
     insurancePlanId: string;
+    affiliateNumber?: number;
     phone: string;
     email: string;
     note: string;
@@ -36,6 +37,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
     documentNumber: '',
     healthInsuranceId: '',
     insurancePlanId: '',
+    affiliateNumber: 0,
     phone: '',
     email: '',
     note: '',
@@ -65,6 +67,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
         documentNumber: patient.documentNumber || '',
         healthInsuranceId: patient.healthInsuranceId?.toString() || '',
         insurancePlanId: patient.insurancePlanId?.toString() || '',
+        affiliateNumber: patient.affiliateNumber || undefined,
         phone: patient.phone || '',
         email: patient.email || '',
         note: patient.note || '',
@@ -77,12 +80,18 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
         documentNumber: '',
         healthInsuranceId: '',
         insurancePlanId: '',
+        affiliateNumber: undefined,
         phone: '',
         email: '',
         note: '',
       });
     }
   }, [patient]);
+
+  const hasAnyInsuranceField =
+    form.healthInsuranceId?.trim() ||
+    form.insurancePlanId?.trim() ||
+    form.affiliateNumber !== undefined;
 
   if (!isOpen || !form) return null;
 
@@ -174,6 +183,12 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
                     </option>
                   ))}
                 </select>
+                {hasAnyInsuranceField &&
+                  (!form.healthInsuranceId?.trim() ||
+                    !form.insurancePlanId?.trim() ||
+                    form.affiliateNumber === undefined) && (
+                    <span className="field-error">Debe completar los 3 campos</span>
+                  )}
               </div>
               <div className="form-group">
                 <label>Plan</label>
@@ -191,6 +206,30 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
                       </option>
                     ))}
                 </select>
+                {hasAnyInsuranceField &&
+                  (!form.healthInsuranceId?.trim() ||
+                    !form.insurancePlanId?.trim() ||
+                    form.affiliateNumber === undefined) && (
+                    <span className="field-error">Debe completar los 3 campos</span>
+                  )}
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Número de afiliado</label>
+                <input
+                  type="number"
+                  value={form.affiliateNumber}
+                  onChange={(e) => setForm({ ...form, affiliateNumber: Number(e.target.value) })}
+                  placeholder="Número de afiliado"
+                />
+                {hasAnyInsuranceField &&
+                  (!form.healthInsuranceId?.trim() ||
+                    !form.insurancePlanId?.trim() ||
+                    form.affiliateNumber === undefined) && (
+                    <span className="field-error">Debe completar los 3 campos</span>
+                  )}
               </div>
             </div>
 

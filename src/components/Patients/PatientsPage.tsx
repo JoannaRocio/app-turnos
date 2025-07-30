@@ -68,6 +68,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         healthInsuranceId:
           patientData.healthInsuranceId === 0 ? null : patientData.healthInsuranceId,
         insurancePlanId: patientData.insurancePlanId === 0 ? null : patientData.insurancePlanId,
+        affiliateNumber: patientData.affiliateNumber === 0 ? null : patientData.affiliateNumber,
       };
 
       if (patientData.id) {
