@@ -397,7 +397,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                           <input
                             type="text"
                             value={nameSearch}
-                            readOnly={!!nameSearch}
+                            readOnly={!!nameSearch && isEditMode}
                             onChange={(e) => {
                               setNameSearch(e.target.value);
                               if (!isEditMode) setDniSearch('');
@@ -417,7 +417,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                           <input
                             type="text"
                             value={dniSearch}
-                            readOnly={!!nameSearch}
+                            readOnly={!!dniSearch && isEditMode}
                             onChange={(e) => {
                               setDniSearch(e.target.value);
                               if (!isEditMode) setNameSearch('');

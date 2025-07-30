@@ -69,7 +69,7 @@ class ClinicalHistoryService {
       body: JSON.stringify({
         patientDocumentNumber: patient.documentNumber,
         professionalId: professionalId,
-        procedureId: procedureIds,
+        procedureIds: procedureIds,
         description: description,
       }),
     });
@@ -79,30 +79,47 @@ class ClinicalHistoryService {
       throw new Error(`Error creando historia clínica: ${msg}`);
     }
 
-    const data = await res.json(); // 👈 asumimos que vuelve la historia creada
-    return data.id; // 👈 devolvemos el ID
+    // 👇 Cambiado a .text()
+    const msg = await res.text();
+    console.log('Respuesta:', msg);
+
+    return 0; // o null si querés que devuelva algo
   }
 
-  static async uploadFile(historyId: number, file: File): Promise<void> {
+  static async uploadFile(entryId: number, file: File): Promise<void> {
     const token = AuthService.getToken();
+
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch(`${BASE_URL}/${historyId}/upload`, {
+    const res = await fetch(`${BASE_URL}/${entryId}/upload`, {
       method: 'POST',
       headers: {
         Authorization: token ? `Bearer ${token}` : '',
-        // ⚠️ No pongas 'Content-Type': multipart/form-data, el browser lo setea solo
+        // ❌ NO poner 'Content-Type': 'multipart/form-data' con fetch
       },
       body: formData,
     });
 
-    const text = await res.text();
     if (!res.ok) {
-      throw new Error(`Error al subir archivo: ${text}`);
+      throw new Error('Error al subir el archivo');
     }
+  }
 
-    console.log('Archivo subido:', text);
+  static async deleteEntry(entryId: number): Promise<void> {
+    const token = AuthService.getToken();
+
+    const res = await fetch(`${BASE_URL}/${entryId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
+
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(`Error al eliminar historia clínica: ${msg}`);
+    }
   }
 }
 

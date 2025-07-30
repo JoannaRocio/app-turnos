@@ -16,7 +16,7 @@ const ProfessionalsComponent: React.FC<{
   const { userRole } = useAuth();
   const isUsuario = userRole === 'USUARIO';
   const [showEditModal, setShowEditModal] = useState(false);
-  const [, setIsUpdating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleRowClick = (professional: Professional) => {
     setSelectedProfessional(professional);
@@ -217,6 +217,7 @@ const ProfessionalsComponent: React.FC<{
         onClose={() => setShowEditModal(false)}
         professional={selectedProfessional}
         onSave={handleSave}
+        isUpdating={isUpdating}
       />
     </section>
   );

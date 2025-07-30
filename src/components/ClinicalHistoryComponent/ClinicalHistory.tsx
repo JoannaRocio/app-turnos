@@ -44,7 +44,8 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
 
   const handleDeleteConfirmed = async (entry: ClinicalHistoryEntry) => {
     try {
-      // await ClinicalHistoryService.deleteEntry(entry.id);
+      await ClinicalHistoryService.deleteEntry(entry.id);
+
       const updated = entries.filter((e) => e.id !== entry.id);
       setEntries(updated);
     } catch (err: any) {
@@ -64,6 +65,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   const handleAddTreatment = () => {
     const id = Number(selectedId);
     if (id && !selectedTreatments.includes(id)) {
+      console.log(selectedTreatments);
       setSelectedTreatments([...selectedTreatments, id]);
     }
     setSelectedId('');
@@ -81,7 +83,10 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   const [notes, setNotes] = useState('');
 
   const handleSave = async () => {
-    if (!notes.trim()) return;
+    if (selectedTreatments.length === 0) {
+      setError('Debés seleccionar al menos un tratamiento antes de guardar.');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -95,20 +100,24 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         selectedTreatments
       );
 
-      // 2. Volver a obtener la historia clínica
-      const updated = await ClinicalHistoryService.getOrCreate(patient, professionalId);
-      setEntries(updated);
+      // 2. Obtener historia clínica para encontrar la nueva entrada
+      let updated = await ClinicalHistoryService.getOrCreate(patient, professionalId);
+      let latestEntry = Array.isArray(updated) ? updated[updated.length - 1] : null;
 
-      // 3. Buscar la entrada más reciente para obtener su ID
-      const latestEntry = Array.isArray(updated) ? updated[updated.length - 1] : null;
-
+      // 3. Subir archivos
       if (latestEntry?.id && uploadedFiles.length > 0) {
         for (const file of uploadedFiles) {
           await ClinicalHistoryService.uploadFile(latestEntry.id, file);
         }
+
+        // ⚠️ Volver a obtener la historia clínica con archivos ya subidos
+        updated = await ClinicalHistoryService.getOrCreate(patient, professionalId);
       }
 
-      // 4. Reset
+      // 4. Actualizar estado
+      setEntries(updated);
+
+      // 5. Reset
       setNotes('');
       setUploadedFiles([]);
       setSelectedTreatments([]);
@@ -302,6 +311,12 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
           )}
         </div>
 
+        {error !== '' && (
+          <div className="alert alert-danger fs-5" role="alert">
+            {error}
+          </div>
+        )}
+
         {/* Botón guardar entrada */}
         <div className="text-end">
           <button
@@ -321,63 +336,105 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         {entries.length === 0 ? (
           <p className="text-white">No hay entradas de historia clínica.</p>
         ) : (
-          entries.map((entry) => {
-            const mockTreatments = [
-              'Limpieza de sarro',
-              'Extracción de carie',
-              'Blanqueamiento dental',
-            ];
+          [...entries]
+            .sort((a, b) => b.id - a.id)
+            .map((entry) => {
+              const mockTreatments = [
+                'Limpieza de sarro',
+                'Extracción de carie',
+                'Blanqueamiento dental',
+              ];
 
-            return (
-              <div key={entry.id} className="card mb-3 position-relative">
-                <div className="card-body">
-                  {/* Botones de editar y eliminar */}
-                  <div className="position-absolute top-0 end-0 m-2 d-flex gap-2 align-items-center">
-                    <button
-                      className="btn btn-secondary d-flex align-items-center gap-1 btn-lg"
-                      title="Editar"
-                    >
-                      <i className="bi bi-pencil"></i> Editar
-                    </button>
-                    <button
-                      className="btn btn-danger d-flex align-items-center gap-1 btn-lg"
-                      title="Eliminar"
-                      onClick={() => {
-                        setShowConfirm(true);
-                        setEntryToDelete(entry);
-                      }}
-                    >
-                      <i className="bi bi-trash"></i> Eliminar
-                    </button>
+              return (
+                <div key={entry.id} className="card mb-3 position-relative">
+                  <div className="card-body">
+                    {/* Botones de editar y eliminar */}
+                    <div className="position-absolute top-0 end-0 m-2 d-flex gap-2 align-items-center">
+                      <button
+                        className="btn btn-secondary d-flex align-items-center gap-1 btn-lg"
+                        title="Editar"
+                      >
+                        <i className="bi bi-pencil"></i> Editar
+                      </button>
+                      <button
+                        className="btn btn-danger d-flex align-items-center gap-1 btn-lg"
+                        title="Eliminar"
+                        onClick={() => {
+                          setShowConfirm(true);
+                          setEntryToDelete(entry);
+                        }}
+                      >
+                        <i className="bi bi-trash"></i> Eliminar
+                      </button>
+                    </div>
+
+                    <p>
+                      <strong>Fecha de última actualización:</strong> {entry.date}
+                    </p>
+                    <p>
+                      <strong>Profesional:</strong> {entry.professionalFullName}
+                    </p>
+
+                    {/* Tratamientos mockeados */}
+                    <div>
+                      <strong>Tratamientos realizados:</strong>
+                      <ul className="mt-2">
+                        {mockTreatments.map((t, index) => (
+                          <li key={index}>{t}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <p>
+                      <strong>Descripción:</strong> {entry.description}
+                    </p>
+                    {entry.files && entry.files.length > 0 ? (
+                      <div>
+                        <strong>Archivos adjuntos:</strong>
+                        <ul className="mt-2">
+                          {entry.files.map((file: { id: number; fileName: string }) => (
+                            <li key={file.id}>
+                              {file.fileName.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                                <a
+                                  href={`http://localhost:8080/api/clinical-history/files/${file.id}/download`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download={file.fileName}
+                                >
+                                  <img
+                                    src={`http://localhost:8080/api/clinical-history/files/${file.id}/download`}
+                                    alt={file.fileName}
+                                    style={{
+                                      maxWidth: '200px',
+                                      marginBottom: '1rem',
+                                      cursor: 'zoom-in',
+                                      border: '1px solid #ccc',
+                                      borderRadius: '8px',
+                                    }}
+                                  />
+                                </a>
+                              ) : (
+                                <a
+                                  href={`http://localhost:8080/api/clinical-history/files/${file.id}/download`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {file.fileName}
+                                </a>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <p>
+                        <strong>Archivos adjuntos:</strong> Sin archivos
+                      </p>
+                    )}
                   </div>
-
-                  <p>
-                    <strong>Fecha de última actualización:</strong> {entry.date}
-                  </p>
-                  <p>
-                    <strong>Profesional:</strong> {entry.professionalFullName}
-                  </p>
-
-                  {/* Tratamientos mockeados */}
-                  <div>
-                    <strong>Tratamientos realizados:</strong>
-                    <ul className="mt-2">
-                      {mockTreatments.map((t, index) => (
-                        <li key={index}>{t}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <p>
-                    <strong>Descripción:</strong> {entry.description}
-                  </p>
-                  <p>
-                    <strong>Archivos adjuntos:</strong> {entry.state}
-                  </p>
                 </div>
-              </div>
-            );
-          })
+              );
+            })
         )}
       </div>
 

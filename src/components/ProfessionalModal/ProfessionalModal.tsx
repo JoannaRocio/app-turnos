@@ -11,6 +11,7 @@ interface ProfessionalModalProps {
   onClose: () => void;
   professional: Partial<Professional> | null;
   onSave: (updated: Partial<Professional>) => void;
+  isUpdating: boolean;
 }
 
 interface TimeRange {
@@ -23,6 +24,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
   onClose,
   professional,
   onSave,
+  isUpdating,
 }) => {
   const [form, setForm] = useState<Partial<Professional>>({
     professionalId: 0,
@@ -197,7 +199,8 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                   !form.professionalName ||
                   !form.documentType ||
                   !form.documentNumber ||
-                  !form.specialties
+                  !form.specialties ||
+                  isUpdating
                 }
               >
                 Guardar
