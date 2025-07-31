@@ -104,7 +104,13 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         setHighlightedPatientId(null);
       }, 10000);
     } catch (error: any) {
-      toast.error(error.message || 'Error al guardar el paciente');
+      const backendMessage =
+        error?.response?.data?.message || // por si usás ResponseStatusException
+        error?.response?.data?.error || // por si devolvés { error: '...' }
+        error.message || // fallback: mensaje de Axios
+        'Error al guardar el paciente';
+
+      toast.error(backendMessage);
       console.error('Error al guardar paciente:', error);
     } finally {
       setIsUpdating(false); // se ejecuta siempre, haya error o no
