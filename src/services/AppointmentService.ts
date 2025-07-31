@@ -1,134 +1,40 @@
 import { Appointment } from '../interfaces/Appointment';
-import AuthService from './AuthService';
+import Api from './Api';
 
 class AppointmentService {
-  private static readonly TOKEN_KEY = 'token';
-  private static BASE_URL = 'http://localhost:8080/api/appointments';
-
-  static async createAppointment(appointment: any) {
-    const token = localStorage.getItem(this.TOKEN_KEY);
-
-    const response = await fetch('http://localhost:8080/api/appointments', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify(appointment),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    return await response.text();
+  static async createAppointment(appointment: any): Promise<string> {
+    const response = await Api.post<string>('/appointments', appointment);
+    return response.data;
   }
 
-  //todos los turnos
   static async getAllAppointments(): Promise<Appointment[]> {
-    const token = localStorage.getItem(this.TOKEN_KEY);
-
-    const response = await fetch('http://localhost:8080/api/appointments', {
-      method: 'GET',
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    const rawData = await response.json();
-    return rawData;
+    const response = await Api.get<Appointment[]>('/appointments');
+    return response.data;
   }
 
   static async getAppointmentByDni(documentNumber: string): Promise<Appointment[]> {
-    const token = localStorage.getItem(this.TOKEN_KEY);
-
-    const response = await fetch(
-      `http://localhost:8080/api/appointments/professional/dni/${documentNumber}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: token ? `Bearer ${token}` : '',
-        },
-      }
+    const response = await Api.get<Appointment[]>(
+      `/appointments/professional/dni/${documentNumber}`
     );
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    const rawData = await response.json();
-    return rawData;
+    return response.data;
   }
 
-  static async updateAppointment(id: number, appointment: any) {
-    const token = localStorage.getItem(this.TOKEN_KEY);
-
-    const response = await fetch(`http://localhost:8080/api/appointments/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify(appointment),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    return await response.text();
+  static async updateAppointment(id: number, appointment: any): Promise<string> {
+    const response = await Api.put<string>(`/appointments/${id}`, appointment);
+    return response.data;
   }
 
   static async deleteAppointment(id: number): Promise<string> {
-    const token = localStorage.getItem(this.TOKEN_KEY);
-
-    const response = await fetch(`http://localhost:8080/api/appointments/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    return await response.text();
+    const response = await Api.delete<string>(`/appointments/${id}`);
+    return response.data;
   }
 
   static async confirmAppointment(id: number): Promise<void> {
-    const token = AuthService.getToken();
-    const res = await fetch(`${this.BASE_URL}/confirmar/${id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!res.ok) throw new Error('Error al confirmar turno');
+    await Api.post<void>(`/appointments/confirmar/${id}`);
   }
 
   static async cancelAppointment(id: number): Promise<void> {
-    const token = AuthService.getToken();
-    const res = await fetch(`${this.BASE_URL}/cancelar/${id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!res.ok) throw new Error('Error al cancelar turno');
+    await Api.post<void>(`/appointments/cancelar/${id}`);
   }
 }
 

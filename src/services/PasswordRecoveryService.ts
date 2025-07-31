@@ -1,32 +1,23 @@
+import Api from './Api';
+
 class PasswordRecoveryService {
-  static async password_recovery(email: string) {
-    const response = await fetch('http://localhost:8080/api/enviar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ destinatario: email }),
-    });
-
-    const text = await response.text();
-
-    if (!response.ok) {
-      return { status: false, message: text };
+  static async password_recovery(email: string): Promise<{ status: boolean; message: string }> {
+    try {
+      const res = await Api.post<string>('/enviar', {
+        destinatario: email,
+      });
+      return { status: true, message: res.data };
+    } catch (error: any) {
+      const msg = error.response?.data || 'Error desconocido';
+      return { status: false, message: msg };
     }
-
-    return { status: true, message: text };
   }
 
-  static reset_password(token: string, password: string) {
-    return fetch(
-      `http://localhost:8080/api/cambiar-contrasena?token=${token}&newPassword=${password}`,
-      {
-        method: 'POST',
-      }
-    ).then((res) => {
-      if (!res.ok) {
-        throw new Error('Error al cambiar la contraseña');
-      }
-      return res.text(); // o res.json() si es JSON
-    });
+  static async reset_password(token: string, password: string): Promise<string> {
+    const res = await Api.post<string>(
+      `/cambiar-contrasena?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(password)}`
+    );
+    return res.data;
   }
 }
 

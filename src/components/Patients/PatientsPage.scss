@@ -8,3 +8,8 @@
   padding: 1.2rem !important;
   margin-bottom: 1rem !important;
 }
+
+.highlighted-row {
+  background-color: #faec9c !important; /* amarillo suave */
+  transition: background-color 0.5s ease !important;
+}

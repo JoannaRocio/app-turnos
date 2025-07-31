@@ -1,32 +1,18 @@
 import { Professional } from '../interfaces/Professional';
-import AuthService from './AuthService';
+import Api from './Api';
 
 class ProfessionalService {
-  private static readonly BASE_URL = 'http://localhost:8080/api/professionals';
+  private static readonly BASE_URL = '/professionals';
 
   static async getAllProfessionals(): Promise<Professional[]> {
-    const token = AuthService.getToken();
+    const response = await Api.get<any[]>(this.BASE_URL);
+    const data = response.data;
 
-    const response = await fetch(this.BASE_URL, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
-    }
-
-    const data = await response.json();
-
-    const mapped: Professional[] = data.map((item: any) => ({
+    const mapped: Professional[] = data.map((item) => ({
       professionalId: item.id,
       professionalName: item.fullName,
       documentType: item.documentType,
-      documentNumber: Number(item.documentNumber),
+      documentNumber: item.documentNumber,
       phone: item.phone ?? '-',
       specialties: item.specialties ?? '-',
       schedules: item.schedules ?? [],
@@ -44,50 +30,30 @@ class ProfessionalService {
   }
 
   static async createProfessional(data: any): Promise<void> {
-    const token = AuthService.getToken();
-
     const payload = {
       ...data,
       fullName: data.professionalName,
     };
     delete payload.professionalName;
 
-    const response = await fetch(this.BASE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await Api.post<string>(this.BASE_URL, payload);
 
-    const responseText = await response.text();
-
-    if (!response.ok) {
-      throw new Error(`Error creando profesional: ${responseText}`);
+    if (response.status >= 400) {
+      throw new Error(`Error creando profesional: ${response.data}`);
     }
   }
 
   static async updateProfessional(id: number, data: any): Promise<void> {
-    const token = AuthService.getToken();
     const payload = {
       ...data,
       fullName: data.professionalName,
     };
     delete payload.professionalName;
 
-    const response = await fetch(`${this.BASE_URL}/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await Api.put<string>(`${this.BASE_URL}/${id}`, payload);
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Error actualizando profesional: ${error}`);
+    if (response.status >= 400) {
+      throw new Error(`Error actualizando profesional: ${response.data}`);
     }
   }
 }

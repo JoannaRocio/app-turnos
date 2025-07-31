@@ -1,19 +1,22 @@
-// src/routes/ProtectedRoute.tsx
-import React, { JSX } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/ContextAuth';
+import { JSX } from 'react';
 
 interface ProtectedRouteProps {
   allowedRoles: string[];
   children: JSX.Element;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
+const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
   const { isAuthenticated, userRole } = useAuth();
 
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  if (!userRole || !allowedRoles.includes(userRole.toUpperCase())) {
-    return <Navigate to="/no-autorizado" />; // Podés crear esta vista simple
+  if (!isAuthenticated) {
+    return <Navigate to="/Inicio-sesion" replace />;
+  }
+
+  const normalizedRole = userRole?.toUpperCase();
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
+    return <Navigate to="/no-autorizado" replace />;
   }
 
   return children;

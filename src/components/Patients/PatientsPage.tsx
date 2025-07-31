@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Patient } from '../../interfaces/Patient';
 import './PatientsPage.scss';
 import PatientModalComponent from '../PatientModal/PatientModalComponent';
@@ -7,9 +7,9 @@ import { useAuth } from '../../context/ContextAuth';
 import ActionDropdown from '../ActionDropdown/ActionDropdown';
 import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import ClinicalHistoryService from '../../services/ClinicalHistoryService';
-import { Appointment } from '../../interfaces/Appointment';
 import ClinicalHistoryComponent from '../ClinicalHistoryComponent/ClinicalHistory';
 import { useDataContext } from '../../context/DataContext';
+import { toast } from 'react-toastify';
 
 interface Props {
   professionalId: number;
@@ -17,31 +17,33 @@ interface Props {
 }
 
 const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
-  const { patients, loadPatients, reloadPatients } = useDataContext();
+  const { patients, reloadPatients } = useDataContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Partial<Patient> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { userRole } = useAuth();
   const role = userRole ?? '';
-  const isUsuario = role === 'USUARIO';
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
   const [showClinicalHistory, setShowClinicalHistory] = useState(false);
   const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
   const [patientData, setPatientData] = useState<Patient | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-
-  const handleRowClick = (patient: Patient) => {
-    setSelectedPatient(patient);
-    setModalOpen(true);
-  };
+  const [sortByNameAsc, setSortByNameAsc] = useState(true);
+  const [highlightedPatientId, setHighlightedPatientId] = useState<number | null>(null);
 
   const filteredPatients = patients.filter((p) => {
     const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
     const dniMatch = p.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
   });
+
+  const sortedPatients = useMemo(() => {
+    return filteredPatients.slice().sort((a, b) => {
+      const nameA = a.fullName?.toLowerCase() ?? '';
+      const nameB = b.fullName?.toLowerCase() ?? '';
+      return sortByNameAsc ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    });
+  }, [filteredPatients, sortByNameAsc]);
 
   const openClinicalHistory = async (patient: Patient) => {
     try {
@@ -54,8 +56,14 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
     }
   };
 
+  const openPatientModal = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setModalOpen(true);
+  };
+
   const handleSave = async (patientData: Partial<Patient>) => {
     setIsUpdating(true);
+
     try {
       const payload = {
         id: patientData.id,
@@ -71,23 +79,48 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         affiliateNumber: patientData.affiliateNumber === 0 ? null : patientData.affiliateNumber,
       };
 
+      // Guardar paciente
       if (patientData.id) {
-        await PatientService.updatePatient(patientData.id, payload);
-        alert('Paciente actualizado con éxito');
+        await PatientService.createPatient(payload);
+        toast.success('Paciente actualizado con éxito');
       } else {
         await PatientService.createPatient(payload);
-        alert('Paciente creado con éxito');
+        toast.success('Paciente creado con éxito');
       }
 
+      //  Recargar datos y cerrar modal
       await reloadPatients();
+      setTimeout(() => {
+        const latest = patients.reduce((max, p) => (p.id > max.id ? p : max), patients[0]);
+        if (latest?.id) {
+          setHighlightedPatientId(latest.id);
+        }
+      }, 300);
       setModalOpen(false);
       setSelectedPatient(null);
-      setIsUpdating(false);
-    } catch (error) {
-      setIsUpdating(false);
+
+      // quitar el resaltado después de unos segundos
+      setTimeout(() => {
+        setHighlightedPatientId(null);
+      }, 10000);
+    } catch (error: any) {
+      toast.error(error.message || 'Error al guardar el paciente');
       console.error('Error al guardar paciente:', error);
+    } finally {
+      setIsUpdating(false); // se ejecuta siempre, haya error o no
     }
   };
+
+  const rowRefs = useRef<Record<number, HTMLTableRowElement | null>>({});
+
+  useEffect(() => {
+    if (highlightedPatientId && rowRefs.current[highlightedPatientId]) {
+      rowRefs.current[highlightedPatientId]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [highlightedPatientId]);
 
   const handleNewPatient = () => {
     const emptyPatient: Partial<Patient> = {
@@ -145,7 +178,9 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
       <table className="App-table">
         <thead>
           <tr>
-            <th>Paciente</th>
+            <th onClick={() => setSortByNameAsc((prev) => !prev)} style={{ cursor: 'pointer' }}>
+              Paciente {sortByNameAsc ? '▲' : '▼'}
+            </th>
             <th>Tipo Documento</th>
             <th>DNI</th>
             <th>Obra Social</th>
@@ -156,17 +191,17 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredPatients.map((patient, index) => (
+          {sortedPatients.map((patient, index) => (
             <tr
-              key={index}
-              onClick={() => {
-                if (!isUsuario) handleRowClick(patient);
+              key={patient.id}
+              ref={(el) => {
+                if (patient.id != null) {
+                  rowRefs.current[patient.id] = el;
+                }
               }}
-              className={!isUsuario ? 'clickable-row' : ''}
-              // onClick={() => handleRowClick(patient)}
-              // className="clickable-row"
+              className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
             >
-              <td>{patient.fullName || '-'}</td>
+              <td>{patient.fullName}</td>
               <td>{patient.documentType || '-'}</td>
               <td>{patient.documentNumber || '-'}</td>
               <td>{patient?.healthInsuranceName || '-'}</td>
@@ -179,6 +214,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
                   isOpen={activeDropdownIndex === index}
                   onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                   onView={() => openClinicalHistory(patient)}
+                  onEdit={() => openPatientModal(patient)}
                 />
               </td>
             </tr>

@@ -11,6 +11,8 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import './App.scss';
 import BranchSelector from './pages/branch-selector/BranchSelector';
 import AppointmentConfirmation from './pages/appointment-confirmation/AppointmentConfirmation';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
@@ -51,7 +53,7 @@ function AppRoutes() {
           }
         />
 
-        <Route path="/confirmar-turno/:appointmentId" element={<AppointmentConfirmation />} />
+        <Route path="/confirmar-turno/:id" element={<AppointmentConfirmation />} />
 
         <Route
           path="/no-autorizado"
@@ -71,6 +73,7 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <AppRoutes />
+          <ToastContainer position="top-right" autoClose={3000} />
         </BrowserRouter>
       </AuthProvider>
     </ComponenteProvider>

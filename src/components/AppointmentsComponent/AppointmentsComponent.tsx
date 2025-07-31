@@ -11,6 +11,7 @@ import ClinicalHistoryComponent from '../ClinicalHistoryComponent/ClinicalHistor
 import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import ClinicalHistoryService from '../../services/ClinicalHistoryService';
 import ActionDropdown from '../ActionDropdown/ActionDropdown';
+import { toast } from 'react-toastify';
 
 interface Props {
   patients: Patient[];
@@ -56,8 +57,8 @@ const AppointmentsComponent: React.FC<Props> = ({
   const [patientData, setPatientData] = useState<Patient | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const [apptToDelete, setApptToDelete] = useState<{
-    appointmentId: number;
+  const [, setApptToDelete] = useState<{
+    id: number;
     patientName: string;
     date: string;
     time: string;
@@ -84,7 +85,7 @@ const AppointmentsComponent: React.FC<Props> = ({
     pro.schedules?.some((s) => s.dayOfWeek === getDayOfWeekString(selectedDate))
   );
 
-  const confirmDelete = (appt: any, time: string) => {
+  const confirmDelete = (appt: any) => {
     setCurrentAppointment(appt);
     setShowConfirm(true);
   };
@@ -101,7 +102,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   };
 
   const [newAppointment, setNewAppointment] = useState({
-    appointmentId: 0,
+    id: 0,
     patientId: 0,
     documentNumber: '',
     time: '',
@@ -159,7 +160,7 @@ const AppointmentsComponent: React.FC<Props> = ({
     if (!selectedProfessional && professionals.length > 0) {
       setSelectedProfessional(professionals[0]);
     }
-  }, [professionals]);
+  }, [professionals, selectedProfessional]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -170,7 +171,6 @@ const AppointmentsComponent: React.FC<Props> = ({
 
   const openModalForTime = (time: string) => {
     const apptExists = getAppointmentForTime(time);
-    const appointment = appointments.find((p) => p.patient.id === apptExists?.patient.id);
     const patient = patients.find((p) => p.id === apptExists?.patient.id);
 
     if (apptExists) {
@@ -181,17 +181,17 @@ const AppointmentsComponent: React.FC<Props> = ({
       setDniSearch(apptExists.patient.documentNumber ?? '');
 
       setNewAppointment({
-        appointmentId: apptExists.appointmentId,
+        id: apptExists.id,
         patientId: apptExists.patient.id ?? 0,
         documentNumber: apptExists.patient.documentNumber,
         time: time,
-        reason: appointment?.reason ?? '-',
+        reason: apptExists?.reason ?? '-',
         notes: patient?.note ?? '-',
       });
     } else {
       setIsEditMode(false);
       setNewAppointment({
-        appointmentId: 0,
+        id: 0,
         patientId: 0,
         documentNumber: '',
         time: time,
@@ -199,7 +199,7 @@ const AppointmentsComponent: React.FC<Props> = ({
         notes: '',
       });
     }
-
+    console.log(newAppointment, 'new');
     setIsModalOpen(true);
   };
 
@@ -212,60 +212,74 @@ const AppointmentsComponent: React.FC<Props> = ({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    setIsUpdating(true);
     e.preventDefault();
 
     if (!newAppointment.patientId || !newAppointment.documentNumber || !newAppointment.time) {
-      alert('Por favor, completá todos los campos obligatorios.');
+      toast.error('Por favor, completá todos los campos obligatorios.');
       return;
     }
 
+    setIsUpdating(true);
+
     const appointmentToSave = {
+      id: newAppointment.id, // si el backend lo requiere
+      patientId: newAppointment.patientId,
       patientDni: newAppointment.documentNumber,
       dateTime: `${selectedDate.toISOString().split('T')[0]}T${newAppointment.time}:00`,
       reason: newAppointment.reason,
       state: 'PENDIENTE',
       professionalId: selectedProfessional?.professionalId ?? professionals[0].professionalId,
-      appointmentId: newAppointment.appointmentId,
+      notes: newAppointment.notes,
     };
 
     try {
       if (isEditMode) {
-        await AppointmentService.updateAppointment(newAppointment.appointmentId, appointmentToSave);
-        if (selectedProfessional?.documentNumber) {
-          onAppointmentsUpdate(selectedProfessional);
-        }
+        await AppointmentService.updateAppointment(newAppointment.id, appointmentToSave);
       } else {
         await AppointmentService.createAppointment(appointmentToSave);
-        if (selectedProfessional?.documentNumber) {
-          onAppointmentsUpdate(selectedProfessional);
-        }
       }
 
-      setIsUpdating(false);
+      toast.success(
+        isEditMode ? 'Turno actualizado correctamente.' : 'Turno creado correctamente.'
+      );
+
+      if (selectedProfessional?.documentNumber) {
+        onAppointmentsUpdate(selectedProfessional);
+      }
+
       closeModal();
-    } catch (error) {
+    } catch (error: any) {
+      handleBackendError(error);
+    } finally {
       setIsUpdating(false);
-      alert(error);
     }
   };
 
   async function handleDeleteConfirmed(currentAppointment: any) {
-    console.log(currentAppointment, 'handleDeleteConfirmed');
-
     try {
-      console.log('entra al boton confirmed');
       await AppointmentService.deleteAppointment(currentAppointment?.id);
-      alert('Turno eliminado correctamente.');
+      toast.success('Turno eliminado correctamente.');
       setShowConfirm(false);
       setApptToDelete(null);
+
       if (selectedProfessional?.documentNumber) {
-        onAppointmentsUpdate(selectedProfessional.documentNumber);
+        onAppointmentsUpdate(selectedProfessional);
       }
-    } catch (error) {
+    } catch (error: any) {
       setCurrentAppointment(null);
-      console.error('Error eliminando el turno:', error);
-      alert('Ocurrió un error al eliminar el turno.');
+      handleBackendError(error, 'Ocurrió un error al eliminar el turno.');
+    }
+  }
+
+  function handleBackendError(error: any, fallbackMessage = 'Ocurrió un error') {
+    const status = error?.response?.status;
+    const data = error?.response?.data;
+
+    if (status === 304 || status === 204) {
+      toast.info('No se realizaron modificaciones.');
+    } else {
+      const message = data?.message || data?.error || fallbackMessage;
+      toast.error(message);
     }
   }
 
@@ -339,27 +353,47 @@ const AppointmentsComponent: React.FC<Props> = ({
                       <tr
                         key={index}
                         onClick={() => openModalForTime(time)}
-                        className={!appt ? 'clickable-row' : ''}
+                        className={'truncate-cell' + !appt ? 'clickable-row' : ''}
+                        title={appt?.reason ?? '-'}
                         style={{ cursor: !appt ? 'pointer' : 'default', fontSize: '1.3rem' }}
                       >
-                        <td>{time}</td>
-                        <td>{appt?.patient.fullName ?? '-'}</td>
-                        <td>{appt?.patient.documentNumber ?? '-'}</td>
-                        <td>{appt?.state ? '✔️' : appt ? '❌' : '-'}</td>
-                        <td>{appt?.patient.healthInsuranceName ?? '-'}</td>
+                        <td className="truncate-cell" title={time ?? '-'}>
+                          {time}
+                        </td>
+                        <td className="truncate-cell" title={appt?.patient.fullName ?? '-'}>
+                          {appt?.patient.fullName ?? '-'}
+                        </td>
+                        <td className="truncate-cell" title={appt?.patient.documentNumber ?? '-'}>
+                          {appt?.patient.documentNumber ?? '-'}
+                        </td>
+                        <td className="truncate-cell" title={appt?.state ?? '-'}>
+                          {appt?.state ?? '-'}
+                        </td>
+                        <td
+                          className="truncate-cell"
+                          title={appt?.patient.healthInsuranceName ?? '-'}
+                        >
+                          {appt?.patient.healthInsuranceName ?? '-'}
+                        </td>
                         {/* <td>{appt?.patient.insurancePlan ?? "-"}</td> */}
                         {/* <td>{appt?.patient.phone ?? "-"}</td> */}
-                        <td>{appt?.reason ?? '-'}</td>
-                        <td>{appt?.patient.note ?? '-'}</td>
-                        <td onClick={handleClick}>
-                          <ActionDropdown
-                            disabled={!appt}
-                            isOpen={activeDropdownIndex === index}
-                            onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
-                            onView={() => openClinicalHistory(appt)}
-                            onEdit={() => openModalForTime(time)}
-                            onDelete={() => confirmDelete(appt, time)}
-                          />
+                        <td className="truncate-cell" title={appt?.reason ?? '-'}>
+                          {appt?.reason ?? '-'}
+                        </td>
+                        <td className="truncate-cell" title={appt?.patient.note ?? '-'}>
+                          {appt?.patient.note ?? '-'}
+                        </td>
+                        <td className="action-cell" onClick={handleClick}>
+                          <div className="dropdown-container">
+                            <ActionDropdown
+                              disabled={!appt}
+                              isOpen={activeDropdownIndex === index}
+                              onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                              onView={() => openClinicalHistory(appt)}
+                              onEdit={() => openModalForTime(time)}
+                              onDelete={() => confirmDelete(appt)}
+                            />
+                          </div>
                         </td>
                       </tr>
                     );
@@ -372,14 +406,12 @@ const AppointmentsComponent: React.FC<Props> = ({
                   message={`¿Estás segura que deseas eliminar el turno de "${currentAppointment?.patient.fullName}"?`}
                   onConfirm={() => {
                     if (currentAppointment) {
-                      console.log(apptToDelete, 'apptoDelete');
                       handleDeleteConfirmed(currentAppointment);
                     } else {
                       alert('No ha seleccionado ningún turno disponible.');
                     }
                   }}
                   onCancel={() => {
-                    console.log(apptToDelete, 'apptoDelete');
                     setShowConfirm(false);
                     setApptToDelete(null);
                   }}

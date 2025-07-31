@@ -3,7 +3,7 @@ import { Patient } from './Patient';
 // type AppointmentState = "pendiente" | "confirmado" | "cancelado";
 
 export interface Appointment {
-  appointmentId: number;
+  id: number;
   patientDni: string;
   patientFullName: string;
   dateTime: string;

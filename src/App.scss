@@ -212,6 +212,36 @@ a {
   }
 }
 
+.App-table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.App-table th,
+.App-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 1.3rem;
+  height: 52px;
+  // overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.truncate-cell {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+}
+
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
 .submit-button {
   width: 100%;
   background-color: var(--color-secondary-light);

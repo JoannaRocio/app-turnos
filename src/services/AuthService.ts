@@ -18,6 +18,10 @@ class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  static isLoggedIn() {
+    return !!this.getToken();
+  }
+
   static isAuthenticated(): boolean {
     return !!this.getToken();
   }

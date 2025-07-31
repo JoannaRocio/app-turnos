@@ -6,8 +6,8 @@ import { UserRole } from '../../interfaces/UserRole';
 import UserModalComponent from '../UserModal/UserModalComponent';
 import MetricsComponent from '../MetricsComponent/MetricsComponent';
 import HealthInsurancePanel from '../HealthInsurancePanel/HealthInsurancePanel';
-import { Professional } from '../../interfaces/Professional';
 import { useDataContext } from '../../context/DataContext';
+import { toast } from 'react-toastify';
 
 const AdminDashboard: React.FC = () => {
   const { users, professionals, loadUsers: reloadUsers } = useDataContext();
@@ -15,6 +15,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'usuarios' | 'metricas' | 'obrasSociales'>('usuarios');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleRowClick = (user: User) => {
     setSelectedUser(user);
@@ -31,22 +32,24 @@ const AdminDashboard: React.FC = () => {
   });
 
   const handleSave = async (userData: Partial<User>) => {
+    setIsUpdating(true);
+
     try {
-      console.log(selectedUser, 'userdata');
       if (userData.id) {
         await UserService.updateUser(userData.id, userData);
-        alert('Usuario actualizado con éxito');
+        toast.success('Usuario actualizado con éxito');
       } else {
         await UserService.createUser(userData);
-
-        alert('Usuario creado con éxito');
+        toast.success('Usuario creado con éxito');
       }
 
-      reloadUsers();
+      await reloadUsers();
       setModalOpen(false);
       setSelectedUser(null);
     } catch (error: any) {
-      alert(error.message ?? 'Error desconocido, consultar con soporte técnico.');
+      toast.error(error.message || 'Error al guardar el usuario');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -134,6 +137,7 @@ const AdminDashboard: React.FC = () => {
             user={selectedUser}
             onSave={handleSave}
             professionals={professionals}
+            isUpdating={isUpdating}
           />
         </>
       )}

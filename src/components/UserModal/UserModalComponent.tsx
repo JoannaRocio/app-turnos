@@ -11,6 +11,7 @@ interface UserModalComponentProps {
   user: Partial<User> | null;
   onSave: (updated: Partial<User>) => void;
   professionals: Professional[];
+  isUpdating: boolean;
 }
 
 const UserModalComponent: React.FC<UserModalComponentProps> = ({
@@ -19,6 +20,7 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
   user,
   onSave,
   professionals,
+  isUpdating,
 }) => {
   const [form, setForm] = useState<Partial<User> & { professionalId?: number }>({
     username: '',
@@ -149,7 +151,7 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
             )}
 
             <div className="d-flex justify-content-center align-items-center">
-              <button className="modal-buttons" type="submit" disabled={!isFormValid}>
+              <button className="modal-buttons" type="submit" disabled={!isFormValid || isUpdating}>
                 Guardar
               </button>
               <button className="modal-buttons" type="button" onClick={onClose}>

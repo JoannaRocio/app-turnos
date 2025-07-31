@@ -137,7 +137,9 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
                     value={form.documentType}
                     onChange={(e) => setForm({ ...form, documentType: e.target.value })}
                   >
-                    <option value="">Tipo de documento</option>
+                    <option value="" disabled hidden>
+                      Tipo de documento
+                    </option>
                     <option value="DNI">DNI</option>
                     <option value="Libreta de Enrolamiento">Libreta de Enrolamiento</option>
                     <option value="Libreta Cívica">Libreta Cívica</option>
@@ -268,7 +270,13 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
               <button
                 className="modal-buttons"
                 type="submit"
-                disabled={!form.fullName || !form.documentNumber || isUpdating}
+                disabled={
+                  !form.fullName ||
+                  !form.documentNumber ||
+                  !form.documentType ||
+                  !form.documentNumber?.trim() ||
+                  isUpdating
+                }
               >
                 Guardar
               </button>

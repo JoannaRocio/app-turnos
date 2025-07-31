@@ -6,13 +6,13 @@ import AppointmentService from '../../services/AppointmentService';
 const AppointmentConfirmation: React.FC = () => {
   const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const { appointmentId } = useParams<{ appointmentId: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      await AppointmentService.confirmAppointment(Number(appointmentId));
+      await AppointmentService.confirmAppointment(Number(id));
       setStatusMessage('✅ Turno confirmado con éxito.');
     } catch (error) {
       setStatusMessage('❌ Hubo un error al confirmar el turno.');
@@ -24,7 +24,7 @@ const AppointmentConfirmation: React.FC = () => {
   const handleCancel = async () => {
     setLoading(true);
     try {
-      await AppointmentService.cancelAppointment(Number(appointmentId));
+      await AppointmentService.cancelAppointment(Number(id));
       setStatusMessage('🛑 Turno cancelado con éxito.');
     } catch (error) {
       setStatusMessage('❌ Hubo un error al cancelar el turno.');
@@ -37,7 +37,7 @@ const AppointmentConfirmation: React.FC = () => {
     <section className="container-confirmation">
       <div className="confirmation-box">
         <h3 className="text-center">Confirmación de turno</h3>
-        <p>ID del turno: {appointmentId}</p>
+        <p>ID del turno: {id}</p>
 
         {statusMessage && <p className="status-message">{statusMessage}</p>}
 

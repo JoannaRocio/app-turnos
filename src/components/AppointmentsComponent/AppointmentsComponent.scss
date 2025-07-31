@@ -129,6 +129,20 @@ select {
   display: none !important;
 }
 
+.dropdown-menu {
+  position: absolute;
+  z-index: 9999;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-container {
+  position: relative;
+}
+.App-table td:not(.action-cell) {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .dropdown-menu.show {
   font-size: 1.5rem;
   padding: 0rem;

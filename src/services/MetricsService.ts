@@ -1,40 +1,24 @@
-import AuthService from './AuthService';
+import Api from './Api';
 
 class MetricsService {
-  private static readonly BASE_URL = 'http://localhost:8080/api/metrics';
-
-  private static async fetchWithAuth<T>(url: string): Promise<T> {
-    const token = AuthService.getToken();
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al obtener métricas: ${errorText}`);
-    }
-
-    return await response.json();
-  }
+  private static readonly BASE_URL = '/metrics';
 
   // ✅ Turnos por día
   static async getAppointmentsPerDay(): Promise<Record<string, number>> {
-    return this.fetchWithAuth(`${this.BASE_URL}/appointments-per-day`);
+    const res = await Api.get<Record<string, number>>(`${this.BASE_URL}/appointments-per-day`);
+    return res.data;
   }
 
-  // ✅ Nuevos pacientes por semana
+  // ✅ Nuevos pacientes por mes
   static async getNewPatientsPerMonth(): Promise<Record<number, number>> {
-    return this.fetchWithAuth(`${this.BASE_URL}/new-patients-per-month`);
+    const res = await Api.get<Record<number, number>>(`${this.BASE_URL}/new-patients-per-month`);
+    return res.data;
   }
 
-  // ✅ Estadísticas de estado de turnos
+  // ✅ Estadísticas por estado de turno
   static async getAppointmentStats(): Promise<Record<string, number>> {
-    return this.fetchWithAuth(`${this.BASE_URL}/appointment-stats`);
+    const res = await Api.get<Record<string, number>>(`${this.BASE_URL}/appointment-stats`);
+    return res.data;
   }
 }
 

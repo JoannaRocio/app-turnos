@@ -1,55 +1,34 @@
 import { Patient } from '../interfaces/Patient';
-import AuthService from './AuthService';
+import Api from './Api';
 
-const BASE_URL = 'http://localhost:8080/api/clinical-history';
+const BASE_URL = '/clinical-history';
 
 class ClinicalHistoryService {
   static async getOrCreate(patient: Patient, professionalId: number): Promise<any[]> {
-    const token = AuthService.getToken();
-    console.log(patient, 'patient');
     // Buscar historia clínica
-    const res = await fetch(`${BASE_URL}/patient/${patient.documentNumber}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (res.status === 200) {
-      const data = await res.json();
-      if (data) return data;
+    try {
+      const res = await Api.get<any[]>(`${BASE_URL}/patient/${patient.documentNumber}`);
+      if (res.data) return res.data;
+    } catch (error: any) {
+      // si error, sigue con creación
     }
 
     // Crear si no existe
-    const createRes = await fetch(BASE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify({
-        patientDocumentNumber: patient.documentNumber,
-        professionalId: professionalId,
-        date: new Date().toISOString().split('T')[0],
-        description: 'Historia clínica inicial',
-      }),
-    });
+    const body = {
+      patientDocumentNumber: patient.documentNumber,
+      professionalId,
+      date: new Date().toISOString().split('T')[0],
+      description: 'Historia clínica inicial',
+    };
 
-    if (!createRes.ok) {
-      const msg = await createRes.text();
-      throw new Error(`Error creando historia clínica: ${msg}`);
+    const createRes = await Api.post(`${BASE_URL}`, body);
+    if (!createRes || createRes.status >= 400) {
+      throw new Error('Error creando historia clínica');
     }
 
     // Reintentar búsqueda
-    const retry = await fetch(`${BASE_URL}/patient/${patient.documentNumber}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!retry.ok) throw new Error('No se pudo obtener la historia clínica luego de crearla');
-    return await retry.json();
+    const retryRes = await Api.get<any[]>(`${BASE_URL}/patient/${patient.documentNumber}`);
+    return retryRes.data;
   }
 
   static async createClinicalHistory(
@@ -58,68 +37,33 @@ class ClinicalHistoryService {
     professionalId: number,
     procedureIds: number[]
   ): Promise<number> {
-    const token = AuthService.getToken();
+    const body = {
+      patientDocumentNumber: patient.documentNumber,
+      professionalId,
+      procedureIds,
+      description,
+    };
 
-    const res = await fetch(BASE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify({
-        patientDocumentNumber: patient.documentNumber,
-        professionalId: professionalId,
-        procedureIds: procedureIds,
-        description: description,
-      }),
-    });
+    const res = await Api.post<string>(`${BASE_URL}`, body);
+    console.log('Respuesta:', res.data);
 
-    if (!res.ok) {
-      const msg = await res.text();
-      throw new Error(`Error creando historia clínica: ${msg}`);
-    }
-
-    // 👇 Cambiado a .text()
-    const msg = await res.text();
-    console.log('Respuesta:', msg);
-
-    return 0; // o null si querés que devuelva algo
+    return 0; // o podrías devolver `res.data` si tu backend lo devuelve
   }
 
   static async uploadFile(entryId: number, file: File): Promise<void> {
-    const token = AuthService.getToken();
-
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch(`${BASE_URL}/${entryId}/upload`, {
-      method: 'POST',
+    await Api.post(`${BASE_URL}/${entryId}/upload`, formData, {
       headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-        // ❌ NO poner 'Content-Type': 'multipart/form-data' con fetch
+        // Axios maneja automáticamente multipart, no es necesario agregar Content-Type
+        'Content-Type': 'multipart/form-data',
       },
-      body: formData,
     });
-
-    if (!res.ok) {
-      throw new Error('Error al subir el archivo');
-    }
   }
 
   static async deleteEntry(entryId: number): Promise<void> {
-    const token = AuthService.getToken();
-
-    const res = await fetch(`${BASE_URL}/${entryId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-
-    if (!res.ok) {
-      const msg = await res.text();
-      throw new Error(`Error al eliminar historia clínica: ${msg}`);
-    }
+    await Api.delete(`${BASE_URL}/${entryId}`);
   }
 }
 
