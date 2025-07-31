@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import PatientService from '../services/PatientService';
 import ProfessionalService from '../services/ProfessionalService';
 import AppointmentService from '../services/AppointmentService';
@@ -38,7 +38,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [, setLoadedAppointment] = useState<string | null>(null);
 
-  const loadPatients = async () => {
+  const loadPatients = useCallback(async () => {
     if (isPatientsLoaded) return;
     try {
       const response = await PatientService.getAll();
@@ -47,7 +47,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Error al cargar pacientes:', error);
     }
-  };
+  }, [isPatientsLoaded]);
 
   const reloadPatients = async () => {
     try {
@@ -59,7 +59,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loadProfessionals = async () => {
+  const loadProfessionals = useCallback(async () => {
     if (isProfessionalsLoaded) return;
     try {
       const data = await ProfessionalService.getAllProfessionals();
@@ -69,7 +69,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Error al cargar profesionales:', error);
     }
-  };
+  }, [isProfessionalsLoaded]);
 
   const reloadProfessionals = async () => {
     try {
@@ -82,7 +82,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     if (isUsersLoaded) return;
     try {
       const data = await UserService.getAllUsers();
@@ -91,7 +91,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Error al cargar usuarios:', error);
     }
-  };
+  }, [isUsersLoaded]);
 
   const reloadUsers = async () => {
     try {
