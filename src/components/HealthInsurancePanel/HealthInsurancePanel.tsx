@@ -28,24 +28,6 @@ const HealthInsurancePanel: React.FC = () => {
   const [selectedInsuranceForPlan, setSelectedInsuranceForPlan] = useState<number | ''>('');
   const [planInput, setPlanInput] = useState('');
 
-  // useEffect(() => {
-  //   fetch('http://localhost:8080/api/health-insurances')
-  //     .then((res) => res.json())
-  //     .then((data: HealthInsurance[]) => {
-  //       setInsurances(data);
-  //       const extractedPlans = data.flatMap((ins) =>
-  //         ins.plans.map((plan) => ({
-  //           ...plan,
-  //           insuranceId: ins.id,
-  //         }))
-  //       );
-  //       setPlans(extractedPlans);
-  //     })
-  //     .catch((err) => {
-  //       console.error('Error al cargar obras sociales:', err);
-  //     });
-  // }, []);
-
   const handleEditPlan = (plan: Plan) => {
     setSelectedPlan(plan);
     setSelectedInsuranceForPlan(plan.id);

@@ -395,13 +395,13 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                             <li key={file.id}>
                               {file.fileName.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                                 <a
-                                  href={`http://localhost:8080/api/clinical-history/files/${file.id}/download`}
+                                  href={`${process.env.REACT_APP_API_URL}/clinical-history/files/${file.id}/download`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download={file.fileName}
                                 >
                                   <img
-                                    src={`http://localhost:8080/api/clinical-history/files/${file.id}/download`}
+                                    src={`${process.env.REACT_APP_API_URL}/clinical-history/files/${file.id}/download`}
                                     alt={file.fileName}
                                     style={{
                                       maxWidth: '200px',
@@ -414,7 +414,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                                 </a>
                               ) : (
                                 <a
-                                  href={`http://localhost:8080/api/clinical-history/files/${file.id}/download`}
+                                  href={`${process.env.REACT_APP_API_URL}/clinical-history/files/${file.id}/download`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >

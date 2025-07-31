@@ -3,7 +3,7 @@ class AuthService {
   private static ROLE_KEY = 'userRole';
 
   static login(username: string, password: string) {
-    return fetch('http://localhost:8080/api/v1/user/login', {
+    return fetch(`${process.env.REACT_APP_API_URL}/v1/user/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),

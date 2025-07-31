@@ -2,7 +2,7 @@ import axios from 'axios';
 import AuthService from './AuthService';
 
 const Api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: process.env.REACT_APP_API_URL,
 });
 
 Api.interceptors.request.use((config) => {
