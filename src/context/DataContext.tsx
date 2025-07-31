@@ -135,7 +135,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadPatients();
     loadProfessionals();
     loadUsers();
-  }, []);
+  }, [loadPatients, loadProfessionals, loadUsers]);
 
   return (
     <DataContext.Provider

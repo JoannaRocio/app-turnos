@@ -3,7 +3,6 @@ import ClinicalHistoryService from '../../services/ClinicalHistoryService';
 import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import { Patient } from '../../interfaces/Patient';
 import './ClinicalHistory.scss';
-import { Professional } from '../../interfaces/Professional';
 import ConfirmModal from '../ConfirmModal/ConfirmModalComponent';
 
 interface Props {
@@ -78,7 +77,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
 
   // Entrada nueva
   const [entries, setEntries] = useState(data);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [notes, setNotes] = useState('');
 

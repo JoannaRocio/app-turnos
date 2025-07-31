@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './AppointmentConfirmation.scss';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import AppointmentService from '../../services/AppointmentService';
 
 const AppointmentConfirmation: React.FC = () => {
   const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const handleConfirm = async () => {
     setLoading(true);

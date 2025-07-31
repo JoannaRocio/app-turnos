@@ -49,9 +49,8 @@ const Home: React.FC = () => {
     };
 
     fetchInitialData();
-  }, []);
+  }, [componenteActivo, loadPatients, loadProfessionals, loadUsers, setComponenteActivo]);
 
-  // 👇 Carga condicional según vista activa
   useEffect(() => {
     const fetchDataByComponent = async () => {
       setIsLoading(true);
@@ -85,7 +84,15 @@ const Home: React.FC = () => {
     };
 
     fetchDataByComponent();
-  }, [componenteActivo]);
+  }, [
+    componenteActivo,
+    isAdmin,
+    loadPatients,
+    loadProfessionals,
+    loadUsers,
+    professionals,
+    selectedProfessional,
+  ]);
 
   // 👇 Carga de turnos por profesional
   const loadAppointments = useCallback(async (professional: Professional) => {

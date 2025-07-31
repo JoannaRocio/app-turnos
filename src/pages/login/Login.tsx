@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './Login.scss';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../../services/AuthService';
@@ -11,7 +11,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
-  const { componenteActivo, setComponenteActivo } = useComponente();
+  const { setComponenteActivo } = useComponente();
 
   const navigate = useNavigate();
   const { login } = useAuth();

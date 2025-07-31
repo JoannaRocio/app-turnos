@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import '../PasswordRecovery.scss'; // Importa los estilos
-import { useNavigate } from 'react-router-dom';
+import '../PasswordRecovery.scss';
 import PasswordRecoveryService from '../../../services/PasswordRecoveryService';
 import { useSearchParams } from 'react-router-dom';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';

@@ -125,18 +125,9 @@ const HealthInsurancePanel: React.FC = () => {
   const [selectedInsurance, setSelectedInsurance] = useState<HealthInsurance | null>(null);
   const [insuranceInput, setInsuranceInput] = useState('');
 
-  const handleNewInsurance = () => {
-    setSelectedInsurance(null);
-    setInsuranceInput('');
-  };
-
   const handleEditInsurance = (insurance: HealthInsurance) => {
     setSelectedInsurance(insurance);
     setInsuranceInput(insurance.name);
-  };
-
-  const handleDeleteInsurance = (id: number) => {
-    setInsurances(insurances.filter((i) => i.id !== id));
   };
 
   const handleSaveInsurance = async () => {
@@ -196,10 +187,10 @@ const HealthInsurancePanel: React.FC = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [serviceInput, setServiceInput] = useState('');
 
-  const handleNewService = () => {
-    setSelectedService(null);
-    setServiceInput('');
-  };
+  // const handleNewService = () => {
+  //   setSelectedService(null);
+  //   setServiceInput('');
+  // };
 
   const handleEditService = (service: Service) => {
     setSelectedService(service);

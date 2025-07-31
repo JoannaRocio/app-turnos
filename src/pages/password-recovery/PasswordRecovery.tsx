@@ -1,22 +1,11 @@
 import React, { useState } from 'react';
-import './PasswordRecovery.scss'; // Importa los estilos
-import { useNavigate } from 'react-router-dom';
+import './PasswordRecovery.scss';
 import PasswordRecoveryService from '../../services/PasswordRecoveryService';
 
 const PasswordRecovery: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-
-  // useEffect(() => {
-  //   const params = new URLSearchParams(location.search);
-  //   const tokenFromURL = params.get("token");
-  //   if (tokenFromURL) {
-  //     setToken(tokenFromURL);
-  //   } else {
-  //     setError("Token inválido o faltante.");
-  //   }
-  // }, [location]);
 
   const handlePasswordRecovery = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,7 +25,7 @@ const PasswordRecovery: React.FC = () => {
       setSuccess(data.message);
     } else {
       setSuccess('');
-      setError(data.message); // ahora te muestra el mensaje "No existe un usuario con ese correo electrónico."
+      setError(data.message);
     }
   };
 
