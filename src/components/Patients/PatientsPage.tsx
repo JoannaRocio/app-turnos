@@ -80,22 +80,28 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
       };
 
       // Guardar paciente
+      let updatedId: number | null = null;
+
       if (patientData.id) {
-        await PatientService.updatePatient(patientData.id, payload);
-        toast.success('Paciente actualizado con éxito');
+        const response = await PatientService.updatePatient(patientData.id, payload);
+        updatedId = response.id; // 👈 el ID devuelto por el backend
+        toast.success(response.message ?? 'Paciente actualizado con éxito');
       } else {
-        await PatientService.createPatient(payload);
-        toast.success('Paciente creado con éxito');
+        const response = await PatientService.createPatient(payload);
+        updatedId = response.id;
+        toast.success(response.message ?? 'Paciente creado con éxito');
       }
 
-      //  Recargar datos y cerrar modal
+      // Recargar pacientes y resaltar el actualizado/creado
       await reloadPatients();
-      setTimeout(() => {
-        const latest = patients.reduce((max, p) => (p.id > max.id ? p : max), patients[0]);
-        if (latest?.id) {
-          setHighlightedPatientId(latest.id);
-        }
-      }, 300);
+
+      if (updatedId) {
+        setHighlightedPatientId(updatedId);
+        // Opcional: quitar el resaltado luego de unos segundos
+        setTimeout(() => {
+          setHighlightedPatientId(null);
+        }, 10000);
+      }
       setModalOpen(false);
       setSelectedPatient(null);
 

@@ -9,16 +9,22 @@ class PatientService {
     return response.data;
   }
 
-  static async createPatient(data: any): Promise<void> {
-    const response = await Api.post<string>(this.BASE_URL, data);
+  static async createPatient(data: any): Promise<{ id: number; message: string }> {
+    const response = await Api.post<{ id: number; message: string }>(this.BASE_URL, data);
 
     if (response.status >= 400) {
       throw new Error(`Error creando paciente: ${response.data}`);
     }
+
+    return response.data;
   }
 
-  static async updatePatient(id: number, data: any): Promise<Patient> {
-    const response = await Api.put<Patient>(`${this.BASE_URL}/${id}`, data);
+  static async updatePatient(id: number, data: any): Promise<{ id: number; message: string }> {
+    const response = await Api.put<{ id: number; message: string }>(`${this.BASE_URL}/${id}`, data);
+
+    if (response.status >= 400) {
+      throw new Error(`Error actualizando paciente: ${response.data}`);
+    }
 
     return response.data;
   }
