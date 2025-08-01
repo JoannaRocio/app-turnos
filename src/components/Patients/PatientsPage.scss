@@ -13,3 +13,10 @@
   background-color: #faec9c !important; /* amarillo suave */
   transition: background-color 0.5s ease !important;
 }
+
+.no-patients-message {
+  color: var(--color-white-light);
+  text-align: center;
+  padding: 2rem;
+  font-style: italic;
+}

@@ -5,6 +5,7 @@ import ProfessionalAvailabilityForm, {
   AvailabilityFormRef,
 } from '../ProfessionalAbiavility/ProfessionalAvailability';
 import { daysOfWeek } from '../../constants/daysOfWeek';
+import SpecialtyService from '../../services/SpecialtyService';
 
 interface ProfessionalModalProps {
   isOpen: boolean;
@@ -38,6 +39,20 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
 
   const [savedAvailability, setSavedAvailability] = useState<Record<string, TimeRange[]>>({});
   const availabilityRef = useRef<AvailabilityFormRef>(null);
+  const [specialties, setSpecialties] = useState<{ id: number; name: string }[]>([]);
+
+  useEffect(() => {
+    const loadSpecialties = async () => {
+      try {
+        const data = await SpecialtyService.getAll();
+        setSpecialties(data);
+      } catch (err) {
+        console.error('Error al cargar especialidades', err);
+      }
+    };
+
+    loadSpecialties();
+  }, []);
 
   useEffect(() => {
     if (professional) {
@@ -175,9 +190,11 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                   onChange={(e) => setForm({ ...form, specialties: e.target.value })}
                 >
                   <option value="">Seleccione una especialidad</option>
-                  <option value="Dentista">Dentista</option>
-                  <option value="Ortodoncista">Ortodoncista</option>
-                  <option value="Endodoncista">Endodoncista</option>
+                  {specialties.map((s) => (
+                    <option key={s.id} value={s.name}>
+                      {s.name}
+                    </option>
+                  ))}
                 </select>
                 {!form.specialties && <span className="field-error">Campo obligatorio</span>}
               </div>

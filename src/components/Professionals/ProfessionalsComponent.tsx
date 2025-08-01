@@ -4,6 +4,7 @@ import { Professional } from '../../interfaces/Professional';
 import ProfessionalService from '../../services/ProfessionalService';
 import ProfessionalModal from '../ProfessionalModal/ProfessionalModal';
 import { useAuth } from '../../context/ContextAuth';
+import { toast } from 'react-toastify';
 
 const ProfessionalsComponent: React.FC<{
   professionals: Professional[];
@@ -106,21 +107,21 @@ const ProfessionalsComponent: React.FC<{
           professionalData
         );
 
-        alert('Profesional actualizado con éxito');
+        toast.success('Profesional actualizado con éxito');
       } else {
         await ProfessionalService.createProfessional(professionalData);
 
-        alert('Profesional creado con éxito');
+        toast.success('Profesional creado con éxito');
       }
 
       reloadProfessional();
       setShowEditModal(false);
       setSelectedProfessional(null);
-      setIsUpdating(false);
     } catch (error: any) {
       console.error(error);
+      toast.error(error.message ?? '❌ Error inesperado al guardar el profesional');
+    } finally {
       setIsUpdating(false);
-      alert(error.message ?? 'Error inesperado al guardar el profesional');
     }
   };
 
@@ -164,53 +165,57 @@ const ProfessionalsComponent: React.FC<{
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      <table className="App-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Tipo documento</th>
-            <th>Numero documento</th>
-            <th>Teléfono</th>
-            {/* <th>Horario de jornada</th> */}
-            <th style={{ width: '350px' }}>Horario de jornada</th>
-            <th>Especialidades</th>
-            <th>De licencia</th>
-            <th>Activo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProfessional.map((professional, index) => (
-            <tr
-              key={index}
-              onClick={() => {
-                if (!isUsuario) handleRowClick(professional);
-              }}
-              className={`${!isUsuario ? 'clickable-row' : ''} 
+      {professionals.length === 0 ? (
+        <p className="no-patients-message">No hay profesionales disponibles.</p>
+      ) : (
+        <table className="App-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo documento</th>
+              <th>Numero documento</th>
+              <th>Teléfono</th>
+              {/* <th>Horario de jornada</th> */}
+              <th style={{ width: '350px' }}>Horario de jornada</th>
+              <th>Especialidades</th>
+              <th>De licencia</th>
+              <th>Activo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProfessional.map((professional, index) => (
+              <tr
+                key={index}
+                onClick={() => {
+                  if (!isUsuario) handleRowClick(professional);
+                }}
+                className={`${!isUsuario ? 'clickable-row' : ''} 
                             ${professional?.professionalState !== 'ACTIVE' ? 'inactive-row' : ''} 
                             ${index % 2 === 0 ? 'bg-primary-r' : 'bg-secondary-r'}`}
-            >
-              <td>{professional?.professionalName || '-'}</td>
-              <td>{professional?.documentType || '-'}</td>
-              <td>{professional?.documentNumber || '-'}</td>
-              <td>{professional?.phone || '-'}</td>
-              <td>{formatSchedulesByDay(professional.schedules)}</td>
-              <td>
-                {Array.isArray(professional?.specialties)
-                  ? professional.specialties.join(', ')
-                  : professional?.specialties || '-'}
-              </td>
-              <td>-</td>
-              <td>
-                {professional
-                  ? professional.professionalState === 'ACTIVE'
-                    ? 'Activo'
-                    : 'No activo'
-                  : '-'}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              >
+                <td>{professional?.professionalName || '-'}</td>
+                <td>{professional?.documentType || '-'}</td>
+                <td>{professional?.documentNumber || '-'}</td>
+                <td>{professional?.phone || '-'}</td>
+                <td>{formatSchedulesByDay(professional.schedules)}</td>
+                <td>
+                  {Array.isArray(professional?.specialties)
+                    ? professional.specialties.join(', ')
+                    : professional?.specialties || '-'}
+                </td>
+                <td>-</td>
+                <td>
+                  {professional
+                    ? professional.professionalState === 'ACTIVE'
+                      ? 'Activo'
+                      : 'No activo'
+                    : '-'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <ProfessionalModal
         isOpen={showEditModal}

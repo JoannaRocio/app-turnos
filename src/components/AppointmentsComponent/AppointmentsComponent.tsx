@@ -170,6 +170,12 @@ const AppointmentsComponent: React.FC<Props> = ({
   };
 
   const openModalForTime = (time: string) => {
+    // Evita abrir el modal si no hay profesionales activos
+    if (filteredProfessionals.length === 0) {
+      toast.warning('No hay profesionales activos disponibles para esta fecha.');
+      return;
+    }
+
     const apptExists = getAppointmentForTime(time);
     const patient = patients.find((p) => p.id === apptExists?.patient.id);
 
@@ -199,7 +205,6 @@ const AppointmentsComponent: React.FC<Props> = ({
         notes: '',
       });
     }
-    console.log(newAppointment, 'new');
     setIsModalOpen(true);
   };
 

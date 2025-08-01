@@ -192,7 +192,7 @@ const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, Availabilit
                       title="Limpiar esta franja horaria"
                       disabled={!range.start_time && !range.end_time}
                     >
-                      🪑
+                      🧹
                     </button>
                   </td>
                 </tr>

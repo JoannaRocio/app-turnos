@@ -222,8 +222,13 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
                 <label>Número de afiliado</label>
                 <input
                   type="number"
-                  value={form.affiliateNumber}
-                  onChange={(e) => setForm({ ...form, affiliateNumber: Number(e.target.value) })}
+                  value={form.affiliateNumber ?? ''}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      affiliateNumber: e.target.value === '' ? undefined : Number(e.target.value),
+                    })
+                  }
                   placeholder="Número de afiliado"
                 />
                 {hasAnyInsuranceField &&

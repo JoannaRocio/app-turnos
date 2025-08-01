@@ -129,7 +129,7 @@ h2 {
 }
 
 .btn-clear-day {
-  background-color: #666;
+  background-color: #fff5c9;
   color: white;
   border: none;
   margin-left: 0.5rem;
@@ -143,16 +143,12 @@ h2 {
 }
 
 .btn-clear-day:hover {
-  background-color: #444;
+  background-color: #fdee68;
 }
 
 .btn-clear-day:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.btn-clear-day:not(:disabled):hover {
-  background-color: #d12f2f;
 }
 
 .save-button-container {

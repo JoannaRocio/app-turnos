@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import PatientService from '../services/PatientService';
 import ProfessionalService from '../services/ProfessionalService';
 import AppointmentService from '../services/AppointmentService';
@@ -22,6 +22,8 @@ interface DataContextType {
   reloadAppointments: (dni: string) => Promise<void>;
   reloadProfessionals: () => Promise<void>;
   clearAppointments: () => void;
+  isDataLoaded: boolean;
+  setIsDataLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isUsersLoaded, setIsUsersLoaded] = useState(false);
   const [isPatientsLoaded, setIsPatientsLoaded] = useState(false);
   const [isProfessionalsLoaded, setIsProfessionalsLoaded] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const [, setLoadedAppointment] = useState<string | null>(null);
 
@@ -55,7 +58,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setPatients(data);
       setIsPatientsLoaded(true);
     } catch (error) {
-      console.error('Error al cargar pacientes:', error);
+      console.error('Error al recargar pacientes:', error);
     }
   };
 
@@ -78,7 +81,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfessionals(active);
       setIsProfessionalsLoaded(true);
     } catch (error) {
-      console.error('Error al cargar profesionales:', error);
+      console.error('Error al recargar profesionales:', error);
     }
   };
 
@@ -131,12 +134,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoadedAppointment(null);
   };
 
-  useEffect(() => {
-    loadPatients();
-    loadProfessionals();
-    loadUsers();
-  }, [loadPatients, loadProfessionals, loadUsers]);
-
   return (
     <DataContext.Provider
       value={{
@@ -144,6 +141,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         professionals,
         appointments,
         users,
+        isDataLoaded,
+        setIsDataLoaded,
         loadPatients,
         loadProfessionals,
         loadUsers,

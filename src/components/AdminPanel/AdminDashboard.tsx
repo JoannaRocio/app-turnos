@@ -9,8 +9,12 @@ import HealthInsurancePanel from '../HealthInsurancePanel/HealthInsurancePanel';
 import { useDataContext } from '../../context/DataContext';
 import { toast } from 'react-toastify';
 
-const AdminDashboard: React.FC = () => {
-  const { users, professionals, loadUsers: reloadUsers } = useDataContext();
+interface AdminDashboardProps {
+  reloadUsers: () => void;
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
+  const { users, professionals } = useDataContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);

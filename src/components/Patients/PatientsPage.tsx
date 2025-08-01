@@ -16,8 +16,7 @@ interface Props {
   reloadPatients: () => void;
 }
 
-const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
-  const { patients, reloadPatients } = useDataContext();
+const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Partial<Patient> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,6 +29,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [sortByNameAsc, setSortByNameAsc] = useState(true);
   const [highlightedPatientId, setHighlightedPatientId] = useState<number | null>(null);
+  const { patients } = useDataContext();
 
   const filteredPatients = patients.filter((p) => {
     const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -81,7 +81,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
 
       // Guardar paciente
       if (patientData.id) {
-        await PatientService.createPatient(payload);
+        await PatientService.updatePatient(patientData.id, payload);
         toast.success('Paciente actualizado con éxito');
       } else {
         await PatientService.createPatient(payload);
@@ -158,10 +158,6 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
     );
   }
 
-  if (patients.length === 0) {
-    return <p className="text-white">No hay pacientes disponibles.</p>;
-  }
-
   return (
     <section>
       <div className="d-flex justify-content-between">
@@ -181,52 +177,56 @@ const PatientsComponent: React.FC<Props> = ({ professionalId }) => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      <table className="App-table">
-        <thead>
-          <tr>
-            <th onClick={() => setSortByNameAsc((prev) => !prev)} style={{ cursor: 'pointer' }}>
-              Paciente {sortByNameAsc ? '▲' : '▼'}
-            </th>
-            <th>Tipo Documento</th>
-            <th>DNI</th>
-            <th>Obra Social</th>
-            <th>Plan</th>
-            <th>Teléfono</th>
-            <th>Notas</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedPatients.map((patient, index) => (
-            <tr
-              key={patient.id}
-              ref={(el) => {
-                if (patient.id != null) {
-                  rowRefs.current[patient.id] = el;
-                }
-              }}
-              className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
-            >
-              <td>{patient.fullName}</td>
-              <td>{patient.documentType || '-'}</td>
-              <td>{patient.documentNumber || '-'}</td>
-              <td>{patient?.healthInsuranceName || '-'}</td>
-              <td>{patient?.insurancePlanName || '-'}</td>
-              <td>{patient?.phone || '-'}</td>
-              <td>{patient?.note || '-'}</td>
-              <td onClick={handleClick}>
-                <ActionDropdown
-                  disabled={!patient}
-                  isOpen={activeDropdownIndex === index}
-                  onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
-                  onView={() => openClinicalHistory(patient)}
-                  onEdit={() => openPatientModal(patient)}
-                />
-              </td>
+      {sortedPatients.length === 0 ? (
+        <p className="no-patients-message">No hay pacientes disponibles.</p>
+      ) : (
+        <table className="App-table">
+          <thead>
+            <tr>
+              <th onClick={() => setSortByNameAsc((prev) => !prev)} style={{ cursor: 'pointer' }}>
+                Paciente {sortByNameAsc ? '▲' : '▼'}
+              </th>
+              <th>Tipo Documento</th>
+              <th>DNI</th>
+              <th>Obra Social</th>
+              <th>Plan</th>
+              <th>Teléfono</th>
+              <th>Notas</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedPatients.map((patient, index) => (
+              <tr
+                key={patient.id}
+                ref={(el) => {
+                  if (patient.id != null) {
+                    rowRefs.current[patient.id] = el;
+                  }
+                }}
+                className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
+              >
+                <td>{patient.fullName}</td>
+                <td>{patient.documentType || '-'}</td>
+                <td>{patient.documentNumber || '-'}</td>
+                <td>{patient?.healthInsuranceName || '-'}</td>
+                <td>{patient?.insurancePlanName || '-'}</td>
+                <td>{patient?.phone || '-'}</td>
+                <td>{patient?.note || '-'}</td>
+                <td onClick={handleClick}>
+                  <ActionDropdown
+                    disabled={!patient}
+                    isOpen={activeDropdownIndex === index}
+                    onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                    onView={() => openClinicalHistory(patient)}
+                    onEdit={() => openPatientModal(patient)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <PatientModalComponent
         isOpen={modalOpen}

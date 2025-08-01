@@ -368,7 +368,14 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                     </div>
 
                     <p>
-                      <strong>Fecha de última actualización:</strong> {entry.date}
+                      <strong>Fecha de última actualización: </strong>
+                      {new Date(entry.dateTime).toLocaleString('es-AR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </p>
                     <p>
                       <strong>Profesional:</strong> {entry.professionalFullName}
