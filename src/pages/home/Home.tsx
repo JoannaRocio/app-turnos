@@ -55,7 +55,7 @@ const Home: React.FC = () => {
     };
 
     fetchInitialData();
-  }, []);
+  }, [isDataLoaded, loadPatients, loadProfessionals, loadUsers]);
 
   // Setear profesional por defecto una vez cargados los datos
   // useEffect(() => {
