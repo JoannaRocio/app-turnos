@@ -420,7 +420,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                       <div className="modal-header">
                         <button
                           type="button"
-                          className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                          className="btn-close btn-close-white top-0 end-0 m-3"
                           aria-label="Cerrar"
                           onClick={() => setIsModalOpen(false)}
                         />
