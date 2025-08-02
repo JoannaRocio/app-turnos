@@ -173,11 +173,12 @@ a {
   transition: 0.5s !important;
   color: var(--color-white-light);
   border-radius: 2rem;
+  font-weight: 500 !important;
   width: 130px;
   background-color: var(--color-primary-light);
   &:hover {
     background-color: var(--color-tertiary-disabled) !important;
-    font-weight: 500;
+    // font-weight: 500;
     border: 1px solid var(--color-primary-light);
   }
 }
@@ -185,7 +186,7 @@ a {
 .App-buttonTertiary {
   border: none;
   font-size: 1.7rem;
-  font-weight: 500;
+  font-weight: 500 !important;
   transition:
     background-color 0.5s,
     color 0.5s;

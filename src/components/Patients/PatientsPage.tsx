@@ -4,7 +4,7 @@ import './PatientsPage.scss';
 import PatientModalComponent from '../PatientModal/PatientModalComponent';
 import PatientService from '../../services/PatientService';
 import { useAuth } from '../../context/ContextAuth';
-import ActionDropdown from '../ActionDropdown/ActionDropdown';
+import ActionDropdown from '../shared/ActionDropdown/ActionDropdown';
 import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import ClinicalHistoryService from '../../services/ClinicalHistoryService';
 import ClinicalHistoryComponent from '../ClinicalHistoryComponent/ClinicalHistory';

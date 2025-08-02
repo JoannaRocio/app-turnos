@@ -1,0 +1,94 @@
+@import '../../../styles/bootstrap-custom.scss';
+
+.container-header {
+  // background-color: var(--color-secondary-dark);
+  background-color: var(--color-white-light);
+  padding: 1rem;
+  font-size: 2rem;
+  color: var(--color-primary-light);
+  box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.2);
+}
+
+.title-header {
+  color: var(--color-neutral-light);
+  position: relative;
+  display: inline-block;
+  transition: color 0.3s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--color-secondary-light);
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    color: var(--color-secondary-light);
+
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+.active-title {
+  color: var(--color-primary-dark);
+}
+
+.active-title {
+  color: var(--color-primary-hover);
+  font-weight: bold;
+}
+
+// OffCanvas
+
+.custom-offcanvas {
+  background-color: var(--color-primary-dark) !important;
+  color: var(--color-white-light) !important;
+
+  .offcanvas-title {
+    font-weight: bold;
+    color: var(--color-white-light);
+  }
+
+  .menu-item {
+    width: 100%;
+    background-color: var(--color-primary-light);
+    border: none;
+    text-align: left;
+    font-size: 1.2rem;
+    color: var(--color-white-light);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition:
+      background-color 0.2s,
+      transform 0.1s;
+
+    i {
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      background-color: var(--color-primary-light);
+      color: var(--color-white-light);
+      transform: translateX(3px);
+    }
+
+    &:active {
+      transform: scale(0.98);
+      background-color: var(--color-secondary-light);
+    }
+  }
+
+  .nav li {
+    list-style: none;
+  }
+
+  .btn-close {
+    filter: invert(1);
+  }
+}

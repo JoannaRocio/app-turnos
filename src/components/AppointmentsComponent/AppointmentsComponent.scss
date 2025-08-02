@@ -197,3 +197,113 @@ button.dropdown-toggle:disabled {
     min-height: 80px;
   }
 }
+
+// mobile
+
+.App-main-title {
+  font-size: 2.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+}
+
+.schedule-title {
+  font-size: 1.5rem;
+  color: var(--color-primary-dark);
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+}
+
+.App-table {
+  font-size: 1.2rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
+
+  th,
+  td {
+    vertical-align: middle;
+    text-align: center;
+  }
+}
+
+.truncate-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.clickable-row:hover {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+// tabla mobile
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: white; // opcional para que se vea más limpio
+
+  .App-table {
+    min-width: 900px; // o lo necesario para que no colapse
+    font-size: 1.2rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+    }
+
+    th,
+    td {
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: middle;
+    }
+  }
+}
+
+select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+// SOLO MOBILE
+@media (max-width: 768px) {
+  .custom-modal {
+    font-size: 0.9rem; // reduce la fuente solo en mobile
+    padding: 1rem;
+    max-width: 95vw;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    form {
+      .form-grid {
+        grid-template-columns: 1fr;
+
+        .full-width {
+          grid-column: span 1;
+        }
+      }
+
+      input,
+      select,
+      textarea {
+        font-size: 0.9rem;
+      }
+
+      .modal-buttons {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

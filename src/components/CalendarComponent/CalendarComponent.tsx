@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './CalendarComponent.scss';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface Props {
   onDateSelect: (date: Date) => void;
@@ -9,6 +10,7 @@ interface Props {
 
 const CalendarComponent: React.FC<Props> = ({ onDateSelect }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const isMobile = useIsMobile();
 
   const handleChange = (date: Date) => {
     setSelectedDate(date);
@@ -27,11 +29,17 @@ const CalendarComponent: React.FC<Props> = ({ onDateSelect }) => {
 
   return (
     <div className="calendar-wrapper">
-      {generateMonthDates().map((date, index) => (
-        <div key={index} className="calendar-container">
-          <Calendar onClickDay={handleChange} value={selectedDate} activeStartDate={date} />
+      {isMobile ? (
+        <div className="calendar-container">
+          <Calendar onClickDay={handleChange} value={selectedDate} />
         </div>
-      ))}
+      ) : (
+        generateMonthDates().map((date, index) => (
+          <div key={index} className="calendar-container">
+            <Calendar onClickDay={handleChange} value={selectedDate} activeStartDate={date} />
+          </div>
+        ))
+      )}
     </div>
   );
 };

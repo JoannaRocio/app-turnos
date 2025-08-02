@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './AppointmentsComponent.scss';
 import { Appointment } from '../../interfaces/Appointment';
-import ConfirmModal from '../ConfirmModal/ConfirmModalComponent';
+import ConfirmModal from '../shared/ConfirmModal/ConfirmModalComponent';
 import AppointmentService from '../../services/AppointmentService';
 import ProfessionalPanel from '../ProfessionalPanel/ProfessionalPanel';
 import CalendarComponent from '../CalendarComponent/CalendarComponent';
@@ -10,8 +10,11 @@ import { Professional } from '../../interfaces/Professional';
 import ClinicalHistoryComponent from '../ClinicalHistoryComponent/ClinicalHistory';
 import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import ClinicalHistoryService from '../../services/ClinicalHistoryService';
-import ActionDropdown from '../ActionDropdown/ActionDropdown';
+import ActionDropdown from '../shared/ActionDropdown/ActionDropdown';
 import { toast } from 'react-toastify';
+import { format } from 'date-fns';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import clsx from 'clsx';
 
 interface Props {
   patients: Patient[];
@@ -56,6 +59,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
   const [patientData, setPatientData] = useState<Patient | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const isMobile = useIsMobile();
 
   const [, setApptToDelete] = useState<{
     id: number;
@@ -226,11 +230,12 @@ const AppointmentsComponent: React.FC<Props> = ({
 
     setIsUpdating(true);
 
+    const dateTime = `${format(selectedDate, 'yyyy-MM-dd')}T${newAppointment.time}:00`;
     const appointmentToSave = {
       id: newAppointment.id, // si el backend lo requiere
       patientId: newAppointment.patientId,
       patientDni: newAppointment.documentNumber,
-      dateTime: `${selectedDate.toISOString().split('T')[0]}T${newAppointment.time}:00`,
+      dateTime: dateTime,
       reason: newAppointment.reason,
       state: 'PENDIENTE',
       professionalId: selectedProfessional?.professionalId ?? professionals[0].professionalId,
@@ -301,10 +306,10 @@ const AppointmentsComponent: React.FC<Props> = ({
   return (
     <>
       <section>
-        <div>
+        <div className="text-center text-md-start px-2">
           <h3 className="App-main-title text-white">Agenda de turnos</h3>
           <h4 className="schedule-title">
-            <i className="fas fa-user-md"></i>
+            <i className="fas fa-user-md me-2"></i>
             {selectedProfessional?.professionalName ?? professionals[0]?.professionalName}
             {' - '}
             {selectedDate.toLocaleDateString('es-AR', {
@@ -315,7 +320,6 @@ const AppointmentsComponent: React.FC<Props> = ({
           </h4>
         </div>
       </section>
-
       {showClinicalHistory && patientData && selectedProfessional?.professionalId !== undefined ? (
         <ClinicalHistoryComponent
           data={clinicalHistoryData}
@@ -326,221 +330,205 @@ const AppointmentsComponent: React.FC<Props> = ({
       ) : (
         <section className="container-fluid">
           <div className="row">
-            <div className="col-2">
+            {/* Panel izquierdo */}
+            <div className="col-12 col-md-2">
               <ProfessionalPanel
                 professionals={professionals}
                 onProfessionalSelect={handleProfessionalSelect}
                 selectedProfessional={selectedProfessional}
               />
             </div>
+            {/* Tabla central */}
+            <div className="col-12 col-md-8 order-2">
+              <div className={clsx('App-table-wrapper', { 'table-responsive': isMobile })}>
+                <table className="App-table table">
+                  <thead>
+                    <tr>
+                      <th>Hora</th>
+                      <th>Paciente</th>
+                      <th>DNI</th>
+                      <th>Asistencia</th>
+                      <th>Obra Social</th>
+                      <th>Motivo</th>
+                      <th>Notas</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {timeSlots.map((time, index) => {
+                      const appt = getAppointmentForTime(time);
 
-            <div className="col-8">
-              <table className="App-table">
-                <thead>
-                  <tr>
-                    <th>Hora</th>
-                    <th>Paciente</th>
-                    <th>DNI</th>
-                    <th>Asistencia</th>
-                    <th>Obra Social</th>
-                    {/* <th>Plan</th> */}
-                    {/* <th>Teléfono</th> */}
-                    <th>Motivo</th>
-                    <th>Notas</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {timeSlots.map((time, index) => {
-                    const appt = getAppointmentForTime(time);
-
-                    return (
-                      <tr
-                        key={index}
-                        onClick={() => openModalForTime(time)}
-                        className={'truncate-cell' + !appt ? 'clickable-row' : ''}
-                        title={appt?.reason ?? '-'}
-                        style={{ cursor: !appt ? 'pointer' : 'default', fontSize: '1.3rem' }}
-                      >
-                        <td className="truncate-cell" title={time ?? '-'}>
-                          {time}
-                        </td>
-                        <td className="truncate-cell" title={appt?.patient.fullName ?? '-'}>
-                          {appt?.patient.fullName ?? '-'}
-                        </td>
-                        <td className="truncate-cell" title={appt?.patient.documentNumber ?? '-'}>
-                          {appt?.patient.documentNumber ?? '-'}
-                        </td>
-                        <td className="truncate-cell" title={appt?.state ?? '-'}>
-                          {appt?.state ?? '-'}
-                        </td>
-                        <td
-                          className="truncate-cell"
-                          title={appt?.patient.healthInsuranceName ?? '-'}
+                      return (
+                        <tr
+                          key={index}
+                          onClick={() => openModalForTime(time)}
+                          className={!appt ? 'clickable-row' : ''}
+                          title={appt?.reason ?? '-'}
+                          style={{ cursor: !appt ? 'pointer' : 'default' }}
                         >
-                          {appt?.patient.healthInsuranceName ?? '-'}
-                        </td>
-                        {/* <td>{appt?.patient.insurancePlan ?? "-"}</td> */}
-                        {/* <td>{appt?.patient.phone ?? "-"}</td> */}
-                        <td className="truncate-cell" title={appt?.reason ?? '-'}>
-                          {appt?.reason ?? '-'}
-                        </td>
-                        <td className="truncate-cell" title={appt?.patient.note ?? '-'}>
-                          {appt?.patient.note ?? '-'}
-                        </td>
-                        <td className="action-cell" onClick={handleClick}>
-                          <div className="dropdown-container">
-                            <ActionDropdown
-                              disabled={!appt}
-                              isOpen={activeDropdownIndex === index}
-                              onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
-                              onView={() => openClinicalHistory(appt)}
-                              onEdit={() => openModalForTime(time)}
-                              onDelete={() => confirmDelete(appt)}
+                          <td className="truncate-cell">{time}</td>
+                          <td className="truncate-cell">{appt?.patient.fullName ?? '-'}</td>
+                          <td className="truncate-cell">{appt?.patient.documentNumber ?? '-'}</td>
+                          <td className="truncate-cell">{appt?.state ?? '-'}</td>
+                          <td className="truncate-cell">
+                            {appt?.patient.healthInsuranceName ?? '-'}
+                          </td>
+                          <td className="truncate-cell">{appt?.reason ?? '-'}</td>
+                          <td className="truncate-cell">{appt?.patient.note ?? '-'}</td>
+                          <td className="action-cell" onClick={handleClick}>
+                            <div className="dropdown-container">
+                              <ActionDropdown
+                                disabled={!appt}
+                                isOpen={activeDropdownIndex === index}
+                                onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                                onView={() => openClinicalHistory(appt)}
+                                onEdit={() => openModalForTime(time)}
+                                onDelete={() => confirmDelete(appt)}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+
+                  <ConfirmModal
+                    isOpen={showConfirm}
+                    title="Confirmar eliminación"
+                    message={`¿Estás segura que deseas eliminar el turno de "${currentAppointment?.patient.fullName}"?`}
+                    onConfirm={() => {
+                      if (currentAppointment) {
+                        handleDeleteConfirmed(currentAppointment);
+                      } else {
+                        alert('No ha seleccionado ningún turno disponible.');
+                      }
+                    }}
+                    onCancel={() => {
+                      setShowConfirm(false);
+                      setApptToDelete(null);
+                    }}
+                  />
+                </table>
+
+                {isModalOpen && (
+                  <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
+                    <div className={`custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
+                      <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
+                      <form onSubmit={handleSubmit} className="form-turno">
+                        <div className="form-grid">
+                          <label>
+                            Paciente:
+                            <input
+                              type="text"
+                              value={nameSearch}
+                              readOnly={!!nameSearch && isEditMode}
+                              onChange={(e) => {
+                                setNameSearch(e.target.value);
+                                if (!isEditMode) setDniSearch('');
+                              }}
+                              list="patientsByName"
+                              placeholder="Escribí el nombre"
                             />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
+                            <datalist id="patientsByName">
+                              {filteredPatients.map((p) => (
+                                <option key={p.id} value={p.fullName} />
+                              ))}
+                            </datalist>
+                          </label>
 
-                <ConfirmModal
-                  isOpen={showConfirm}
-                  title="Confirmar eliminación"
-                  message={`¿Estás segura que deseas eliminar el turno de "${currentAppointment?.patient.fullName}"?`}
-                  onConfirm={() => {
-                    if (currentAppointment) {
-                      handleDeleteConfirmed(currentAppointment);
-                    } else {
-                      alert('No ha seleccionado ningún turno disponible.');
-                    }
-                  }}
-                  onCancel={() => {
-                    setShowConfirm(false);
-                    setApptToDelete(null);
-                  }}
-                />
-              </table>
+                          <label>
+                            DNI:
+                            <input
+                              type="text"
+                              value={dniSearch}
+                              readOnly={!!dniSearch && isEditMode}
+                              onChange={(e) => {
+                                setDniSearch(e.target.value);
+                                if (!isEditMode) setNameSearch('');
+                              }}
+                              list="patientsByDni"
+                              placeholder="Escribí el DNI"
+                            />
+                            <datalist id="patientsByDni">
+                              {filteredPatients.map((p) => (
+                                <option key={p.id} value={p.documentNumber} />
+                              ))}
+                            </datalist>
+                          </label>
 
-              {isModalOpen && (
-                <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
-                  <div className={`custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
-                    <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
-                    <form onSubmit={handleSubmit} className="form-turno">
-                      <div className="form-grid">
-                        <label>
-                          Paciente:
-                          <input
-                            type="text"
-                            value={nameSearch}
-                            readOnly={!!nameSearch && isEditMode}
-                            onChange={(e) => {
-                              setNameSearch(e.target.value);
-                              if (!isEditMode) setDniSearch('');
-                            }}
-                            list="patientsByName"
-                            placeholder="Escribí el nombre"
-                          />
-                          <datalist id="patientsByName">
-                            {filteredPatients.map((p) => (
-                              <option key={p.id} value={p.fullName} />
-                            ))}
-                          </datalist>
-                        </label>
+                          <label>
+                            Profesional:
+                            <select
+                              value={selectedProfessional?.professionalId || ''}
+                              onChange={(e) => {
+                                const pro = professionals.find(
+                                  (p) => p.professionalId === Number(e.target.value)
+                                );
+                                if (pro) {
+                                  setSelectedProfessional(pro);
+                                }
+                              }}
+                            >
+                              <option value="">Seleccioná un profesional</option>
+                              {filteredProfessionals.map((pro) => (
+                                <option key={pro.professionalId} value={pro.professionalId}>
+                                  {pro.professionalName}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
 
-                        <label>
-                          DNI:
-                          <input
-                            type="text"
-                            value={dniSearch}
-                            readOnly={!!dniSearch && isEditMode}
-                            onChange={(e) => {
-                              setDniSearch(e.target.value);
-                              if (!isEditMode) setNameSearch('');
-                            }}
-                            list="patientsByDni"
-                            placeholder="Escribí el DNI"
-                          />
-                          <datalist id="patientsByDni">
-                            {filteredPatients.map((p) => (
-                              <option key={p.id} value={p.documentNumber} />
-                            ))}
-                          </datalist>
-                        </label>
+                          <label>
+                            Hora:
+                            <select name="time" value={newAppointment.time} onChange={handleChange}>
+                              {timeSlots.map((time) => (
+                                <option
+                                  key={time}
+                                  value={time}
+                                  disabled={!!getAppointmentForTime(time)}
+                                >
+                                  {time}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
 
-                        <label>
-                          Profesional:
-                          <select
-                            value={selectedProfessional?.professionalId || ''}
-                            onChange={(e) => {
-                              const pro = professionals.find(
-                                (p) => p.professionalId === Number(e.target.value)
-                              );
-                              if (pro) {
-                                setSelectedProfessional(pro);
-                              }
-                            }}
-                          >
-                            <option value="">Seleccioná un profesional</option>
-                            {filteredProfessionals.map((pro) => (
-                              <option key={pro.professionalId} value={pro.professionalId}>
-                                {pro.professionalName}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
+                          <label className="full-width">
+                            Motivo:
+                            <input
+                              type="text"
+                              name="reason"
+                              value={newAppointment.reason}
+                              onChange={handleChange}
+                            />
+                          </label>
 
-                        <label>
-                          Hora:
-                          <select name="time" value={newAppointment.time} onChange={handleChange}>
-                            {timeSlots.map((time) => (
-                              <option
-                                key={time}
-                                value={time}
-                                disabled={!!getAppointmentForTime(time)}
-                              >
-                                {time}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
+                          <label className="full-width">
+                            Notas:
+                            <textarea
+                              name="notes"
+                              value={newAppointment.notes}
+                              onChange={handleChange}
+                            />
+                          </label>
+                        </div>
 
-                        <label className="full-width">
-                          Motivo:
-                          <input
-                            type="text"
-                            name="reason"
-                            value={newAppointment.reason}
-                            onChange={handleChange}
-                          />
-                        </label>
-
-                        <label className="full-width">
-                          Notas:
-                          <textarea
-                            name="notes"
-                            value={newAppointment.notes}
-                            onChange={handleChange}
-                          />
-                        </label>
-                      </div>
-
-                      <div className="d-flex justify-content-center align-items-center">
-                        <button className="modal-buttons" type="submit" disabled={isUpdating}>
-                          {isEditMode ? 'Actualizar' : 'Guardar'}
-                        </button>
-                        <button className="modal-buttons" type="button" onClick={closeModal}>
-                          Cancelar
-                        </button>
-                      </div>
-                    </form>
+                        <div className="d-flex justify-content-center align-items-center">
+                          <button className="modal-buttons" type="submit" disabled={isUpdating}>
+                            {isEditMode ? 'Actualizar' : 'Guardar'}
+                          </button>
+                          <button className="modal-buttons" type="button" onClick={closeModal}>
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-
-            <div className="col-2">
+            {/* Calendario */}
+            <div className="col-12 col-md-2 order-1 order-md-2">
               <CalendarComponent onDateSelect={handleDateSelect} />
             </div>
           </div>

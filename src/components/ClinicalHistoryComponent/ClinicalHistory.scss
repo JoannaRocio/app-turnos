@@ -125,3 +125,12 @@
 .clinical-subtitle {
   color: var(--color-primary-dark);
 }
+
+.container-buttons-clinicalHistory {
+  position: absolute;
+  @media (max-width: 768px) {
+    position: static;
+    justify-self: self-end;
+    padding: 1rem 0;
+  }
+}

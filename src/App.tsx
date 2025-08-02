@@ -1,6 +1,6 @@
 // src/App.tsx
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import HeaderComponent from './components/HeaderComponent/HeaderComponent';
+import HeaderComponent from './components/shared/HeaderComponent/HeaderComponent';
 import Home from './pages/home/Home';
 import { ComponenteProvider } from './context/ContextComponent';
 import { AuthProvider, useAuth } from './context/ContextAuth';

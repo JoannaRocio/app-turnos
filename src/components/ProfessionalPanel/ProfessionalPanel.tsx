@@ -1,6 +1,7 @@
 import React from 'react';
 import './ProfessionalPanel.scss';
 import { Professional } from '../../interfaces/Professional';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface Props {
   professionals: Professional[];
@@ -17,6 +18,8 @@ const ProfessionalPanel: React.FC<Props> = ({
     onProfessionalSelect(professional);
   };
 
+  const isMobile = useIsMobile();
+
   return (
     <div className="professional-panel">
       {professionals.length === 0 ? (
@@ -25,8 +28,26 @@ const ProfessionalPanel: React.FC<Props> = ({
           El usuario <strong>Administrador</strong> puede cargar uno desde la pestaña
           <strong>"Profesionales"</strong>.
         </div>
+      ) : isMobile ? (
+        // Vista MOBILE: dropdown
+        <select
+          className="form-select"
+          value={selectedProfessional?.professionalId || ''}
+          onChange={(e) => {
+            const selected = professionals.find((p) => p.professionalId === Number(e.target.value));
+            if (selected) onProfessionalSelect(selected);
+          }}
+        >
+          <option value="">Seleccioná un profesional</option>
+          {professionals.map((pro) => (
+            <option key={pro.professionalId} value={pro.professionalId}>
+              {pro.professionalName} - DNI: {pro.documentNumber}
+            </option>
+          ))}
+        </select>
       ) : (
-        professionals.map((pro: Professional) => (
+        // Vista DESKTOP: cards
+        professionals.map((pro) => (
           <div
             key={pro.professionalId}
             className={`professional-card ${

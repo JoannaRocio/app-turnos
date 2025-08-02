@@ -3,7 +3,7 @@ import ClinicalHistoryService from '../../services/ClinicalHistoryService';
 import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
 import { Patient } from '../../interfaces/Patient';
 import './ClinicalHistory.scss';
-import ConfirmModal from '../ConfirmModal/ConfirmModalComponent';
+import ConfirmModal from '../shared/ConfirmModal/ConfirmModalComponent';
 
 interface Props {
   data: ClinicalHistoryEntry[];
@@ -348,7 +348,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                 <div key={entry.id} className="card mb-3 position-relative">
                   <div className="card-body">
                     {/* Botones de editar y eliminar */}
-                    <div className="position-absolute top-0 end-0 m-2 d-flex gap-2 align-items-center">
+                    <div className="container-buttons-clinicalHistory top-0 end-0 m-2 d-flex gap-2 align-items-center">
                       <button
                         className="btn btn-secondary d-flex align-items-center gap-1 btn-lg"
                         title="Editar"
