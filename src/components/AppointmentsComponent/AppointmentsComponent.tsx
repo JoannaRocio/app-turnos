@@ -161,6 +161,10 @@ const AppointmentsComponent: React.FC<Props> = ({
   }, [nameSearch, dniSearch, patients, isEditMode]);
 
   useEffect(() => {
+    document.body.classList.toggle('modal-open', isModalOpen);
+  }, [isModalOpen]);
+
+  useEffect(() => {
     if (!selectedProfessional && professionals.length > 0) {
       setSelectedProfessional(professionals[0]);
     }
