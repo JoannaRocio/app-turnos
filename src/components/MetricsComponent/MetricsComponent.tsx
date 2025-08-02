@@ -130,107 +130,110 @@ const MetricsComponent = () => {
   // }, [esLocale]);
 
   return (
-    <section className="container mt-5">
-      {/* Turnos por día */}
-      <div className="row mb-5">
-        <div className="col-12">
-          <div className="bg-white rounded-xl p-4 shadow metrics-container">
-            <h3 className="text-xl font-bold mb-4">Turnos asignados por día (últimos 30 días)</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={appointmentsPerDay}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(date) =>
-                    new Date(date).toLocaleDateString('es-AR', {
-                      day: '2-digit',
-                      month: 'short',
-                    })
-                  }
-                />
-                <YAxis allowDecimals={false} />
-                <Tooltip
-                  formatter={(value: number) => [`${value} turnos`, 'Cantidad']}
-                  labelFormatter={(label) =>
-                    `Fecha: ${new Date(label).toLocaleDateString('es-AR')}`
-                  }
-                />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#007bff"
-                  activeDot={{ r: 6 }}
-                  label={{ position: 'top', fill: '#333', fontSize: 12 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Pacientes nuevos por mes */}
-      <div className="row mb-5">
-        <div className="col-12">
-          <div className="bg-white rounded-xl p-4 shadow metrics-container">
-            <h3 className="text-xl font-bold mb-4">Pacientes nuevos por mes</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={patientsByMonth}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Estado de turnos y pie chart */}
-      <div className="row mb-5">
-        <div className="col-md-6 mb-4">
-          <div className="bg-white rounded-xl p-4 shadow metrics-container h-100">
-            <h3 className="text-xl font-bold mb-4">Estado de los turnos</h3>
-            <ul>
-              {appointmentStats.map(({ state, count }) => (
-                <li key={state} className="text-gray-700">
-                  <strong>{state}:</strong> {count}
-                </li>
-              ))}
-            </ul>
+    <>
+      <h3 className="App-secondary-title text-white">Métricas</h3>
+      <section className="container mt-5">
+        {/* Turnos por día */}
+        <div className="row mb-5">
+          <div className="col-12">
+            <div className="bg-white rounded-xl p-4 shadow metrics-container">
+              <h3 className="text-xl font-bold mb-4">Turnos asignados por día (últimos 30 días)</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={appointmentsPerDay}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(date) =>
+                      new Date(date).toLocaleDateString('es-AR', {
+                        day: '2-digit',
+                        month: 'short',
+                      })
+                    }
+                  />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip
+                    formatter={(value: number) => [`${value} turnos`, 'Cantidad']}
+                    labelFormatter={(label) =>
+                      `Fecha: ${new Date(label).toLocaleDateString('es-AR')}`
+                    }
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#007bff"
+                    activeDot={{ r: 6 }}
+                    label={{ position: 'top', fill: '#333', fontSize: 12 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
-        <div className="col-md-6 mb-4">
-          <div className="bg-white rounded-xl p-4 shadow metrics-container h-100">
-            <h3 className="text-xl font-bold mb-4">Distribución de estados de turnos</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={appointmentStats}
-                  dataKey="count"
-                  nameKey="state"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  label
-                >
-                  {appointmentStats.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0d6efd'][index % 5]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+        {/* Pacientes nuevos por mes */}
+        <div className="row mb-5">
+          <div className="col-12">
+            <div className="bg-white rounded-xl p-4 shadow metrics-container">
+              <h3 className="text-xl font-bold mb-4">Pacientes nuevos por mes</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={patientsByMonth}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+
+        {/* Estado de turnos y pie chart */}
+        <div className="row mb-5">
+          <div className="col-md-6 mb-4">
+            <div className="bg-white rounded-xl p-4 shadow metrics-container h-100">
+              <h3 className="text-xl font-bold mb-4">Estado de los turnos</h3>
+              <ul>
+                {appointmentStats.map(({ state, count }) => (
+                  <li key={state} className="text-gray-700">
+                    <strong>{state}:</strong> {count}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="col-md-6 mb-4">
+            <div className="bg-white rounded-xl p-4 shadow metrics-container h-100">
+              <h3 className="text-xl font-bold mb-4">Distribución de estados de turnos</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={appointmentStats}
+                    dataKey="count"
+                    nameKey="state"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    label
+                  >
+                    {appointmentStats.map((_entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0d6efd'][index % 5]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 

@@ -33,3 +33,12 @@
 .today-row strong {
   color: #007bff;
 }
+
+.desktop-w {
+  width: 380px;
+  max-width: none !important;
+  @media (max-width: 768px) {
+    // width: auto;
+    width: 100px;
+  }
+}

@@ -8,6 +8,8 @@ import MetricsComponent from '../MetricsComponent/MetricsComponent';
 import HealthInsurancePanel from '../HealthInsurancePanel/HealthInsurancePanel';
 import { useDataContext } from '../../context/DataContext';
 import { toast } from 'react-toastify';
+import ActionDropdown from '../shared/ActionDropdown/ActionDropdown';
+import ConfirmModal from '../shared/ConfirmModal/ConfirmModalComponent';
 
 interface AdminDashboardProps {
   reloadUsers: () => void;
@@ -20,6 +22,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'usuarios' | 'metricas' | 'obrasSociales'>('usuarios');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleRowClick = (user: User) => {
     setSelectedUser(user);
@@ -68,6 +72,39 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
     setModalOpen(true);
   };
 
+  const handleDelete = (user: User) => {
+    setSelectedUser(user);
+    setShowConfirm(true);
+  };
+
+  async function handleDeleteConfirmed(selectedUser: any) {
+    try {
+      // await UserService.delete(selectedUser?.id);
+      toast.success('Turno eliminado correctamente.');
+      setShowConfirm(false);
+      // setApptToDelete(null);
+
+      // if (selectedUser?.documentNumber) {
+      //   onAppointmentsUpdate(selectedUser);
+      // }
+    } catch (error: any) {
+      // setCurrentAppointment(null);
+      handleBackendError(error, 'Ocurrió un error al eliminar el turno.');
+    }
+  }
+
+  function handleBackendError(error: any, fallbackMessage = 'Ocurrió un error') {
+    const status = error?.response?.status;
+    const data = error?.response?.data;
+
+    if (status === 304 || status === 204) {
+      toast.info('No se realizaron modificaciones.');
+    } else {
+      const message = data?.message || data?.error || fallbackMessage;
+      toast.error(message);
+    }
+  }
+
   if (!users || users.length === 0) {
     return <p className="text-white">No hay usuarios disponibles.</p>;
   }
@@ -102,7 +139,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
       {activeTab === 'usuarios' && (
         <>
           <div className="d-flex justify-content-between">
-            <h3 className="text-white">Usuarios</h3>
+            <h3 className="text-white App-secondary-title">Usuarios</h3>
             <button className="btn App-buttonTertiary" onClick={handleNewUser}>
               Nuevo
             </button>
@@ -116,24 +153,44 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
-          <table className="App-table">
-            <thead>
-              <tr>
-                <th>Nombre usuario</th>
-                <th>Email</th>
-                <th>Rol</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user, index) => (
-                <tr key={index} onClick={() => handleRowClick(user)} className="clickable-row">
-                  <td>{user.username || '-'}</td>
-                  <td>{user.email || '-'}</td>
-                  <td>{user.role || '-'}</td>
+          <div className="table-responsive">
+            <table className="App-table">
+              <thead>
+                <tr>
+                  <th>Nombre usuario</th>
+                  <th>Email</th>
+                  <th>Rol</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-primary-r' : 'bg-secondary-r'}>
+                    <td>
+                      <span className="ellipsis-cell" title={user.username || undefined}>
+                        {user.username || '-'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="ellipsis-cell" title={user.email || undefined}>
+                        {user.email || '-'}
+                      </span>
+                    </td>
+                    <td>{user.role || '-'}</td>
+                    <td>
+                      <ActionDropdown
+                        disabled={!user}
+                        isOpen={activeDropdownIndex === index}
+                        onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                        onEdit={() => handleRowClick(user)}
+                        onDelete={() => handleDelete(user)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <UserModalComponent
             isOpen={modalOpen}
@@ -142,6 +199,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
             onSave={handleSave}
             professionals={professionals}
             isUpdating={isUpdating}
+          />
+
+          <ConfirmModal
+            isOpen={showConfirm}
+            title="Confirmar eliminación"
+            message={`¿Estás segura que deseas eliminar el usuario de "${selectedUser?.username}"?`}
+            onConfirm={() => {
+              if (selectedUser) {
+                handleDeleteConfirmed(selectedUser);
+              } else {
+                alert('No ha seleccionado ningún turno disponible.');
+              }
+            }}
+            onCancel={() => {
+              setShowConfirm(false);
+              // setApptToDelete(null);
+            }}
           />
         </>
       )}

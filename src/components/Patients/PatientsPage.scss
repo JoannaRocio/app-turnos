@@ -10,7 +10,7 @@
 }
 
 .highlighted-row {
-  background-color: #faec9c !important; /* amarillo suave */
+  background-color: #faec9c !important;
   transition: background-color 0.5s ease !important;
 }
 
@@ -19,4 +19,40 @@
   text-align: center;
   padding: 2rem;
   font-style: italic;
+}
+
+// Solo en mobile
+@media (max-width: 768px) {
+  .App-table th,
+  .App-table td {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .App-main-title {
+    font-size: 1.3rem;
+  }
+
+  .App-buttonTertiary {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .filter-input {
+    font-size: 0.9rem;
+  }
+
+  .table-responsive {
+    margin-bottom: 1rem;
+  }
+}
+
+.ellipsis-cell {
+  max-width: -webkit-fill-available;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
 }

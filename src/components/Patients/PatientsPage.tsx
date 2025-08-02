@@ -177,7 +177,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
 
       <input
         type="text"
-        className="form-control mb-3 filter-input"
+        className="form-control mb-3 filter-input w-100"
         placeholder="Buscar por nombre o DNI..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -186,52 +186,82 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
       {sortedPatients.length === 0 ? (
         <p className="no-patients-message">No hay pacientes disponibles.</p>
       ) : (
-        <table className="App-table">
-          <thead>
-            <tr>
-              <th onClick={() => setSortByNameAsc((prev) => !prev)} style={{ cursor: 'pointer' }}>
-                Paciente {sortByNameAsc ? '▲' : '▼'}
-              </th>
-              <th>Tipo Documento</th>
-              <th>DNI</th>
-              <th>Obra Social</th>
-              <th>Plan</th>
-              <th>Teléfono</th>
-              <th>Notas</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedPatients.map((patient, index) => (
-              <tr
-                key={patient.id}
-                ref={(el) => {
-                  if (patient.id != null) {
-                    rowRefs.current[patient.id] = el;
-                  }
-                }}
-                className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
-              >
-                <td>{patient.fullName}</td>
-                <td>{patient.documentType || '-'}</td>
-                <td>{patient.documentNumber || '-'}</td>
-                <td>{patient?.healthInsuranceName || '-'}</td>
-                <td>{patient?.insurancePlanName || '-'}</td>
-                <td>{patient?.phone || '-'}</td>
-                <td>{patient?.note || '-'}</td>
-                <td onClick={handleClick}>
-                  <ActionDropdown
-                    disabled={!patient}
-                    isOpen={activeDropdownIndex === index}
-                    onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
-                    onView={() => openClinicalHistory(patient)}
-                    onEdit={() => openPatientModal(patient)}
-                  />
-                </td>
+        <div className="table-responsive">
+          <table className="App-table">
+            <thead>
+              <tr>
+                <th onClick={() => setSortByNameAsc((prev) => !prev)} style={{ cursor: 'pointer' }}>
+                  Paciente {sortByNameAsc ? '▲' : '▼'}
+                </th>
+                <th>Tipo Documento</th>
+                <th>DNI</th>
+                <th>Obra Social</th>
+                <th>Plan</th>
+                <th>Teléfono</th>
+                <th>Notas</th>
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sortedPatients.map((patient, index) => (
+                <tr
+                  key={patient.id}
+                  ref={(el) => {
+                    if (patient.id != null) {
+                      rowRefs.current[patient.id] = el;
+                    }
+                  }}
+                  className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
+                >
+                  <td>
+                    <span className="ellipsis-cell" title={patient.fullName}>
+                      {patient.fullName}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="ellipsis-cell" title={patient.documentType || '-'}>
+                      {patient.documentType || '-'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="ellipsis-cell" title={patient.documentNumber || '-'}>
+                      {patient.documentNumber || '-'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="ellipsis-cell" title={patient.healthInsuranceName || '-'}>
+                      {patient.healthInsuranceName || '-'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="ellipsis-cell" title={patient.insurancePlanName || '-'}>
+                      {patient.insurancePlanName || '-'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="ellipsis-cell" title={patient.phone || '-'}>
+                      {patient.phone || '-'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="ellipsis-cell" title={patient.note || '-'}>
+                      {patient.note || '-'}
+                    </span>
+                  </td>
+                  <td onClick={handleClick}>
+                    <ActionDropdown
+                      disabled={!patient}
+                      isOpen={activeDropdownIndex === index}
+                      onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                      onView={() => openClinicalHistory(patient)}
+                      onEdit={() => openPatientModal(patient)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <PatientModalComponent

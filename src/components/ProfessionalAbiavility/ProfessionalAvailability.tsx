@@ -127,79 +127,81 @@ const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, Availabilit
     return (
       <div className="availability-container">
         <h5 className="fw-bold">Disponibilidad del profesional</h5>
-        <table className="availability-table">
-          <thead>
-            <tr>
-              <th>Día</th>
-              <th>Hora inicio</th>
-              <th>Hora fin</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {daysOfWeek.map((day) =>
-              (availability[day] || []).map((range, idx) => (
-                <tr key={`${day}-${idx}`}>
-                  {idx === 0 && (
-                    <td rowSpan={(availability[day] || []).length} className="day-label">
-                      {dayLabels[day] || day}
+        <div className="table-responsive">
+          <table className="availability-table">
+            <thead>
+              <tr>
+                <th>Día</th>
+                <th>Hora inicio</th>
+                <th>Hora fin</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {daysOfWeek.map((day) =>
+                (availability[day] || []).map((range, idx) => (
+                  <tr key={`${day}-${idx}`}>
+                    {idx === 0 && (
+                      <td rowSpan={(availability[day] || []).length} className="day-label">
+                        {dayLabels[day] || day}
+                      </td>
+                    )}
+                    <td>
+                      <input
+                        list="horarios"
+                        value={range.start_time}
+                        onChange={(e) => handleTimeChange(day, idx, 'start_time', e.target.value)}
+                        placeholder="--:--"
+                        pattern="^([01]\d|2[0-3]):([0-5][0-9])$"
+                        title="Formato HH:MM (00:00 a 23:59)"
+                      />
                     </td>
-                  )}
-                  <td>
-                    <input
-                      list="horarios"
-                      value={range.start_time}
-                      onChange={(e) => handleTimeChange(day, idx, 'start_time', e.target.value)}
-                      placeholder="--:--"
-                      pattern="^([01]\d|2[0-3]):([0-5][0-9])$"
-                      title="Formato HH:MM (00:00 a 23:59)"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      list="horarios"
-                      value={range.end_time}
-                      onChange={(e) => handleTimeChange(day, idx, 'end_time', e.target.value)}
-                      placeholder="--:--"
-                      pattern="^([01]\d|2[0-3]):([0-5][0-9])$"
-                      title="Formato HH:MM (00:00 a 23:59)"
-                    />
-                    <datalist id="horarios">
-                      {timeOptions.map((time) => (
-                        <option key={time} value={time} />
-                      ))}
-                    </datalist>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveRange(day, idx)}
-                      disabled={availability[day].length === 1}
-                      title={
-                        availability[day].length === 1
-                          ? 'Debe tener al menos una franja'
-                          : 'Eliminar franja'
-                      }
-                      className="btn-remove"
-                    >
-                      ✕
-                    </button>
+                    <td>
+                      <input
+                        list="horarios"
+                        value={range.end_time}
+                        onChange={(e) => handleTimeChange(day, idx, 'end_time', e.target.value)}
+                        placeholder="--:--"
+                        pattern="^([01]\d|2[0-3]):([0-5][0-9])$"
+                        title="Formato HH:MM (00:00 a 23:59)"
+                      />
+                      <datalist id="horarios">
+                        {timeOptions.map((time) => (
+                          <option key={time} value={time} />
+                        ))}
+                      </datalist>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRange(day, idx)}
+                        disabled={availability[day].length === 1}
+                        title={
+                          availability[day].length === 1
+                            ? 'Debe tener al menos una franja'
+                            : 'Eliminar franja'
+                        }
+                        className="btn-remove"
+                      >
+                        ✕
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleClearRange(day, idx)}
-                      className="btn-clear-day"
-                      title="Limpiar esta franja horaria"
-                      disabled={!range.start_time && !range.end_time}
-                    >
-                      🧹
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                      <button
+                        type="button"
+                        onClick={() => handleClearRange(day, idx)}
+                        className="btn-clear-day"
+                        title="Limpiar esta franja horaria"
+                        disabled={!range.start_time && !range.end_time}
+                      >
+                        🧹
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
         <div className="add-buttons-container">
           {daysOfWeek.map((day) => (

@@ -61,3 +61,68 @@
   align-items: center;
   z-index: 999;
 }
+
+/* Modal principal */
+.modal-patient {
+  width: 100%;
+  max-width: 600px;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Fila de inputs */
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Columna individual */
+.form-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive: stack en mobile */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .modal-patient {
+    padding: 1rem;
+  }
+
+  .modal-buttons {
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+}
+
+/* Ajuste de tamaño de letra en mobile */
+@media (max-width: 768px) {
+  .modal-patient {
+    font-size: 1rem;
+  }
+
+  .modal-patient input,
+  .modal-patient select,
+  .modal-patient label {
+    font-size: 0.9rem;
+  }
+
+  .modal-buttons {
+    font-size: 1rem;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  .field-error {
+    font-size: 0.8rem;
+  }
+}

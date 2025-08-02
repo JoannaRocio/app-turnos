@@ -110,11 +110,12 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
         className={`modal-overlay-professionalModal ${professional?.professionalId ? 'edit-mode' : ''}`}
       >
         <div className={`modal modal-patient ${professional?.professionalId ? 'edit-mode' : ''}`}>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="form-paciente">
             <h4>{professional?.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <label htmlFor="documentType">Nombre completo</label>
+            {/* Nombre completo */}
+            <div className="form-group">
+              <label htmlFor="professionalName">Nombre completo</label>
               <input
                 id="professionalName"
                 type="text"
@@ -130,15 +131,18 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
               )}
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {/* Tipo y número de documento */}
+            <div className="form-row">
+              <div className="form-group">
                 <label htmlFor="documentType">Tipo de documento</label>
                 <select
                   id="documentType"
                   value={form.documentType}
                   onChange={(e) => setForm({ ...form, documentType: e.target.value })}
                 >
-                  <option value="">Tipo de documento</option>
+                  <option value="" disabled hidden>
+                    Tipo de documento
+                  </option>
                   <option value="DNI">DNI</option>
                   <option value="Libreta de Enrolamiento">Libreta de Enrolamiento</option>
                   <option value="Libreta Cívica">Libreta Cívica</option>
@@ -149,8 +153,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                 </select>
                 {!form.documentType && <span className="field-error">Campo obligatorio</span>}
               </div>
-
-              <div style={{ flex: 2, display: 'flex', flexDirection: 'column' }}>
+              <div className="form-group">
                 <label htmlFor="documentNumber">Número de documento</label>
                 <input
                   id="documentNumber"
@@ -165,8 +168,9 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {/* Teléfono y especialidad */}
+            <div className="form-row">
+              <div className="form-group">
                 <label htmlFor="phone">Teléfono</label>
                 <input
                   type="tel"
@@ -181,8 +185,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                   placeholder="Teléfono"
                 />
               </div>
-
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <div className="form-group">
                 <label htmlFor="specialties">Especialidad</label>
                 <select
                   id="specialties"
@@ -200,6 +203,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
               </div>
             </div>
 
+            {/* Componente de disponibilidad */}
             {professional?.professionalId !== undefined && (
               <ProfessionalAvailabilityForm
                 ref={availabilityRef}
@@ -208,6 +212,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
               />
             )}
 
+            {/* Botones */}
             <div className="d-flex justify-content-center align-items-center">
               <button
                 className="modal-buttons"

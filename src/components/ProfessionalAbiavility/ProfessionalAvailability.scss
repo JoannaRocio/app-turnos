@@ -158,3 +158,42 @@ h2 {
 .btn-availability {
   background-color: var(--color-yellow);
 }
+
+.availability-container h5 {
+  @media (max-width: 768px) {
+    font-size: 1.1rem; // tamaño más chico en mobile
+  }
+}
+
+@media (max-width: 768px) {
+  .availability-table {
+    // display: block;
+    overflow-x: auto;
+    font-size: 0.85rem;
+
+    th,
+    td {
+      white-space: nowrap;
+      padding: 0.4rem;
+    }
+
+    input {
+      font-size: 0.85rem;
+      padding: 0.2rem;
+    }
+
+    .btn-remove,
+    .btn-clear-day {
+      font-size: 0.8rem;
+    }
+  }
+
+  .add-buttons-container .btn-add {
+    font-size: 0.85rem;
+
+    h6 {
+      font-size: 0.85rem;
+      margin: 0;
+    }
+  }
+}

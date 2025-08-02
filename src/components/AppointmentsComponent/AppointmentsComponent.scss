@@ -24,6 +24,11 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   margin: auto;
 
+  border-color: white;
+  border-style: solid;
+  border-width: 4px;
+  border-radius: 10px;
+
   h2 {
     margin-top: 0;
   }
@@ -74,9 +79,9 @@
   cursor: pointer;
 }
 
-select {
-  height: -webkit-fill-available;
-}
+// select {
+//   height: -webkit-fill-available;
+// }
 
 //alert
 
@@ -253,7 +258,7 @@ button.dropdown-toggle:disabled {
   background-color: white; // opcional para que se vea más limpio
 
   .App-table {
-    min-width: 900px; // o lo necesario para que no colapse
+    min-width: 600px; // o lo necesario para que no colapse
     font-size: 1.2rem;
 
     @media (max-width: 768px) {
@@ -269,11 +274,11 @@ button.dropdown-toggle:disabled {
   }
 }
 
-select {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
+// select {
+//   width: 100%;
+//   max-width: 100%;
+//   box-sizing: border-box;
+// }
 
 // SOLO MOBILE
 @media (max-width: 768px) {

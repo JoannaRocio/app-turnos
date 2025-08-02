@@ -112,7 +112,7 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
           >
             <h4>{patient?.id ? 'Editar paciente' : 'Alta de paciente'}</h4>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="form-group">
               <label htmlFor="documentType">Nombre completo</label>
               <input
                 id="patientName"
@@ -129,27 +129,26 @@ const PatientModalComponent: React.FC<PatientModalComponentProps> = ({
 
             <div className="form-row">
               {/* Tipo y número de documento */}
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <label htmlFor="documentType">Tipo de documento</label>
-                  <select
-                    id="documentType"
-                    value={form.documentType}
-                    onChange={(e) => setForm({ ...form, documentType: e.target.value })}
-                  >
-                    <option value="" disabled hidden>
-                      Tipo de documento
-                    </option>
-                    <option value="DNI">DNI</option>
-                    <option value="Libreta de Enrolamiento">Libreta de Enrolamiento</option>
-                    <option value="Libreta Cívica">Libreta Cívica</option>
-                    <option value="Cédula de Identidad">Cédula de Identidad</option>
-                    <option value="Pasaporte">Pasaporte</option>
-                    <option value="Cédula de Extranjería">Cédula de Extranjería</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                  {!form.documentType && <span className="field-error">Campo obligatorio</span>}
-                </div>
+
+              <div className="form-group">
+                <label htmlFor="documentType">Tipo de documento</label>
+                <select
+                  id="documentType"
+                  value={form.documentType}
+                  onChange={(e) => setForm({ ...form, documentType: e.target.value })}
+                >
+                  <option value="" disabled hidden>
+                    Tipo de documento
+                  </option>
+                  <option value="DNI">DNI</option>
+                  <option value="Libreta de Enrolamiento">Libreta de Enrolamiento</option>
+                  <option value="Libreta Cívica">Libreta Cívica</option>
+                  <option value="Cédula de Identidad">Cédula de Identidad</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Cédula de Extranjería">Cédula de Extranjería</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                {!form.documentType && <span className="field-error">Campo obligatorio</span>}
               </div>
               <div className="form-group">
                 <label>Número documento</label>
