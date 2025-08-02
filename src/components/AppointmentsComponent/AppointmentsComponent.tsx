@@ -306,7 +306,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   return (
     <>
       <section>
-        <div className="text-center text-md-start px-2">
+        <div className="text-md-start px-2">
           <h3 className="App-main-title text-white">Agenda de turnos</h3>
           <h4 className="schedule-title">
             <i className="fas fa-user-md me-2"></i>
@@ -341,7 +341,7 @@ const AppointmentsComponent: React.FC<Props> = ({
             {/* Tabla central */}
             <div className="col-12 col-md-8 order-2">
               <div className={clsx('App-table-wrapper', { 'table-responsive': isMobile })}>
-                <table className="App-table table">
+                <table className="App-table">
                   <thead>
                     <tr>
                       <th>Hora</th>
@@ -413,6 +413,14 @@ const AppointmentsComponent: React.FC<Props> = ({
                 {isModalOpen && (
                   <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
                     <div className={`custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
+                      <div className="modal-header">
+                        <button
+                          type="button"
+                          className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                          aria-label="Cerrar"
+                          onClick={() => setIsModalOpen(false)}
+                        />
+                      </div>
                       <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
                       <form onSubmit={handleSubmit} className="form-turno">
                         <div className="form-grid">

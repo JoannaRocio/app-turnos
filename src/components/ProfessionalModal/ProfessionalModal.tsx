@@ -110,6 +110,14 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
         className={`modal-overlay-professionalModal ${professional?.professionalId ? 'edit-mode' : ''}`}
       >
         <div className={`modal modal-patient ${professional?.professionalId ? 'edit-mode' : ''}`}>
+          <div className="modal-header">
+            <button
+              type="button"
+              className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+              aria-label="Cerrar"
+              onClick={onClose}
+            />
+          </div>
           <form onSubmit={handleSubmit} className="form-paciente">
             <h4>{professional?.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
 

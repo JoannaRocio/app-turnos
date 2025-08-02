@@ -1,4 +1,4 @@
-@import '~bootstrap/scss/bootstrap';
+@use '~bootstrap/scss/bootstrap';
 
 :root {
   // PRIMARY (Basado en --rt-color-primary y derivados)
@@ -63,6 +63,10 @@ body {
   min-height: 100vh;
   margin: 0;
   color: var(--color-neutral-light);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 h1 {
@@ -214,6 +218,7 @@ a {
 }
 
 .App-table {
+  color: var(--color-neutral-dark);
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
@@ -307,7 +312,7 @@ a {
   font-weight: 500;
 
   @media (max-width: 768px) {
-    font-size: 1rem !important;
+    font-size: 1.4rem !important;
     padding: 0.4rem 0.75rem;
     min-width: auto;
   }
@@ -400,35 +405,56 @@ a {
 @media (max-width: 768px) {
   .filter-input {
     width: 100%;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
+  }
+
+  .App-table {
+    table-layout: auto;
   }
 
   .App-table th,
   .App-table td {
-    font-size: 0.85rem;
+    font-size: 1.2rem;
     white-space: nowrap;
     padding: 0.4rem;
     height: auto;
+    max-width: 100px;
   }
 
   .App-main-title {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
   }
 
   .App-secondary-title {
     @media (max-width: 768px) {
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       // text-align: center;
     }
   }
 
   .App-buttonTertiary {
-    font-size: 0.9rem;
+    font-size: 1.4rem;
     padding: 0.4rem 0.8rem;
   }
 
   .table-responsive {
     margin-top: 1rem;
+  }
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  color: white;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 10;
+  &:hover {
+    color: #ccc;
   }
 }
 

@@ -1,7 +1,7 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
+@use 'bootstrap/scss/functions';
+@use 'bootstrap/scss/variables';
+@use 'bootstrap/scss/mixins';
 // @import 'bootstrap/scss/buttons';
-@import 'bootstrap/scss/offcanvas';
-@import 'bootstrap/scss/transitions';
-@import 'bootstrap/scss/close';
+@use 'bootstrap/scss/offcanvas';
+@use 'bootstrap/scss/transitions';
+@use 'bootstrap/scss/close';

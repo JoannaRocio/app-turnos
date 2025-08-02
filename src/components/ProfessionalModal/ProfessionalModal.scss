@@ -21,7 +21,7 @@
   width: 400px;
   overflow-y: auto;
   max-height: 560px;
-  max-width: 600px;
+  max-width: 800px;
   justify-self: anchor-center;
   padding: 24px;
   align-self: anchor-center;
@@ -93,7 +93,7 @@
   }
 
   .modal-patient {
-    padding: 1rem;
+    padding: 1.4rem;
   }
 
   .modal-buttons {
@@ -104,14 +104,10 @@
 
 /* Ajuste de tamaño de letra en mobile */
 @media (max-width: 768px) {
-  .modal-patient {
-    font-size: 1rem;
-  }
-
   .modal-patient input,
   .modal-patient select,
   .modal-patient label {
-    font-size: 0.9rem;
+    font-size: 1.4rem;
   }
 
   .modal-buttons {
@@ -123,6 +119,6 @@
   }
 
   .field-error {
-    font-size: 0.8rem;
+    font-size: 1.2rem;
   }
 }

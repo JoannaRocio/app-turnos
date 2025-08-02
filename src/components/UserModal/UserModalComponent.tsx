@@ -60,6 +60,14 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
     <section>
       <div className={`modal-overlay ${user?.id ? 'edit-mode' : ''}`}>
         <div className={`modal modal-patient ${user?.id ? 'edit-mode' : ''}`}>
+          <div className="modal-header">
+            <button
+              type="button"
+              className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+              aria-label="Cerrar"
+              onClick={onClose}
+            />
+          </div>
           <form
             autoComplete="off"
             className="user-form"

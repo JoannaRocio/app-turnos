@@ -10,10 +10,14 @@
   padding: 1rem;
 }
 
+.modal-header {
+  position: relative;
+}
+
 .custom-modal {
   display: flex;
   flex-direction: column;
-  max-width: 600px;
+  max-width: 800px;
   width: 100%;
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
@@ -219,7 +223,7 @@ button.dropdown-toggle:disabled {
   color: var(--color-primary-dark);
 
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     text-align: center;
   }
 }
@@ -273,12 +277,6 @@ button.dropdown-toggle:disabled {
     }
   }
 }
-
-// select {
-//   width: 100%;
-//   max-width: 100%;
-//   box-sizing: border-box;
-// }
 
 // SOLO MOBILE
 @media (max-width: 768px) {

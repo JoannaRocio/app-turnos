@@ -161,7 +161,7 @@ h2 {
 
 .availability-container h5 {
   @media (max-width: 768px) {
-    font-size: 1.1rem; // tamaño más chico en mobile
+    font-size: 1.4rem; // tamaño más chico en mobile
   }
 }
 
@@ -169,7 +169,7 @@ h2 {
   .availability-table {
     // display: block;
     overflow-x: auto;
-    font-size: 0.85rem;
+    font-size: 1.2rem;
 
     th,
     td {
@@ -178,22 +178,45 @@ h2 {
     }
 
     input {
-      font-size: 0.85rem;
+      font-size: 1.2rem;
       padding: 0.2rem;
     }
 
     .btn-remove,
     .btn-clear-day {
-      font-size: 0.8rem;
+      font-size: 1.2rem;
     }
   }
 
   .add-buttons-container .btn-add {
-    font-size: 0.85rem;
+    font-size: 1.2rem;
 
     h6 {
-      font-size: 0.85rem;
+      font-size: 1.2rem;
       margin: 0;
+    }
+  }
+}
+
+// Mobile
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: white; // opcional para que se vea más limpio
+  .App-table {
+    min-width: 800px; // o lo necesario para que no colapse
+    font-size: 1.2rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+    }
+
+    th,
+    td {
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: middle;
     }
   }
 }

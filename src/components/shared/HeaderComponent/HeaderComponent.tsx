@@ -37,7 +37,7 @@ const HeaderComponent: React.FC = () => {
           data-bs-target="#mobileMenu"
           aria-controls="mobileMenu"
         >
-          <i className="bi bi-list fs-4"></i> Menú
+          <i className="bi bi-list fs-4"></i> <div className="fs-3 fw-medium">Menú</div>
         </button>
 
         {/* Menú para desktop */}
@@ -101,7 +101,7 @@ const HeaderComponent: React.FC = () => {
                       componenteActivo === 'panel-admin' ? 'active-title' : ''
                     }`}
                   >
-                    Panel Admin
+                    Panel Administrador
                   </div>
                 </button>
               </li>
@@ -176,7 +176,7 @@ const HeaderComponent: React.FC = () => {
                   onClick={() => setComponenteActivo('panel-admin')}
                 >
                   <i className="bi bi-sliders2 me-2"></i>
-                  Panel Admin
+                  Panel Administrador
                 </button>
               </li>
             )}

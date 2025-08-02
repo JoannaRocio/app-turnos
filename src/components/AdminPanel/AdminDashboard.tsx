@@ -112,7 +112,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
   return (
     <section>
       <div className="d-flex justify-content-between admin-panel">
-        <h3 className="App-main-title text-white">Panel de administrador</h3>
+        <h3 className="App-main-title text-white">Panel de admin</h3>
 
         <div className="tabs">
           <button
