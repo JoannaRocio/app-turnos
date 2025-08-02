@@ -281,7 +281,7 @@ button.dropdown-toggle:disabled {
 // SOLO MOBILE
 @media (max-width: 768px) {
   .custom-modal {
-    font-size: 0.9rem; // reduce la fuente solo en mobile
+    font-size: 1.4rem; // reduce la fuente solo en mobile
     padding: 1rem;
     max-width: 95vw;
 
@@ -301,11 +301,11 @@ button.dropdown-toggle:disabled {
       input,
       select,
       textarea {
-        font-size: 0.9rem;
+        font-size: 1.2rem;
       }
 
       .modal-buttons {
-        font-size: 0.9rem;
+        font-size: 1.2rem;
       }
     }
   }
