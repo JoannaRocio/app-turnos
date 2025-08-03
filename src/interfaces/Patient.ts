@@ -14,4 +14,5 @@ export interface Patient {
   lastVisitDate: string | null;
   note: string;
   state: string;
+  isGuest: boolean;
 }

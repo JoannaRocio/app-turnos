@@ -77,6 +77,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
           patientData.healthInsuranceId === 0 ? null : patientData.healthInsuranceId,
         insurancePlanId: patientData.insurancePlanId === 0 ? null : patientData.insurancePlanId,
         affiliateNumber: patientData.affiliateNumber === 0 ? null : patientData.affiliateNumber,
+        isGuest: patientData.isGuest,
       };
 
       // Guardar paciente
@@ -144,6 +145,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
       healthInsuranceName: '',
       insurancePlanName: '',
       note: '',
+      isGuest: false,
     };
     setSelectedPatient(emptyPatient);
     setModalOpen(true);
@@ -195,10 +197,10 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
                 </th>
                 <th>Tipo Documento</th>
                 <th>DNI</th>
-                <th>Obra Social</th>
-                <th>Plan</th>
+                <th>Obra Social y plan</th>
                 <th>Teléfono</th>
                 <th>Notas</th>
+                <th>¿Es nuevo?</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -229,12 +231,12 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
                     </span>
                   </td>
                   <td>
-                    <span className="ellipsis-cell" title={patient.healthInsuranceName || '-'}>
+                    <span
+                      className="ellipsis-cell"
+                      title={`${patient.healthInsuranceName || '-'}\n${patient.insurancePlanName || '-'}`}
+                    >
                       {patient.healthInsuranceName || '-'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="ellipsis-cell" title={patient.insurancePlanName || '-'}>
+                      <br />
                       {patient.insurancePlanName || '-'}
                     </span>
                   </td>
@@ -247,6 +249,36 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
                     <span className="ellipsis-cell" title={patient.note || '-'}>
                       {patient.note || '-'}
                     </span>
+                  </td>
+                  <td className="text-center">
+                    {patient.isGuest == null ? (
+                      '-'
+                    ) : (
+                      <div className="d-flex justify-content-center align-items-center guest-cell">
+                        {/* Texto Sí/No */}
+                        <span className="guest-text me-2">{patient.isGuest ? 'Sí' : 'No'}</span>
+                        {/* El switch de Bootstrap */}
+                        <div className="form-check form-switch guest-switch m-0">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            id={`guestSwitch-${patient.id}`}
+                            checked={patient.isGuest}
+                            disabled={isUpdating}
+                            onChange={() => {
+                              if (isUpdating) return;
+                              handleSave({ ...patient, isGuest: !patient.isGuest });
+                            }}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor={`guestSwitch-${patient.id}`}
+                            aria-label="Marcar como invitado"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </td>
                   <td onClick={handleClick}>
                     <ActionDropdown

@@ -47,3 +47,47 @@
   display: inline-block;
   vertical-align: middle;
 }
+
+// switch
+
+/* src/styles/_custom-switch.scss */
+
+.guest-switch {
+  // ancho y alto opcionales
+  .form-check-input {
+    width: 2.4rem;
+    height: 1.4rem;
+    // color de fondo para "No" (unchecked)
+    background-color: #dc3545;
+    border-color: #dc3545;
+    transition:
+      background-color 0.3s,
+      border-color 0.3s;
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    // Estilo del knob por defecto
+    &::after {
+      background-color: #fff;
+    }
+
+    // Cuando está checked -> "Sí"
+    &:checked {
+      background-color: #28a745;
+      border-color: #28a745;
+
+      &::after {
+        background-color: #fff;
+      }
+    }
+  }
+
+  // Opcional: mover el label fuera de la izquierda
+  .form-check-label {
+    margin-left: 0.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+}
