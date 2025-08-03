@@ -113,9 +113,14 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
           <div className="modal-header">
             <button
               type="button"
-              className="btn-close btn-close-white top-0 end-0 m-3"
+              className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
               aria-label="Cerrar"
               onClick={onClose}
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                borderRadius: '50%',
+                padding: '0.5rem',
+              }}
             />
           </div>
           <form onSubmit={handleSubmit} className="form-paciente">

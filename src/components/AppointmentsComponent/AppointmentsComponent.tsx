@@ -309,116 +309,122 @@ const AppointmentsComponent: React.FC<Props> = ({
 
   return (
     <>
-      {isModalOpen && (
-        <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
-          <div className={`custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
-            <div className="modal-header d-flex justify-content-end">
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                aria-label="Cerrar"
-                onClick={() => setIsModalOpen(false)}
-              />
+      <div className="col-12 col-md-8 order-2">
+        {isModalOpen && (
+          <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
+            <div className={`custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
+              <div className="modal-header d-flex justify-content-end">
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  aria-label="Cerrar"
+                  onClick={() => setIsModalOpen(false)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    borderRadius: '50%',
+                    padding: '0.5rem',
+                  }}
+                />
+              </div>
+              <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
+              <form onSubmit={handleSubmit} className="form-turno">
+                <div className="form-grid">
+                  {/* Campos del formulario */}
+                  <label>
+                    Paciente:
+                    <input
+                      type="text"
+                      value={nameSearch}
+                      readOnly={!!nameSearch && isEditMode}
+                      onChange={(e) => {
+                        setNameSearch(e.target.value);
+                        if (!isEditMode) setDniSearch('');
+                      }}
+                      list="patientsByName"
+                      placeholder="Escribí el nombre"
+                    />
+                    <datalist id="patientsByName">
+                      {filteredPatients.map((p) => (
+                        <option key={p.id} value={p.fullName} />
+                      ))}
+                    </datalist>
+                  </label>
+                  <label>
+                    DNI:
+                    <input
+                      type="text"
+                      value={dniSearch}
+                      readOnly={!!dniSearch && isEditMode}
+                      onChange={(e) => {
+                        setDniSearch(e.target.value);
+                        if (!isEditMode) setNameSearch('');
+                      }}
+                      list="patientsByDni"
+                      placeholder="Escribí el DNI"
+                    />
+                    <datalist id="patientsByDni">
+                      {filteredPatients.map((p) => (
+                        <option key={p.id} value={p.documentNumber} />
+                      ))}
+                    </datalist>
+                  </label>
+                  <label>
+                    Profesional:
+                    <select
+                      value={selectedProfessional?.professionalId || ''}
+                      onChange={(e) => {
+                        const pro = professionals.find(
+                          (p) => p.professionalId === Number(e.target.value)
+                        );
+                        if (pro) setSelectedProfessional(pro);
+                      }}
+                    >
+                      <option value="">Seleccioná un profesional</option>
+                      {filteredProfessionals.map((pro) => (
+                        <option key={pro.professionalId} value={pro.professionalId}>
+                          {pro.professionalName}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Hora:
+                    <select name="time" value={newAppointment.time} onChange={handleChange}>
+                      {timeSlots.map((time) => (
+                        <option key={time} value={time} disabled={!!getAppointmentForTime(time)}>
+                          {time}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="full-width">
+                    Motivo:
+                    <input
+                      type="text"
+                      name="reason"
+                      value={newAppointment.reason}
+                      onChange={handleChange}
+                    />
+                  </label>
+                  <label className="full-width">
+                    Notas:
+                    <textarea name="notes" value={newAppointment.notes} onChange={handleChange} />
+                  </label>
+                </div>
+
+                <div className="d-flex justify-content-center align-items-center">
+                  <button className="modal-buttons" type="submit" disabled={isUpdating}>
+                    {isEditMode ? 'Actualizar' : 'Guardar'}
+                  </button>
+                  <button className="modal-buttons" type="button" onClick={closeModal}>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
-            <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
-            <form onSubmit={handleSubmit} className="form-turno">
-              <div className="form-grid">
-                {/* Campos del formulario */}
-                <label>
-                  Paciente:
-                  <input
-                    type="text"
-                    value={nameSearch}
-                    readOnly={!!nameSearch && isEditMode}
-                    onChange={(e) => {
-                      setNameSearch(e.target.value);
-                      if (!isEditMode) setDniSearch('');
-                    }}
-                    list="patientsByName"
-                    placeholder="Escribí el nombre"
-                  />
-                  <datalist id="patientsByName">
-                    {filteredPatients.map((p) => (
-                      <option key={p.id} value={p.fullName} />
-                    ))}
-                  </datalist>
-                </label>
-                <label>
-                  DNI:
-                  <input
-                    type="text"
-                    value={dniSearch}
-                    readOnly={!!dniSearch && isEditMode}
-                    onChange={(e) => {
-                      setDniSearch(e.target.value);
-                      if (!isEditMode) setNameSearch('');
-                    }}
-                    list="patientsByDni"
-                    placeholder="Escribí el DNI"
-                  />
-                  <datalist id="patientsByDni">
-                    {filteredPatients.map((p) => (
-                      <option key={p.id} value={p.documentNumber} />
-                    ))}
-                  </datalist>
-                </label>
-                <label>
-                  Profesional:
-                  <select
-                    value={selectedProfessional?.professionalId || ''}
-                    onChange={(e) => {
-                      const pro = professionals.find(
-                        (p) => p.professionalId === Number(e.target.value)
-                      );
-                      if (pro) setSelectedProfessional(pro);
-                    }}
-                  >
-                    <option value="">Seleccioná un profesional</option>
-                    {filteredProfessionals.map((pro) => (
-                      <option key={pro.professionalId} value={pro.professionalId}>
-                        {pro.professionalName}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  Hora:
-                  <select name="time" value={newAppointment.time} onChange={handleChange}>
-                    {timeSlots.map((time) => (
-                      <option key={time} value={time} disabled={!!getAppointmentForTime(time)}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="full-width">
-                  Motivo:
-                  <input
-                    type="text"
-                    name="reason"
-                    value={newAppointment.reason}
-                    onChange={handleChange}
-                  />
-                </label>
-                <label className="full-width">
-                  Notas:
-                  <textarea name="notes" value={newAppointment.notes} onChange={handleChange} />
-                </label>
-              </div>
-
-              <div className="d-flex justify-content-center align-items-center">
-                <button className="modal-buttons" type="submit" disabled={isUpdating}>
-                  {isEditMode ? 'Actualizar' : 'Guardar'}
-                </button>
-                <button className="modal-buttons" type="button" onClick={closeModal}>
-                  Cancelar
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
-
+        )}
+      </div>
       <section>
         <div className="text-md-start px-2">
           <h3 className="App-main-title text-white">Agenda de turnos</h3>

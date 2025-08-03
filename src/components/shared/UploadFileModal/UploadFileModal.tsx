@@ -45,14 +45,19 @@ const UploadFileModal: React.FC<Props> = ({ isOpen, entryId, onClose, onUploaded
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="custom-modal">
-        <div className="modal-header d-flex justify-content-end">
+    <div className="modalUploadModal-overlay">
+      <div className="custom-modalUploadModal">
+        <div className="modalUploadModal-header d-flex justify-content-end">
           <button className="btn-close" onClick={onClose} />
         </div>
         <h2>Agregar archivos adjuntos</h2>
 
-        <input type="file" className="form-control mb-3" multiple onChange={handleChange} />
+        <input
+          type="file"
+          className="form-control mb-3 inputUploadModal"
+          multiple
+          onChange={handleChange}
+        />
 
         {files.length > 0 && (
           <ul className="list-group mb-3">
@@ -75,13 +80,13 @@ const UploadFileModal: React.FC<Props> = ({ isOpen, entryId, onClose, onUploaded
 
         <div className="d-flex justify-content-end">
           <button
-            className="btn btn-primary me-2"
+            className="btn btn-primary me-2 buttonUploadModal"
             disabled={!files.length || loading}
             onClick={handleUpload}
           >
             {loading ? 'Subiendo…' : `Subir ${files.length} archivo(s)`}
           </button>
-          <button className="btn btn-secondary" onClick={onClose}>
+          <button className="btn btn-secondary buttonUploadModal" onClick={onClose}>
             Cancelar
           </button>
         </div>

@@ -27,21 +27,21 @@ const EditDescriptionModal: React.FC<Props> = ({
   if (!isOpen || entryId == null) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="custom-modal">
-        <div className="modal-header d-flex justify-content-end">
+    <div className="modalEditDesc-overlay">
+      <div className="custom-modalEditDesc">
+        <div className="modalEditDesc-header d-flex justify-content-end">
           <button className="btn-close" onClick={onClose} />
         </div>
         <h2>Editar descripción</h2>
         <textarea
-          className="form-control mb-3"
+          className="form-control mb-3 textarea-modalEditDesc"
           rows={4}
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
         />
         <div className="d-flex justify-content-end">
           <button
-            className="btn btn-primary me-2"
+            className="btn btn-primary me-2 btnEditDesc"
             disabled={loading}
             onClick={async () => {
               setLoading(true);
