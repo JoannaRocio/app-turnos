@@ -245,7 +245,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
 
             {/* Botones */}
             <div className="d-flex justify-content-center align-items-center">
-              <button className="modal-buttons" type="submit" disabled={!isDirty}>
+              <button className="modal-buttons" type="submit" disabled={!isDirty || isUpdating}>
                 Guardar
               </button>
               <button className="modal-buttons" type="button" onClick={onClose}>
