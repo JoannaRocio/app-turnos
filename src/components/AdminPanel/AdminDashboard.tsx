@@ -205,7 +205,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
             isOpen={showConfirm}
             title="Confirmar eliminación"
             message={`¿Estás segura que deseas eliminar el usuario de "${selectedUser?.username}"?`}
-            onConfirm={() => {
+            onConfirm={async () => {
               if (selectedUser) {
                 handleDeleteConfirmed(selectedUser);
               } else {

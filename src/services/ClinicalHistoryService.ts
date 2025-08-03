@@ -62,6 +62,22 @@ class ClinicalHistoryService {
     });
   }
 
+  /** Actualizar sólo la descripción */
+  static async updateDescription(entryId: number, description: string): Promise<void> {
+    await Api.put(`${BASE_URL}/${entryId}/description`, { description });
+  }
+
+  /** Reemplazar la lista de procedimientos (añadir o eliminar) */
+  static async updateProcedures(entryId: number, procedureIds: number[]): Promise<void> {
+    await Api.put(`${BASE_URL}/${entryId}/procedures`, { procedureIds });
+  }
+
+  /** Eliminar un archivo existente */
+  static async deleteFile(fileId: number): Promise<void> {
+    await Api.delete(`${BASE_URL}/files/${fileId}`);
+  }
+
+  /** Borrar toda la entrada */
   static async deleteEntry(entryId: number): Promise<void> {
     await Api.delete(`${BASE_URL}/${entryId}`);
   }

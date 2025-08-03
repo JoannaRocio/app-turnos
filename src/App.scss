@@ -404,6 +404,10 @@ body.modal-open {
   height: 100vh;
 }
 
+.filter-input {
+  font-size: 1.4rem;
+}
+
 // Mobile tablas y button
 
 // Responsive tabla y filtro
@@ -464,7 +468,7 @@ body.modal-open {
 }
 
 .scrollable-cell {
-  max-width: 300px;
+  max-width: 420px;
   overflow-x: auto;
   white-space: nowrap;
   display: block;
