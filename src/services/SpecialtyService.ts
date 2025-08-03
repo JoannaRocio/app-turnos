@@ -3,7 +3,7 @@ import Api from './Api';
 
 export interface Specialty {
   id: number;
-  name: string;
+  name: string[];
 }
 
 class SpecialtyService {
@@ -15,7 +15,7 @@ class SpecialtyService {
 
     const mapped: Specialty[] = data.map((item) => ({
       id: item.id,
-      name: item.name,
+      name: [item.name],
     }));
 
     return mapped;

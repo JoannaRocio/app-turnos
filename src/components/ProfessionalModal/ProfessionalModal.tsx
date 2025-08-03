@@ -5,7 +5,8 @@ import ProfessionalAvailabilityForm, {
   AvailabilityFormRef,
 } from '../ProfessionalAbiavility/ProfessionalAvailability';
 import { daysOfWeek } from '../../constants/daysOfWeek';
-import SpecialtyService from '../../services/SpecialtyService';
+import SpecialtyService, { Specialty } from '../../services/SpecialtyService';
+import Select, { MultiValue } from 'react-select';
 
 interface ProfessionalModalProps {
   isOpen: boolean;
@@ -20,6 +21,8 @@ interface TimeRange {
   end_time: string;
 }
 
+type Option = { value: number; label: string };
+
 const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
   isOpen,
   onClose,
@@ -33,83 +36,95 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
     documentType: '',
     documentNumber: '',
     phone: '',
-    specialties: '',
+    specialtyIds: [],
     schedules: [],
   });
-
-  const [savedAvailability, setSavedAvailability] = useState<Record<string, TimeRange[]>>({});
-  const availabilityRef = useRef<AvailabilityFormRef>(null);
-  const [specialties, setSpecialties] = useState<{ id: number; name: string }[]>([]);
-
+  const [originalForm, setOriginalForm] = useState<Partial<Professional>>({});
+  const [availabilityDirty, setAvailabilityDirty] = useState(false);
+  const initSpec = useRef(false);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
   useEffect(() => {
-    const loadSpecialties = async () => {
-      try {
-        const data = await SpecialtyService.getAll();
-        setSpecialties(data);
-      } catch (err) {
-        console.error('Error al cargar especialidades', err);
-      }
-    };
-
-    loadSpecialties();
+    SpecialtyService.getAll().then(setSpecialties);
   }, []);
 
+  const options: Option[] = specialties.map((s) => ({
+    value: s.id,
+    label: Array.isArray(s.name) ? s.name.join(', ') : s.name,
+  }));
+
+  // --- Cuando cambia `professional`, prefill + guardo originalForm ---
   useEffect(() => {
     if (professional) {
-      setForm(professional);
-
-      const availabilityMap: Record<string, TimeRange[]> = {};
-      daysOfWeek.forEach((day) => {
-        availabilityMap[day] = [];
-      });
-
-      professional.schedules?.forEach((s) => {
-        const day = s.dayOfWeek;
-        const start = s.startTime?.slice(0, 5);
-        const end = s.endTime?.slice(0, 5);
-
-        if (day && start && end) {
-          availabilityMap[day].push({ start_time: start, end_time: end });
-        }
-      });
-
-      daysOfWeek.forEach((day) => {
-        if (availabilityMap[day].length === 0) {
-          availabilityMap[day] = [{ start_time: '', end_time: '' }];
-        }
-      });
-
-      setSavedAvailability(availabilityMap);
+      const loaded: Partial<Professional> = {
+        professionalId: professional.professionalId ?? 0,
+        professionalName: professional.professionalName ?? '',
+        documentType: professional.documentType ?? '',
+        documentNumber: professional.documentNumber ?? '',
+        phone: professional.phone ?? '',
+        specialtyIds: professional.specialtyIds ?? [],
+        schedules: professional.schedules ?? [],
+      };
+      setForm(loaded);
+      setOriginalForm(loaded);
+      setAvailabilityDirty(false);
+      initSpec.current = false;
     }
   }, [professional]);
 
-  if (!isOpen || !form) return null;
+  // Mapear specialtyNames → specialtyIds solo una vez
+  useEffect(() => {
+    if (professional && options.length && professional.specialtyNames && !initSpec.current) {
+      const matched = options
+        .filter((o) => professional.specialtyNames!.includes(o.label))
+        .map((o) => o.value);
+      setForm((f) => ({ ...f, specialtyIds: matched }));
+      initSpec.current = true;
+    }
+  }, [options, professional]);
 
+  // --- Disponibilidad ---
+  const [savedAvailability, setSavedAvailability] = useState<Record<string, TimeRange[]>>({});
+  const availabilityRef = useRef<AvailabilityFormRef>(null);
+
+  useEffect(() => {
+    if (professional) {
+      const map: Record<string, TimeRange[]> = {};
+      daysOfWeek.forEach((d) => (map[d] = []));
+      professional.schedules?.forEach((s) => {
+        map[s.dayOfWeek]?.push({
+          start_time: s.startTime?.slice(0, 5) ?? '',
+          end_time: s.endTime?.slice(0, 5) ?? '',
+        });
+      });
+      daysOfWeek.forEach((d) => {
+        if (!map[d].length) map[d] = [{ start_time: '', end_time: '' }];
+      });
+      setSavedAvailability(map);
+    }
+  }, [professional]);
+
+  if (!isOpen) return null;
+
+  // --- Submit ---
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     const entries = availabilityRef.current?.getAvailabilityData() || [];
-    const formattedSchedules = entries.map((entry) => ({
-      dayOfWeek: entry.day_of_week,
-      startTime: entry.start_time,
-      endTime: entry.end_time,
+    const schedules = entries.map((e: { day_of_week: any; start_time: any; end_time: any }) => ({
+      dayOfWeek: e.day_of_week,
+      startTime: e.start_time,
+      endTime: e.end_time,
     }));
-
-    const updatedForm = {
-      ...form,
-      schedules: formattedSchedules,
-    };
-
-    setForm(updatedForm);
-    onSave(updatedForm);
+    const updated: Partial<Professional> = { ...form, schedules };
+    onSave(updated);
   };
 
+  // --- Detectar cambios ---
+  const formDirty = JSON.stringify(form) !== JSON.stringify(originalForm);
+  const isDirty = formDirty || availabilityDirty;
   return (
     <section>
-      <div
-        className={`modal-overlay-professionalModal ${professional?.professionalId ? 'edit-mode' : ''}`}
-      >
-        <div className={`modal modal-patient ${professional?.professionalId ? 'edit-mode' : ''}`}>
+      <div className={`modal-overlay-professionalModal ${form.professionalId ? 'edit-mode' : ''}`}>
+        <div className={`modal modal-patient ${form.professionalId ? 'edit-mode' : ''}`}>
           <div className="modal-header">
             <button
               type="button"
@@ -124,9 +139,9 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
             />
           </div>
           <form onSubmit={handleSubmit} className="form-paciente">
-            <h4>{professional?.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
+            <h4>{form.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
 
-            {/* Nombre completo */}
+            {/* Nombre */}
             <div className="form-group">
               <label htmlFor="professionalName">Nombre completo</label>
               <input
@@ -144,7 +159,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
               )}
             </div>
 
-            {/* Tipo y número de documento */}
+            {/* Documento */}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="documentType">Tipo de documento</label>
@@ -175,13 +190,13 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                   onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
                   placeholder="Número de documento"
                 />
-                {(!form.documentNumber || !form.documentNumber.toString().trim()) && (
+                {!form.documentNumber?.trim() && (
                   <span className="field-error">Campo obligatorio</span>
                 )}
               </div>
             </div>
 
-            {/* Teléfono y especialidad */}
+            {/* Teléfono y Especialidades */}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="phone">Teléfono</label>
@@ -199,45 +214,38 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="specialties">Especialidad</label>
-                <select
-                  id="specialties"
-                  value={form.specialties}
-                  onChange={(e) => setForm({ ...form, specialties: e.target.value })}
-                >
-                  <option value="">Seleccione una especialidad</option>
-                  {specialties.map((s) => (
-                    <option key={s.id} value={s.name}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-                {!form.specialties && <span className="field-error">Campo obligatorio</span>}
+                <label htmlFor="specialties">Especialidades</label>
+                <Select<Option, true>
+                  inputId="specialties"
+                  options={options}
+                  isMulti
+                  closeMenuOnSelect={false}
+                  hideSelectedOptions={false}
+                  value={options.filter((o) => form.specialtyIds?.includes(o.value))}
+                  onChange={(sel: MultiValue<Option>) =>
+                    setForm({ ...form, specialtyIds: sel.map((o) => o.value) })
+                  }
+                  placeholder="Seleccioná especialidades…"
+                />
+                {!form.specialtyIds?.length && (
+                  <span className="field-error">Debe seleccionar al menos una especialidad</span>
+                )}
               </div>
             </div>
 
-            {/* Componente de disponibilidad */}
-            {professional?.professionalId !== undefined && (
+            {/* Disponibilidad */}
+            {form.professionalId !== undefined && (
               <ProfessionalAvailabilityForm
                 ref={availabilityRef}
-                professionalId={professional.professionalId}
+                professionalId={form.professionalId}
                 initialAvailability={savedAvailability}
+                onChange={() => setAvailabilityDirty(true)}
               />
             )}
 
             {/* Botones */}
             <div className="d-flex justify-content-center align-items-center">
-              <button
-                className="modal-buttons"
-                type="submit"
-                disabled={
-                  !form.professionalName ||
-                  !form.documentType ||
-                  !form.documentNumber ||
-                  !form.specialties ||
-                  isUpdating
-                }
-              >
+              <button className="modal-buttons" type="submit" disabled={!isDirty}>
                 Guardar
               </button>
               <button className="modal-buttons" type="button" onClick={onClose}>

@@ -12,5 +12,6 @@ npm install date-fns
 npm install axios
 npm install --save-dev @types/axios
 npm install bootstrap-icons
+npm install react-select
 
 npm install

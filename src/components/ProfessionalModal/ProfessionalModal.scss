@@ -72,6 +72,28 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
+/* En tu CSS (o SCSS) */
+.specialties-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+  max-height: 200px; /* Ajusta según convenga */
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+/* Opcional: para ocultar barra muy gruesa en Webkit */
+.specialties-container::-webkit-scrollbar {
+  width: 6px;
+}
+.specialties-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
 /* Fila de inputs */
 .form-row {
   display: flex;

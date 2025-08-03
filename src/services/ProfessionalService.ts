@@ -17,6 +17,8 @@ class ProfessionalService {
       specialties: item.specialties ?? '-',
       schedules: item.schedules ?? [],
       professionalState: item.professionalState ?? '-',
+      specialtyNames: item.specialtyNames ?? [],
+      specialtyIds: item.specialtyIds ?? [],
     }));
 
     // Ordenar activos primero

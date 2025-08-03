@@ -424,6 +424,24 @@ const AppointmentsComponent: React.FC<Props> = ({
             </div>
           </div>
         )}
+
+        <ConfirmModal
+          isOpen={showConfirm}
+          title="Confirmar eliminación"
+          message={`¿Estás segura que deseas eliminar el turno de "${currentAppointment?.patient.fullName}"?`}
+          onConfirm={async () => {
+            if (currentAppointment) {
+              await handleDeleteConfirmed(currentAppointment);
+              setShowConfirm(false);
+            } else {
+              alert('No ha seleccionado ningún turno disponible.');
+            }
+          }}
+          onCancel={() => {
+            setShowConfirm(false);
+            setApptToDelete(null);
+          }}
+        />
       </div>
       <section>
         <div className="text-md-start px-2">
@@ -512,24 +530,6 @@ const AppointmentsComponent: React.FC<Props> = ({
                       );
                     })}
                   </tbody>
-
-                  <ConfirmModal
-                    isOpen={showConfirm}
-                    title="Confirmar eliminación"
-                    message={`¿Estás segura que deseas eliminar el turno de "${currentAppointment?.patient.fullName}"?`}
-                    onConfirm={async () => {
-                      if (currentAppointment) {
-                        await handleDeleteConfirmed(currentAppointment);
-                        setShowConfirm(false);
-                      } else {
-                        alert('No ha seleccionado ningún turno disponible.');
-                      }
-                    }}
-                    onCancel={() => {
-                      setShowConfirm(false);
-                      setApptToDelete(null);
-                    }}
-                  />
                 </table>
               </div>
             </div>

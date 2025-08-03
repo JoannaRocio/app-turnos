@@ -42,3 +42,24 @@
     width: 100px;
   }
 }
+
+.specialties-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  padding: 0.25em 0.5em;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.me-1 {
+  margin-right: 0.25rem;
+}
+.mb-1 {
+  margin-bottom: 0.25rem;
+}

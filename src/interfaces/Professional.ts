@@ -10,7 +10,9 @@ export interface Professional {
   documentType: string;
   documentNumber: string;
   phone: string;
-  specialties: string;
+  specialties: number[];
   schedules: Schedule[];
   professionalState: string;
+  specialtyNames: string[];
+  specialtyIds: number[];
 }

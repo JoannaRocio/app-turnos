@@ -16,6 +16,7 @@ interface AvailabilityEntry {
 interface AvailabilityFormProps {
   professionalId: number;
   initialAvailability?: Record<string, TimeRange[]>;
+  onChange?: () => void;
 }
 
 export interface AvailabilityFormRef {
@@ -34,7 +35,7 @@ const dayLabels: Record<string, string> = {
 };
 
 const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, AvailabilityFormProps>(
-  ({ professionalId, initialAvailability }, ref) => {
+  ({ professionalId, initialAvailability, onChange }, ref) => {
     const [availability, setAvailability] = useState<Record<string, TimeRange[]>>(() => {
       const initial: Record<string, TimeRange[]> = {};
       daysOfWeek.forEach((day) => {
@@ -87,6 +88,7 @@ const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, Availabilit
         updated[index] = { ...updated[index], [field]: value };
         return { ...prev, [day]: updated };
       });
+      onChange?.();
     };
 
     const handleAddRange = (day: string) => {
@@ -94,6 +96,7 @@ const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, Availabilit
         ...prev,
         [day]: [...prev[day], { start_time: '', end_time: '' }],
       }));
+      onChange?.();
     };
 
     const handleRemoveRange = (day: string, index: number) => {
@@ -102,6 +105,7 @@ const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, Availabilit
         updated.splice(index, 1);
         return { ...prev, [day]: updated.length ? updated : [{ start_time: '', end_time: '' }] };
       });
+      onChange?.();
     };
 
     const handleClearRange = (day: string, index: number) => {
@@ -110,6 +114,7 @@ const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, Availabilit
         updated[index] = { start_time: '', end_time: '' };
         return { ...prev, [day]: updated };
       });
+      onChange?.();
     };
 
     const generateTimeOptions = () => {

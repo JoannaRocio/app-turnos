@@ -132,7 +132,7 @@ const ProfessionalsComponent: React.FC<{
       documentType: '',
       documentNumber: '',
       phone: '',
-      specialties: '',
+      specialties: [],
     };
     setSelectedProfessional(emptyProfessional);
     setShowEditModal(true);
@@ -220,19 +220,16 @@ const ProfessionalsComponent: React.FC<{
                     </div>
                   </td>
                   <td>
-                    <span
+                    <div
                       className="ellipsis-cell"
-                      title={
-                        Array.isArray(professional?.specialties)
-                          ? professional.specialties.join(', ')
-                          : professional?.specialties || '-'
-                      }
+                      title={professional?.specialtyNames?.join(', ') ?? '-'}
                     >
-                      {Array.isArray(professional.specialties)
-                        ? professional.specialties.join(', ')
-                        : professional?.specialties || '-'}
-                    </span>
+                      {professional?.specialtyNames?.length
+                        ? professional.specialtyNames.map((name) => <div key={name}>{name}</div>)
+                        : '-'}
+                    </div>
                   </td>
+
                   <td>-</td>
                   <td>
                     {professional
