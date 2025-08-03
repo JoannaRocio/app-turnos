@@ -1,0 +1,130 @@
+/* EditProcedureModal.scss */
+
+.modalEditProc-overlay {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000; /* ensure it floats above everything else */
+  padding: 1rem;
+}
+
+.custom-modalEditProc {
+  background: var(--color-white-light);
+  color: var(--color-neutral-dark);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalEditProc-header {
+  display: flex;
+  justify-content: flex-end;
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.6rem;
+    color: var(--color-neutral-dark);
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.procedures-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1.5rem;
+
+  .form-check {
+    margin-bottom: 0.5rem;
+
+    .form-check-input {
+      width: 1.2rem;
+      height: 1.2rem;
+      margin-right: 0.5rem;
+    }
+
+    .form-check-label {
+      font-size: 1.4rem;
+    }
+  }
+}
+
+.modalEditProc-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  .btn {
+    font-size: 1.4rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .btn-primary {
+    background-color: var(--color-secondary-light);
+    color: var(--color-white-light);
+
+    &:hover {
+      background-color: var(--color-secondary-hover);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-secondary {
+    background-color: var(--color-neutral-light);
+    color: var(--color-white-light);
+
+    &:hover {
+      background-color: var(--color-neutral-hover);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .custom-modalEditProc {
+    padding: 1rem;
+    max-width: 90vw;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  .procedures-list .form-check-label {
+    font-size: 1.2rem;
+  }
+
+  .modalEditProc-footer .btn {
+    font-size: 1.2rem;
+    padding: 0.4rem 0.8rem;
+  }
+}

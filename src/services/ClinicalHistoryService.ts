@@ -62,6 +62,29 @@ class ClinicalHistoryService {
     });
   }
 
+  static async downloadFile(id: number, fileName: string) {
+    // fuerza la respuesta como blob
+    const res = await Api.get<Blob>(`/clinical-history/files/${id}/download`, {
+      responseType: 'blob',
+    });
+    // crea un URL local y dispara la descarga
+    const url = window.URL.createObjectURL(res.data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+
+  static async fetchFileBlob(id: number): Promise<Blob> {
+    const res = await Api.get<Blob>(`/clinical-history/files/${id}/download`, {
+      responseType: 'blob',
+    });
+    return res.data;
+  }
+
   /** Actualizar sólo la descripción */
   static async updateDescription(entryId: number, description: string): Promise<void> {
     await Api.put(`${BASE_URL}/${entryId}/description`, { description });
@@ -69,7 +92,8 @@ class ClinicalHistoryService {
 
   /** Reemplazar la lista de procedimientos (añadir o eliminar) */
   static async updateProcedures(entryId: number, procedureIds: number[]): Promise<void> {
-    await Api.put(`${BASE_URL}/${entryId}/procedures`, { procedureIds });
+    const url = `${BASE_URL}/${entryId}/procedures`;
+    await Api.post<void>(url, { procedureIds });
   }
 
   /** Eliminar un archivo existente */
@@ -81,6 +105,12 @@ class ClinicalHistoryService {
   static async deleteEntry(entryId: number): Promise<void> {
     await Api.delete(`${BASE_URL}/${entryId}`);
   }
+
+  // agregar procedimientos
+  // static async updateProcedures(entryId: number, procedureIds: number[]): Promise<void> {
+  //   const url = `${this.BASE_URL}/${entryId}/procedures`;
+  //   await Api.put<void>(url, { procedureIds });
+  // }
 }
 
 export default ClinicalHistoryService;

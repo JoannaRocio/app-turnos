@@ -111,7 +111,7 @@ const AppointmentsComponent: React.FC<Props> = ({
     documentNumber: '',
     time: '',
     reason: '',
-    notes: '',
+    note: '',
   });
 
   useEffect(() => {
@@ -200,7 +200,7 @@ const AppointmentsComponent: React.FC<Props> = ({
         documentNumber: apptExists.patient.documentNumber,
         time: time,
         reason: apptExists?.reason ?? '-',
-        notes: patient?.note ?? '-',
+        note: patient?.note ?? '-',
       });
     } else {
       setIsEditMode(false);
@@ -210,7 +210,7 @@ const AppointmentsComponent: React.FC<Props> = ({
         documentNumber: '',
         time: time,
         reason: '',
-        notes: '',
+        note: '',
       });
     }
     setIsModalOpen(true);
@@ -243,7 +243,7 @@ const AppointmentsComponent: React.FC<Props> = ({
       reason: newAppointment.reason,
       state: 'PENDIENTE',
       professionalId: selectedProfessional?.professionalId ?? professionals[0].professionalId,
-      notes: newAppointment.notes,
+      note: newAppointment.note,
     };
 
     try {
@@ -408,7 +408,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                   </label>
                   <label className="full-width">
                     Notas:
-                    <textarea name="notes" value={newAppointment.notes} onChange={handleChange} />
+                    <textarea name="note" value={newAppointment.note} onChange={handleChange} />
                   </label>
                 </div>
 
@@ -460,7 +460,7 @@ const AppointmentsComponent: React.FC<Props> = ({
               />
             </div>
             {/* Tabla central */}
-            <div className="col-12 col-md-8 order-2">
+            <div className="col-12 col-md-7 order-2">
               <div className={clsx('App-table-wrapper', { 'table-responsive': isMobile })}>
                 <table className="App-table">
                   <thead>
@@ -534,7 +534,7 @@ const AppointmentsComponent: React.FC<Props> = ({
               </div>
             </div>
             {/* Calendario */}
-            <div className="col-12 col-md-2 order-1 order-md-2">
+            <div className="col-12 col-md-3 order-1 order-md-2">
               <CalendarComponent onDateSelect={handleDateSelect} />
             </div>
           </div>

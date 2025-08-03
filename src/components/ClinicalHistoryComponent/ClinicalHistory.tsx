@@ -9,6 +9,7 @@ import { Procedure } from '../../interfaces/Procedure';
 import EditDescriptionModal from '../shared/EditDescriptionModal/EditDescriptionModal';
 import UploadFileModal from '../shared/UploadFileModal/UploadFileModal';
 import { toast } from 'react-toastify';
+import EditProcedureModal from '../shared/EditProcedureModal/EditProcedureModal';
 
 interface Props {
   data: ClinicalHistoryEntry[];
@@ -17,24 +18,15 @@ interface Props {
   professionalId: number;
 }
 
+interface FileEntry {
+  id: number;
+  fileName: string;
+}
+
 const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, professionalId }) => {
   // Cartel de confirmación para eliminar Historia clinica
   const [showConfirm, setShowConfirm] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<ClinicalHistoryEntry | null>(null);
-
-  // const handleDeleteConfirmed = async (entry: ClinicalHistoryEntry) => {
-  //   try {
-  //     await ClinicalHistoryService.deleteEntry(entry.id);
-
-  //     const updated = entries.filter((e) => e.id !== entry.id);
-  //     setEntries(updated);
-  //   } catch (err: any) {
-  //     console.error('Error al eliminar:', err);
-  //   } finally {
-  //     setShowConfirm(false);
-  //     setEntryToDelete(null);
-  //   }
-  // };
 
   // Tratamiento
   const [selectedTreatments, setSelectedTreatments] = useState<number[]>([]);
@@ -51,7 +43,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
       }
     };
     fetchProcedures();
-  }, []);
+  }, [data]);
 
   // Funciones de agregar/quitar
   const handleAddTreatment = () => {
@@ -68,7 +60,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
 
   // Entrada nueva
   const [entries, setEntries] = useState(data);
-  const [, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -96,6 +88,8 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
 
         // 2) Actualizar procedimientos
         await ClinicalHistoryService.updateProcedures(entryId, selectedTreatments);
+
+        toast.success('Entrada de historia clínica actualizada correctamente.');
       } else {
         // ── MODO CREACIÓN ──
         entryId = await ClinicalHistoryService.createClinicalHistory(
@@ -104,6 +98,8 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
           professionalId,
           selectedTreatments
         );
+
+        toast.success('Nueva entrada de historia clínica creada correctamente.');
       }
 
       // 3) Subir nuevos archivos (si hay)
@@ -114,16 +110,17 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
       // 4) Refrescar lista completa
       const refreshed = await ClinicalHistoryService.getOrCreate(patient, professionalId);
       setEntries(refreshed);
-
+    } catch (err: any) {
+      console.error(err);
+      const message = err?.message || 'Error al guardar la entrada clínica.';
+      setError(message);
+      toast.error(message);
+    } finally {
       // 5) Reset formulario y salir de edición
       setNotes('');
       setUploadedFiles([]);
       setSelectedTreatments([]);
       setEditingEntry(null);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Error al guardar la entrada clínica.');
-    } finally {
       setLoading(false);
     }
   };
@@ -164,6 +161,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   // Para editar descripción
   const [showDescModal, setShowDescModal] = useState(false);
   const [showFileModal, setShowFileModal] = useState(false);
+  const [showProcModal, setShowProcModal] = useState(false);
 
   // función para recargar entries, con toast de éxito/ error
   const refreshEntries = async () => {
@@ -219,6 +217,30 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   // Al inicio de tu componente:
   const [showFileConfirm, setShowFileConfirm] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ id: number; fileName: string } | null>(null);
+
+  // Archivo previsualización
+
+  const [filePreviews, setFilePreviews] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    // Genera vistas previas sólo para archivos de imagen
+    entries.forEach((entry) => {
+      entry.files.forEach((file: FileEntry) => {
+        if (/\.(jpe?g|png|gif)$/i.test(file.fileName) && !filePreviews[file.id]) {
+          ClinicalHistoryService.fetchFileBlob(file.id)
+            .then((blob) => {
+              const url = URL.createObjectURL(blob);
+              setFilePreviews((prev) => ({ ...prev, [file.id]: url }));
+            })
+            .catch(console.error);
+        }
+      });
+    });
+    // al desmontar, libera los objectURLs
+    return () => {
+      Object.values(filePreviews).forEach(URL.revokeObjectURL);
+    };
+  }, [entries, filePreviews]);
 
   return (
     <div className="container my-4">
@@ -397,7 +419,8 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
               className="btn btn-success btn-lg fs-4"
               onClick={handleSave}
               disabled={
-                selectedTreatments.length === 0 && notes.trim() === '' && !uploadedFiles.length
+                loading ||
+                (selectedTreatments.length === 0 && notes.trim() === '' && !uploadedFiles.length)
               }
             >
               Guardar entrada clínica
@@ -420,6 +443,17 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
                   <div className="card-body">
                     {/* Botones de editar y eliminar */}
                     <div className="container-buttons-clinicalHistory top-0 end-0 m-2 d-flex gap-2 align-items-center">
+                      <button
+                        className="btn btn-info d-flex align-items-center gap-1 btn-lg"
+                        title="Editar procedimientos"
+                        onClick={() => {
+                          setEditingEntry(entry);
+                          setShowProcModal(true);
+                        }}
+                      >
+                        <i className="bi bi-list-check"></i> Editar procedimientos
+                      </button>
+
                       <button
                         className="btn btn-warning d-flex align-items-center gap-1 btn-lg"
                         title="Agregar archivo"
@@ -491,34 +525,31 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
 
                         <ul className="mt-2 list-unstyled">
                           {entry.files.map((file: { id: number; fileName: string }) => {
-                            const downloadUrl = `${process.env.REACT_APP_API_URL}/clinical-history/files/${file.id}/download`;
                             const isImage = /\.(jpg|jpeg|png|gif)$/i.test(file.fileName);
                             return (
                               <li key={file.id} className="d-flex align-items-center mb-2">
-                                {isImage ? (
-                                  <a
-                                    href={downloadUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    download={file.fileName}
-                                  >
+                                <button
+                                  type="button"
+                                  className="btn btn-link p-0 me-2"
+                                  onClick={() =>
+                                    ClinicalHistoryService.downloadFile(file.id, file.fileName)
+                                  }
+                                >
+                                  {isImage ? (
                                     <img
-                                      src={downloadUrl}
+                                      src={filePreviews[file.id]}
                                       alt={file.fileName}
                                       style={{
-                                        maxWidth: '200px',
-                                        marginBottom: '0.5rem',
+                                        maxWidth: '100px',
                                         cursor: 'zoom-in',
                                         border: '1px solid #ccc',
-                                        borderRadius: '8px',
+                                        borderRadius: '4px',
                                       }}
                                     />
-                                  </a>
-                                ) : (
-                                  <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-                                    {file.fileName}
-                                  </a>
-                                )}
+                                  ) : (
+                                    <span>{file.fileName}</span>
+                                  )}
+                                </button>
 
                                 {/* Botón para eliminar el archivo */}
                                 <button
@@ -589,6 +620,14 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
         entryId={editingEntry?.id ?? null}
         onClose={() => setShowFileModal(false)}
         onUploaded={refreshEntries}
+      />
+
+      <EditProcedureModal
+        isOpen={showProcModal}
+        entryId={editingEntry?.id ?? null}
+        initialProcedureIds={editingEntry?.procedureIds ?? []}
+        onClose={() => setShowProcModal(false)}
+        onSaved={refreshEntries}
       />
     </div>
   );

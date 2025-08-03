@@ -134,3 +134,48 @@
     padding: 1rem 0;
   }
 }
+
+.container-buttons-clinicalHistory {
+  display: flex;
+  gap: 1rem;
+  // ya tenías: .top-0 .end-0 .m-2 etc, pero nos aseguramos
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  // estilos comunes a todos los btn
+  .btn {
+    font-size: 1.4rem;
+    padding: 0.5rem 1rem;
+  }
+
+  // responsive para móvil
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+
+    .btn {
+      width: 100%;
+      font-size: 1.2rem !important;
+      padding: 0.4rem 0.8rem !important;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .container-buttons-clinicalHistory {
+    position: static; // quito el absolute para que fluya dentro del flujo del card
+    margin-bottom: 1rem; // separo de lo que viene debajo
+    flex-wrap: wrap; // permiten varias filas si no caben
+    justify-content: flex-start;
+    width: 100%;
+    align-content: flex-end;
+  }
+  .container-buttons-clinicalHistory .btn {
+    flex: 1 1 48%; // dos botones por fila al 48% cada uno
+    max-width: 48%;
+    font-size: 1.2rem; // ajusta el tamaño de texto
+    padding: 0.4rem 0.6rem;
+  }
+}
