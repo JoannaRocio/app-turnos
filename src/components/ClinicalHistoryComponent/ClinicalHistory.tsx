@@ -22,19 +22,19 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
   const [showConfirm, setShowConfirm] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<ClinicalHistoryEntry | null>(null);
 
-  const handleDeleteConfirmed = async (entry: ClinicalHistoryEntry) => {
-    try {
-      await ClinicalHistoryService.deleteEntry(entry.id);
+  // const handleDeleteConfirmed = async (entry: ClinicalHistoryEntry) => {
+  //   try {
+  //     await ClinicalHistoryService.deleteEntry(entry.id);
 
-      const updated = entries.filter((e) => e.id !== entry.id);
-      setEntries(updated);
-    } catch (err: any) {
-      console.error('Error al eliminar:', err);
-    } finally {
-      setShowConfirm(false);
-      setEntryToDelete(null);
-    }
-  };
+  //     const updated = entries.filter((e) => e.id !== entry.id);
+  //     setEntries(updated);
+  //   } catch (err: any) {
+  //     console.error('Error al eliminar:', err);
+  //   } finally {
+  //     setShowConfirm(false);
+  //     setEntryToDelete(null);
+  //   }
+  // };
 
   // Tratamiento
   const [selectedTreatments, setSelectedTreatments] = useState<number[]>([]);
