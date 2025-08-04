@@ -1,3 +1,4 @@
+import { ClinicalHistoryEntry } from '../interfaces/ClinicalHistoryEntry';
 import { Patient } from '../interfaces/Patient';
 import Api from './Api';
 
@@ -44,9 +45,11 @@ class ClinicalHistoryService {
       description,
     };
 
-    await Api.post<string>(`${BASE_URL}`, body);
+    // 2) Usa el tipo correcto en el post
+    const res = await Api.post<ClinicalHistoryEntry>(BASE_URL, body);
 
-    return 0; // o podrías devolver `res.data` si tu backend lo devuelve
+    // 3) Retorna el id que vino en el body de la respuesta
+    return res.data.id;
   }
 
   static async uploadFile(entryId: number, file: File): Promise<void> {
