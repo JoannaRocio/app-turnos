@@ -629,7 +629,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                 month: 'long',
               })}
             </h4>
-            {role === 'USUARIO' && !showClinicalHistory && (
+            {!showClinicalHistory && (
               <button
                 title="Imprimir turnos"
                 className="btn App-buttonTertiary"
@@ -773,8 +773,12 @@ const AppointmentsComponent: React.FC<Props> = ({
                                 isOpen={activeDropdownIndex === index}
                                 onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                                 onView={() => openClinicalHistory(appt)}
-                                onEdit={() => openModalForTime(time)}
-                                onDelete={() => confirmDelete(appt)}
+                                onEdit={
+                                  role !== 'USUARIO' ? () => openModalForTime(time) : undefined
+                                }
+                                onDelete={
+                                  role !== 'USUARIO' ? () => confirmDelete(appt) : undefined
+                                }
                               />
                             </div>
                           </td>

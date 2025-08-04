@@ -288,7 +288,7 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
                       isOpen={activeDropdownIndex === index}
                       onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                       onView={() => openClinicalHistory(patient)}
-                      onEdit={() => openPatientModal(patient)}
+                      onEdit={role !== 'USUARIO' ? () => openPatientModal(patient) : undefined}
                     />
                   </td>
                 </tr>
