@@ -629,7 +629,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                 month: 'long',
               })}
             </h4>
-            {role === 'USUARIO' && (
+            {role === 'USUARIO' && !showClinicalHistory && (
               <button
                 title="Imprimir turnos"
                 className="btn App-buttonTertiary"
