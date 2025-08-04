@@ -44,9 +44,7 @@ class ClinicalHistoryService {
       description,
     };
 
-    const res = await Api.post<string>(`${BASE_URL}`, body);
-
-    return 0; // o podrías devolver `res.data` si tu backend lo devuelve
+    return 0;
   }
 
   static async uploadFile(entryId: number, file: File): Promise<void> {
