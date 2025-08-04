@@ -100,7 +100,7 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="Ingrese un email"
+                  placeholder="Ingrese su email"
                 />
               </div>
             </div>

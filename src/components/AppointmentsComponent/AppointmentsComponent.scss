@@ -251,7 +251,7 @@ button.dropdown-toggle:disabled {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
+  // max-width: 120px;
 }
 
 .clickable-row:hover {
@@ -314,4 +314,59 @@ button.dropdown-toggle:disabled {
       }
     }
   }
+}
+
+.new-patient-switch {
+  .form-check-input:disabled + .form-check-label {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    color: #6c757d;
+  }
+
+  .form-check-input:disabled {
+    background-color: #e9ecef !important;
+    border-color: #ced4da !important;
+  }
+}
+
+.new-patient-switch {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  .guest-text {
+    position: relative;
+    z-index: 2;
+    margin-right: 0.5rem;
+    font-weight: bold;
+
+    &.yes {
+      color: #28a745;
+    }
+    &.no {
+      color: #6c757d;
+    }
+  }
+
+  .form-check-input {
+    position: relative;
+    z-index: 1;
+    margin-left: 0;
+    transform: scale(1.2);
+    cursor: pointer;
+  }
+}
+
+.col-hora {
+  width: 70px;
+}
+
+.col-nombre {
+  width: 140px;
+}
+
+.custom-container-switch {
+  background-color: var(--color-tertiary-light) !important;
+  color: rgb(80, 92, 105);
+  width: fit-content;
+  border-radius: 10px;
 }

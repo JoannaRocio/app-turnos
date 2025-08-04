@@ -215,70 +215,72 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
                   }}
                   className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
                 >
-                  <td>
+                  <td className="truncate-cell">
                     <span className="ellipsis-cell" title={patient.fullName}>
                       {patient.fullName}
                     </span>
                   </td>
-                  <td>
+                  <td className="truncate-cell">
                     <span className="ellipsis-cell" title={patient.documentType || '-'}>
                       {patient.documentType || '-'}
                     </span>
                   </td>
-                  <td>
+                  <td className="truncate-cell">
                     <span className="ellipsis-cell" title={patient.documentNumber || '-'}>
                       {patient.documentNumber || '-'}
                     </span>
                   </td>
-                  <td>
+                  <td className="truncate-cell">
                     <span
                       className="ellipsis-cell"
-                      title={`${patient.healthInsuranceName || '-'}\n${patient.insurancePlanName || '-'}`}
+                      title={`${patient.healthInsuranceName || '-'}\n${patient.insurancePlanName || ''}`}
                     >
-                      {patient.healthInsuranceName || '-'}
-                      <br />
-                      {patient.insurancePlanName || '-'}
+                      {patient.healthInsuranceName || ''}
+                    </span>
+                    <br />
+                    <span className="ellipsis-cell text-muted fst-italic small">
+                      {patient.insurancePlanName || ''}
                     </span>
                   </td>
-                  <td>
+                  <td className="truncate-cell">
                     <span className="ellipsis-cell" title={patient.phone || '-'}>
                       {patient.phone || '-'}
                     </span>
                   </td>
-                  <td>
+                  <td className="truncate-cell">
                     <span className="ellipsis-cell" title={patient.note || '-'}>
                       {patient.note || '-'}
                     </span>
                   </td>
-                  <td className="text-center">
-                    {patient.isGuest == null ? (
-                      '-'
-                    ) : (
-                      <div className="d-flex justify-content-center align-items-center guest-cell">
-                        {/* Texto Sí/No */}
-                        <span className="guest-text me-2">{patient.isGuest ? 'Sí' : 'No'}</span>
-                        {/* El switch de Bootstrap */}
-                        <div className="form-check form-switch guest-switch m-0">
-                          <input
-                            className="form-check-input"
-                            type="checkbox"
-                            role="switch"
-                            id={`guestSwitch-${patient.id}`}
-                            checked={patient.isGuest}
-                            disabled={isUpdating}
-                            onChange={() => {
-                              if (isUpdating) return;
-                              handleSave({ ...patient, isGuest: !patient.isGuest });
-                            }}
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor={`guestSwitch-${patient.id}`}
-                            aria-label="Marcar como invitado"
-                          />
+                  <td className="text-center truncate-cell">
+                    <span title={patient.isGuest === true ? 'Si' : 'No'}>
+                      {patient.isGuest == null ? (
+                        '-'
+                      ) : (
+                        <div className="d-flex justify-content-center align-items-center guest-cell">
+                          <span className="guest-text me-2">{patient.isGuest ? 'Sí' : 'No'}</span>
+                          <div className="form-check form-switch guest-switch m-0">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              role="switch"
+                              id={`guestSwitch-${patient.id}`}
+                              checked={patient.isGuest}
+                              disabled={isUpdating}
+                              onChange={() => {
+                                if (isUpdating) return;
+                                handleSave({ ...patient, isGuest: !patient.isGuest });
+                              }}
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`guestSwitch-${patient.id}`}
+                              aria-label="Marcar como invitado"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </span>
                   </td>
                   <td onClick={handleClick}>
                     <ActionDropdown

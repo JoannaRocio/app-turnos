@@ -45,7 +45,6 @@ class ClinicalHistoryService {
     };
 
     const res = await Api.post<string>(`${BASE_URL}`, body);
-    console.log('Respuesta:', res.data);
 
     return 0; // o podrías devolver `res.data` si tu backend lo devuelve
   }

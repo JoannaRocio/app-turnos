@@ -116,6 +116,7 @@ const Home: React.FC = () => {
           appointments={appointments}
           professionals={professionals}
           onAppointmentsUpdate={(prof) => loadAppointments(prof)}
+          reloadPatients={reloadPatients}
         />
       )}
 

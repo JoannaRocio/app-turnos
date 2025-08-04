@@ -15,11 +15,13 @@ import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import clsx from 'clsx';
+import PatientService from '../../services/PatientService';
 
 interface Props {
   patients: Patient[];
   professionals: Professional[];
   appointments: Appointment[];
+  reloadPatients: () => void;
   onAppointmentsUpdate: (selectedProfessional: any) => void;
 }
 
@@ -44,6 +46,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   patients,
   professionals,
   onAppointmentsUpdate,
+  reloadPatients,
 }) => {
   const timeSlots = generateTimeSlots();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,6 +69,9 @@ const AppointmentsComponent: React.FC<Props> = ({
     patientName: string;
     date: string;
     time: string;
+    isGuest: boolean;
+    mail: string;
+    phone: number;
   } | null>(null);
 
   const handleDateSelect = (date: Date) => {
@@ -108,10 +114,14 @@ const AppointmentsComponent: React.FC<Props> = ({
   const [newAppointment, setNewAppointment] = useState({
     id: 0,
     patientId: 0,
+    patientName: '',
     documentNumber: '',
     time: '',
     reason: '',
     note: '',
+    isGuest: false,
+    email: '',
+    phone: '',
   });
 
   useEffect(() => {
@@ -133,32 +143,48 @@ const AppointmentsComponent: React.FC<Props> = ({
   useEffect(() => {
     if (isEditMode) return;
 
-    const matchByName = nameSearch
-      ? patients.find((p) => p.fullName?.toLowerCase().includes(nameSearch.toLowerCase()))
-      : null;
+    // 1) Si ni nombre ni DNI coinciden, limpiamos patientId *e isGuest*
+    const matchByName = patients.find((p) => p.fullName === nameSearch);
+    const matchByDni = patients.find((p) => p.documentNumber === dniSearch);
 
-    const matchByDni = dniSearch
-      ? patients.find((p) => p.documentNumber?.includes(dniSearch))
-      : null;
-
-    if (matchByName && !dniSearch) {
+    if (!matchByName && !matchByDni && newAppointment.patientId !== 0) {
       setNewAppointment((prev) => ({
         ...prev,
-        patientId: matchByName.id ?? 0,
-        documentNumber: matchByName.documentNumber ?? '',
-        patientName: matchByName.fullName ?? '',
+        patientId: 0,
+        isGuest: false, // ↩️ reseteamos el switch
       }));
-      setDniSearch(matchByName.documentNumber ?? '');
-    } else if (matchByDni && !nameSearch) {
-      setNewAppointment((prev) => ({
-        ...prev,
-        patientId: matchByDni.id ?? 0,
-        documentNumber: matchByDni.documentNumber ?? '',
-        patientName: matchByDni.fullName ?? '',
-      }));
-      setNameSearch(matchByDni.fullName ?? '');
     }
-  }, [nameSearch, dniSearch, patients, isEditMode]);
+
+    // 2) Si ya hay patientId, no volvemos a autocompletar
+    if (newAppointment.patientId !== 0) return;
+
+    // 3) Coincidencia exacta por nombre
+    const exactByName = patients.find((p) => p.fullName === nameSearch);
+    if (exactByName) {
+      setNewAppointment((prev) => ({
+        ...prev,
+        patientId: exactByName.id,
+        documentNumber: exactByName.documentNumber,
+        patientName: exactByName.fullName,
+        isGuest: false, // ↩️ y aquí también
+      }));
+      setDniSearch(exactByName.documentNumber);
+      return;
+    }
+
+    // 4) Coincidencia exacta por DNI
+    const exactByDni = patients.find((p) => p.documentNumber === dniSearch);
+    if (exactByDni) {
+      setNewAppointment((prev) => ({
+        ...prev,
+        patientId: exactByDni.id,
+        documentNumber: exactByDni.documentNumber,
+        patientName: exactByDni.fullName,
+        isGuest: false, // ↩️ y aquí
+      }));
+      setNameSearch(exactByDni.fullName);
+    }
+  }, [nameSearch, dniSearch, patients, isEditMode, newAppointment.patientId]);
 
   useEffect(() => {
     document.body.classList.toggle('modal-open', isModalOpen);
@@ -197,26 +223,35 @@ const AppointmentsComponent: React.FC<Props> = ({
       setNewAppointment({
         id: apptExists.id,
         patientId: apptExists.patient.id ?? 0,
+        patientName: apptExists.patient.fullName ?? '-',
         documentNumber: apptExists.patient.documentNumber,
         time: time,
         reason: apptExists?.reason ?? '-',
         note: patient?.note ?? '-',
+        isGuest: !!apptExists.patient.isGuest,
+        email: apptExists.patient.email ?? '-',
+        phone: apptExists.patient.phone ?? '-',
       });
     } else {
       setIsEditMode(false);
       setNewAppointment({
         id: 0,
         patientId: 0,
+        patientName: '',
         documentNumber: '',
         time: time,
         reason: '',
         note: '',
+        isGuest: false,
+        email: '',
+        phone: '',
       });
     }
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
+    setIsEditMode(false);
     setIsModalOpen(false);
   };
 
@@ -227,40 +262,67 @@ const AppointmentsComponent: React.FC<Props> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newAppointment.patientId || !newAppointment.documentNumber || !newAppointment.time) {
-      toast.error('Por favor, completá todos los campos obligatorios.');
+    // Validación mínima
+    if (!newAppointment.documentNumber) {
+      toast.error('El DNI no existe en la base de datos. Si es nuevo marcar "Es nuevo"');
+      return;
+    }
+    if (!newAppointment.time) {
+      toast.error('Por favor, completá con el campo Hora.');
       return;
     }
 
     setIsUpdating(true);
 
-    const dateTime = `${format(selectedDate, 'yyyy-MM-dd')}T${newAppointment.time}:00`;
-    const appointmentToSave = {
-      id: newAppointment.id, // si el backend lo requiere
-      patientId: newAppointment.patientId,
-      patientDni: newAppointment.documentNumber,
-      dateTime: dateTime,
-      reason: newAppointment.reason,
-      state: 'PENDIENTE',
-      professionalId: selectedProfessional?.professionalId ?? professionals[0].professionalId,
-      note: newAppointment.note,
-    };
-
     try {
+      let patientId = newAppointment.patientId;
+
+      // 1) Si es “paciente nuevo” (isGuest), creamos primero el paciente
+      if (newAppointment.isGuest) {
+        const patientPayload = {
+          fullName: nameSearch, // nombre que tipeaste
+          documentType: 'DNI', // o el que uses por defecto
+          documentNumber: newAppointment.documentNumber,
+          phone: newAppointment.phone || null,
+          email: newAppointment.email || null,
+          note: null,
+          healthInsuranceId: null,
+          insurancePlanId: null,
+          affiliateNumber: null,
+          isGuest: true,
+        };
+
+        const createResp = await PatientService.createPatient(patientPayload);
+        patientId = createResp.id;
+        toast.success(createResp.message ?? 'Paciente creado con éxito');
+        await reloadPatients();
+      }
+
+      // 2) Con patientId (nuevo o existente), armamos el turno
+      const dateTime = `${format(selectedDate, 'yyyy-MM-dd')}T${newAppointment.time}:00`;
+      const appointmentToSave = {
+        id: newAppointment.id, // para update usa este id
+        patientId,
+        patientDni: newAppointment.documentNumber,
+        dateTime,
+        reason: newAppointment.reason,
+        state: 'PENDIENTE',
+        professionalId: selectedProfessional?.professionalId ?? professionals[0].professionalId,
+        note: newAppointment.note,
+      };
+
       if (isEditMode) {
         await AppointmentService.updateAppointment(newAppointment.id, appointmentToSave);
+        toast.success('Turno actualizado correctamente.');
       } else {
         await AppointmentService.createAppointment(appointmentToSave);
+        toast.success('Turno creado correctamente.');
       }
 
-      toast.success(
-        isEditMode ? 'Turno actualizado correctamente.' : 'Turno creado correctamente.'
-      );
-
-      if (selectedProfessional?.documentNumber) {
+      // 3) Refrescar y cerrar
+      if (selectedProfessional?.professionalId) {
         onAppointmentsUpdate(selectedProfessional);
       }
-
       closeModal();
     } catch (error: any) {
       handleBackendError(error);
@@ -328,17 +390,16 @@ const AppointmentsComponent: React.FC<Props> = ({
               </div>
               <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
               <form onSubmit={handleSubmit} className="form-turno">
-                <div className="form-grid">
+                <div className="form-grid form-group">
                   {/* Campos del formulario */}
+                  {/* Paciente */}
                   <label>
-                    Paciente:
+                    Paciente*
                     <input
                       type="text"
                       value={nameSearch}
-                      readOnly={!!nameSearch && isEditMode}
                       onChange={(e) => {
                         setNameSearch(e.target.value);
-                        if (!isEditMode) setDniSearch('');
                       }}
                       list="patientsByName"
                       placeholder="Escribí el nombre"
@@ -349,15 +410,22 @@ const AppointmentsComponent: React.FC<Props> = ({
                       ))}
                     </datalist>
                   </label>
+
+                  {/* DNI */}
                   <label>
-                    DNI:
+                    DNI*
                     <input
                       type="text"
                       value={dniSearch}
-                      readOnly={!!dniSearch && isEditMode}
                       onChange={(e) => {
-                        setDniSearch(e.target.value);
-                        if (!isEditMode) setNameSearch('');
+                        const val = e.target.value;
+                        setDniSearch(val);
+                        if (newAppointment.isGuest) {
+                          setNewAppointment((prev) => ({
+                            ...prev,
+                            documentNumber: val,
+                          }));
+                        }
                       }}
                       list="patientsByDni"
                       placeholder="Escribí el DNI"
@@ -368,8 +436,70 @@ const AppointmentsComponent: React.FC<Props> = ({
                       ))}
                     </datalist>
                   </label>
+
+                  {/* SWITCH “¿Es un paciente nuevo?” */}
+                  <div className="d-flex full-width gap-3 custom-container-switch">
+                    <label className="form-check-label ms-2" htmlFor="switchIsNew">
+                      ¿Es un paciente nuevo?
+                    </label>
+                    <div className="form-check form-switch mb-3 new-patient-switch">
+                      <span className={`guest-text ${newAppointment.isGuest ? 'yes' : 'no'}`}>
+                        {newAppointment.isGuest ? 'Sí' : 'No'}
+                      </span>
+
+                      {/* Switch */}
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="switchIsNew"
+                        checked={newAppointment.isGuest}
+                        disabled={newAppointment.patientId !== 0 || isUpdating}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setNewAppointment((prev) => ({
+                            ...prev,
+                            isGuest: checked,
+                            // si paso a "nuevo", vuelco aquí lo que ya tipeaste
+                            documentNumber: checked ? dniSearch : prev.documentNumber,
+                            patientName: checked ? nameSearch : prev.patientName,
+                            // opcional: si quieres, resetea patientId
+                            patientId: checked ? 0 : prev.patientId,
+                          }));
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* —————— Campos sólo para paciente nuevo —————— */}
+                  {newAppointment.isGuest && (
+                    <div className="form-grid mb-3 full-width">
+                      <label className="text-primary">
+                        Teléfono:
+                        <input
+                          type="number"
+                          name="phone"
+                          value={newAppointment.phone}
+                          onChange={handleChange}
+                          placeholder="Teléfono (opcional)"
+                          disabled={isEditMode}
+                        />
+                      </label>
+                      <label className="text-primary">
+                        Email:
+                        <input
+                          type="email"
+                          name="email"
+                          value={newAppointment.email}
+                          onChange={handleChange}
+                          placeholder="Email (opcional)"
+                          disabled={isEditMode}
+                        />
+                      </label>
+                    </div>
+                  )}
+
                   <label>
-                    Profesional:
+                    Profesional*
                     <select
                       value={selectedProfessional?.professionalId || ''}
                       onChange={(e) => {
@@ -388,7 +518,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                     </select>
                   </label>
                   <label>
-                    Hora:
+                    Hora*
                     <select name="time" value={newAppointment.time} onChange={handleChange}>
                       {timeSlots.map((time) => (
                         <option key={time} value={time} disabled={!!getAppointmentForTime(time)}>
@@ -483,13 +613,13 @@ const AppointmentsComponent: React.FC<Props> = ({
                 <table className="App-table">
                   <thead>
                     <tr>
-                      <th>Hora</th>
-                      <th>Paciente</th>
-                      <th>DNI</th>
+                      <th className="col-hora">Hora</th>
+                      <th className="col-nombre">Paciente</th>
                       <th>Asistencia</th>
                       <th>Obra Social</th>
                       <th>Motivo</th>
                       <th>Notas</th>
+                      <th>¿Es nuevo?</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>
@@ -506,14 +636,43 @@ const AppointmentsComponent: React.FC<Props> = ({
                           style={{ cursor: !appt ? 'pointer' : 'default' }}
                         >
                           <td className="truncate-cell">{time}</td>
-                          <td className="truncate-cell">{appt?.patient.fullName ?? '-'}</td>
-                          <td className="truncate-cell">{appt?.patient.documentNumber ?? '-'}</td>
+                          <td
+                            className="truncate-cell"
+                            title={`${appt?.patient.fullName}\n${appt?.patient.documentNumber}`}
+                          >
+                            {appt?.patient.fullName ?? '-'}
+                            <br />
+                            {appt?.patient.documentNumber ?? ''}
+                          </td>
+
                           <td className="truncate-cell">{appt?.state ?? '-'}</td>
                           <td className="truncate-cell">
-                            {appt?.patient.healthInsuranceName ?? '-'}
+                            <span
+                              className="ellipsis-cell"
+                              title={`${appt?.patient.healthInsuranceName || '-'}\n${appt?.patient.insurancePlanName || ''}`}
+                            >
+                              {appt?.patient.healthInsuranceName || ''}
+                            </span>
+                            <br />
+                            <span className="ellipsis-cell text-muted fst-italic small">
+                              {appt?.patient.insurancePlanName || ''}
+                            </span>
                           </td>
                           <td className="truncate-cell">{appt?.reason ?? '-'}</td>
                           <td className="truncate-cell">{appt?.patient.note ?? '-'}</td>
+                          <td className="truncate-cell text-center">
+                            {appt?.patient.isGuest == null ? (
+                              '-'
+                            ) : (
+                              <span
+                                className={`me-2 ${
+                                  appt.patient.isGuest ? 'text-success' : 'text-danger'
+                                }`}
+                              >
+                                {appt.patient.isGuest ? 'Sí' : 'No'}
+                              </span>
+                            )}
+                          </td>
                           <td className="action-cell" onClick={handleClick}>
                             <div className="dropdown-container">
                               <ActionDropdown
