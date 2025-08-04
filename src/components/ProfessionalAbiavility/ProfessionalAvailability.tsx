@@ -152,30 +152,36 @@ const ProfessionalAvailabilityForm = forwardRef<AvailabilityFormRef, Availabilit
                       </td>
                     )}
                     <td>
-                      <input
-                        list="horarios"
+                      <select
                         value={range.start_time}
                         onChange={(e) => handleTimeChange(day, idx, 'start_time', e.target.value)}
-                        placeholder="--:--"
-                        pattern="^([01]\d|2[0-3]):([0-5][0-9])$"
-                        title="Formato HH:MM (00:00 a 23:59)"
-                      />
+                      >
+                        <option value="" disabled>
+                          --:--
+                        </option>
+                        {timeOptions.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td>
-                      <input
-                        list="horarios"
+                      <select
                         value={range.end_time}
                         onChange={(e) => handleTimeChange(day, idx, 'end_time', e.target.value)}
-                        placeholder="--:--"
-                        pattern="^([01]\d|2[0-3]):([0-5][0-9])$"
-                        title="Formato HH:MM (00:00 a 23:59)"
-                      />
-                      <datalist id="horarios">
+                      >
+                        <option value="" disabled>
+                          --:--
+                        </option>
                         {timeOptions.map((time) => (
-                          <option key={time} value={time} />
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
                         ))}
-                      </datalist>
+                      </select>
                     </td>
+
                     <td>
                       <button
                         type="button"
