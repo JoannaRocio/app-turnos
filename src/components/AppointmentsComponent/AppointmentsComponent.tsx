@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './AppointmentsComponent.scss';
 import { Appointment } from '../../interfaces/Appointment';
 import ConfirmModal from '../shared/ConfirmModal/ConfirmModalComponent';
@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import clsx from 'clsx';
 import PatientService from '../../services/PatientService';
+import { useAuth } from '../../context/ContextAuth';
 
 interface Props {
   patients: Patient[];
@@ -63,7 +64,8 @@ const AppointmentsComponent: React.FC<Props> = ({
   const [patientData, setPatientData] = useState<Patient | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const isMobile = useIsMobile();
-
+  const { userRole } = useAuth();
+  const role = userRole ?? '';
   const [, setApptToDelete] = useState<{
     id: number;
     patientName: string;
@@ -369,6 +371,46 @@ const AppointmentsComponent: React.FC<Props> = ({
     e.stopPropagation();
   };
 
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    // Abre una nueva ventana con solo el contenido printable
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+    <html>
+      <head>
+      <title>
+        Turnos – ${selectedProfessional?.professionalName} – 
+        ${selectedDate.toLocaleDateString('es-AR', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        })}
+      </title>
+        <style>
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #ccc; padding: 0.5em; }
+
+          /* Oculta cualquier elemento con .no-print en impresión */
+          @media print {
+            .no-print {
+              display: none !important;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        ${tableRef.current?.innerHTML}
+      </body>
+    </html>
+  `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    // printWindow.close(); // opcional: cerrar tras imprimir
+  };
+
   return (
     <>
       <div className="col-12 col-md-8 order-2">
@@ -576,16 +618,27 @@ const AppointmentsComponent: React.FC<Props> = ({
       <section>
         <div className="text-md-start px-2">
           <h3 className="App-main-title text-white">Agenda de turnos</h3>
-          <h4 className="schedule-title">
-            <i className="fas fa-user-md me-2"></i>
-            {selectedProfessional?.professionalName ?? professionals[0]?.professionalName}
-            {' - '}
-            {selectedDate.toLocaleDateString('es-AR', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-            })}
-          </h4>
+          <div className="d-flex justify-content-between">
+            <h4 className="schedule-title">
+              <i className="fas fa-user-md me-2"></i>
+              {selectedProfessional?.professionalName ?? professionals[0]?.professionalName}
+              {' - '}
+              {selectedDate.toLocaleDateString('es-AR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+            </h4>
+            {role === 'USUARIO' && (
+              <button
+                title="Imprimir turnos"
+                className="btn App-buttonTertiary"
+                onClick={handlePrint}
+              >
+                Imprimir
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
@@ -608,19 +661,19 @@ const AppointmentsComponent: React.FC<Props> = ({
               />
             </div>
             {/* Tabla central */}
-            <div className="col-12 col-md-7 order-2">
+            <div className="col-12 col-md-7 order-2" ref={tableRef}>
               <div className={clsx('App-table-wrapper', { 'table-responsive': isMobile })}>
                 <table className="App-table">
                   <thead>
                     <tr>
                       <th className="col-hora">Hora</th>
                       <th className="col-nombre">Paciente</th>
-                      <th className="col-asistencia">Asistencia</th>
+                      <th className="col-asistencia no-print">Asistencia</th>
                       <th>Obra Social</th>
                       <th>Motivo</th>
-                      <th>Notas</th>
-                      <th className="col-nuevo">¿Es nuevo?</th>
-                      <th className="col-acciones">Acciones</th>
+                      <th className="no-print">Notas</th>
+                      <th className="col-nuevo no-print">¿Es nuevo?</th>
+                      <th className="col-acciones no-print">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -645,7 +698,11 @@ const AppointmentsComponent: React.FC<Props> = ({
                             {appt?.patient.documentNumber ?? ''}
                           </td>
 
-                          <td className="truncate-cell" title={`${appt?.state}`}>
+                          <td
+                            className="truncate-cell no-print"
+                            title={`${appt?.state}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {appt ? (
                               <select
                                 className={`
@@ -695,8 +752,8 @@ const AppointmentsComponent: React.FC<Props> = ({
                             </span>
                           </td>
                           <td className="truncate-cell">{appt?.reason ?? '-'}</td>
-                          <td className="truncate-cell">{appt?.patient.note ?? '-'}</td>
-                          <td className="truncate-cell text-center">
+                          <td className="truncate-cell no-print">{appt?.patient.note ?? '-'}</td>
+                          <td className="truncate-cell text-center no-print">
                             {appt?.patient.isGuest == null ? (
                               '-'
                             ) : (
@@ -709,7 +766,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                               </span>
                             )}
                           </td>
-                          <td className="action-cell" onClick={handleClick}>
+                          <td className="action-cell no-print" onClick={handleClick}>
                             <div className="dropdown-container">
                               <ActionDropdown
                                 disabled={!appt}
