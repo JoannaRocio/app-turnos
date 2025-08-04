@@ -276,7 +276,7 @@ button.dropdown-toggle:disabled {
 
     th,
     td {
-      white-space: nowrap;
+      // white-space: nowrap;
       text-align: center;
       vertical-align: middle;
     }
@@ -357,11 +357,23 @@ button.dropdown-toggle:disabled {
 }
 
 .col-hora {
-  width: 70px;
+  width: 60px;
 }
 
 .col-nombre {
   width: 140px;
+}
+
+.col-nuevo {
+  width: 90px;
+}
+
+.col-asistencia {
+  width: 110px;
+}
+
+.col-acciones {
+  width: 80px;
 }
 
 .custom-container-switch {
@@ -369,4 +381,53 @@ button.dropdown-toggle:disabled {
   color: rgb(80, 92, 105);
   width: fit-content;
   border-radius: 10px;
+}
+
+// Select de state de turno
+
+// Colores pastel por estado
+.status-pendiente {
+  background-color: #fff8e1 !important; // pastel amarillo claro
+}
+.status-atendido {
+  background-color: #e8f5e9 !important; // pastel verde claro
+}
+.status-ausente_con_aviso {
+  background-color: #fff3e0 !important; // pastel naranja muy suave
+}
+.status-ausente_sin_aviso {
+  background-color: #ffebee !important; // pastel rojo muy suave
+}
+.status-cancelado {
+  background-color: #eceff1 !important; // pastel gris claro
+}
+.status-confirmado {
+  background-color: #e3f2fd !important; // pastel azul claro
+}
+.status-ninguno {
+  background-color: #f3e5f5 !important; // pastel lila claro
+}
+
+// Para que el fondo del select muestre ese color
+.form-select.status-pendiente,
+.form-select.status-atendido,
+.form-select.status-ausente_con_aviso,
+.form-select.status-ausente_sin_aviso,
+.form-select.status-cancelado,
+.form-select.status-confirmado,
+.form-select.status-ninguno {
+  color: #333; // texto oscuro para contraste
+  border-color: transparent;
+  font-size: 1.2rem;
+}
+
+// Opcional: al abrir el dropdown, que el panel también sea pastel
+.form-select.status-pendiente:focus,
+.form-select.status-atendido:focus,
+.form-select.status-ausente_con_aviso:focus,
+.form-select.status-ausente_sin_aviso:focus,
+.form-select.status-cancelado:focus,
+.form-select.status-confirmado:focus,
+.form-select.status-ninguno:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
 }

@@ -201,9 +201,6 @@ h2 {
 // Mobile
 
 .table-responsive {
-  // overflow-x: auto;
-  // -webkit-overflow-scrolling: touch;
-  // background-color: white; // opcional para que se vea más limpio
   .App-table {
     min-width: 800px; // o lo necesario para que no colapse
     font-size: 1.2rem;
@@ -214,7 +211,7 @@ h2 {
 
     th,
     td {
-      white-space: nowrap;
+      white-space: pre-wrap;
       text-align: center;
       vertical-align: middle;
     }

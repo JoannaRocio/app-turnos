@@ -615,12 +615,12 @@ const AppointmentsComponent: React.FC<Props> = ({
                     <tr>
                       <th className="col-hora">Hora</th>
                       <th className="col-nombre">Paciente</th>
-                      <th>Asistencia</th>
+                      <th className="col-asistencia">Asistencia</th>
                       <th>Obra Social</th>
                       <th>Motivo</th>
                       <th>Notas</th>
-                      <th>¿Es nuevo?</th>
-                      <th>Acciones</th>
+                      <th className="col-nuevo">¿Es nuevo?</th>
+                      <th className="col-acciones">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -645,7 +645,43 @@ const AppointmentsComponent: React.FC<Props> = ({
                             {appt?.patient.documentNumber ?? ''}
                           </td>
 
-                          <td className="truncate-cell">{appt?.state ?? '-'}</td>
+                          <td className="truncate-cell" title={`${appt?.state}`}>
+                            {appt ? (
+                              <select
+                                className={`
+                                  form-select
+                                  status-${appt.state.toLowerCase()}
+                                `}
+                                onClick={(e) => e.stopPropagation()}
+                                value={appt.state}
+                                onChange={async (e) => {
+                                  const nextState = e.target.value;
+                                  try {
+                                    await AppointmentService.updateAppointmentState(
+                                      appt.id,
+                                      nextState
+                                    );
+                                    toast.success(`Estado actualizado a "${nextState}"`);
+                                    onAppointmentsUpdate(selectedProfessional);
+                                  } catch (err) {
+                                    toast.error('No se pudo cambiar el estado');
+                                    console.error(err);
+                                  }
+                                }}
+                              >
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="ATENDIDO">Atendido</option>
+                                <option value="AUSENTE_CON_AVISO">Ausente con aviso</option>
+                                <option value="AUSENTE_SIN_AVISO">Ausente sin aviso</option>
+                                <option value="CANCELADO">Cancelado</option>
+                                <option value="CONFIRMADO">Confirmado</option>
+                                <option value="NINGUNO">Ninguno</option>
+                              </select>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+
                           <td className="truncate-cell">
                             <span
                               className="ellipsis-cell"

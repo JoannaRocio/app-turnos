@@ -36,6 +36,10 @@ class AppointmentService {
   static async cancelAppointment(id: number): Promise<void> {
     await Api.post<void>(`/appointments/cancelar/${id}`);
   }
+
+  static async updateAppointmentState(appointmentId: number, newState: string): Promise<void> {
+    await Api.patch(`/appointments/${appointmentId}/state`, null, { params: { state: newState } });
+  }
 }
 
 export default AppointmentService;
