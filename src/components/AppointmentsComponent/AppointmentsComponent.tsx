@@ -679,14 +679,23 @@ const AppointmentsComponent: React.FC<Props> = ({
                   <tbody>
                     {timeSlots.map((time, index) => {
                       const appt = getAppointmentForTime(time);
+                      const slotDate = new Date(selectedDate);
 
+                      const [hours, minutes] = time.split(':').map(Number);
+                      slotDate.setHours(hours, minutes, 0, 0);
+
+                      const isPastSlot = slotDate < new Date();
                       return (
                         <tr
                           key={index}
-                          onClick={() => openModalForTime(time)}
-                          className={!appt ? 'clickable-row' : ''}
-                          title={appt?.reason ?? '-'}
-                          style={{ cursor: !appt ? 'pointer' : 'default' }}
+                          onClick={() => {
+                            if (!isPastSlot && !appt) openModalForTime(time);
+                          }}
+                          title={isPastSlot ? 'Horario ya vencido' : (appt?.reason ?? undefined)}
+                          className={isPastSlot ? 'past-slot' : !appt ? 'clickable-row' : ''}
+                          style={{
+                            cursor: isPastSlot ? 'not-allowed' : !appt ? 'pointer' : 'default',
+                          }}
                         >
                           <td className="truncate-cell">{time}</td>
                           <td
@@ -699,9 +708,8 @@ const AppointmentsComponent: React.FC<Props> = ({
                           </td>
 
                           <td
-                            className="truncate-cell no-print"
+                            className="truncate-cell no-print state-cell"
                             title={`${appt?.state}`}
-                            onClick={(e) => e.stopPropagation()}
                           >
                             {appt ? (
                               <select
@@ -774,10 +782,14 @@ const AppointmentsComponent: React.FC<Props> = ({
                                 onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                                 onView={() => openClinicalHistory(appt)}
                                 onEdit={
-                                  role !== 'USUARIO' ? () => openModalForTime(time) : undefined
+                                  appt && !isPastSlot && role !== 'USUARIO'
+                                    ? () => openModalForTime(time)
+                                    : undefined
                                 }
                                 onDelete={
-                                  role !== 'USUARIO' ? () => confirmDelete(appt) : undefined
+                                  appt && !isPastSlot && role !== 'USUARIO'
+                                    ? () => confirmDelete(appt)
+                                    : undefined
                                 }
                               />
                             </div>
