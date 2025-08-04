@@ -10,17 +10,21 @@ import { User } from '../interfaces/User';
 
 interface DataContextType {
   patients: Patient[];
-  professionals: Professional[];
+  allProfessionals: Professional[];
+  activeProfessionals: Professional[];
   appointments: Appointment[];
   users: User[];
   loadPatients: () => Promise<void>;
-  loadProfessionals: () => Promise<void>;
+  loadAllProfessionals: () => Promise<void>;
+  loadActiveProfessionals: () => Promise<void>;
   loadUsers: () => Promise<void>;
   loadAppointments: (dni: string) => Promise<void>;
   reloadUsers: () => Promise<void>;
   reloadPatients: () => Promise<void>;
   reloadAppointments: (dni: string) => Promise<void>;
-  reloadProfessionals: () => Promise<void>;
+  reloadAllProfessionals: () => Promise<void>;
+  reloadActiveProfessionals: () => Promise<void>;
+
   clearAppointments: () => void;
   isDataLoaded: boolean;
   setIsDataLoaded: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,7 +34,9 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [activeProfessionals, setActiveProfessionals] = useState<Professional[]>([]);
+  const [allProfessionals, setAllProfessionals] = useState<Professional[]>([]);
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
@@ -62,23 +68,44 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loadProfessionals = useCallback(async () => {
+  const loadActiveProfessionals = useCallback(async () => {
     if (isProfessionalsLoaded) return;
     try {
       const data = await ProfessionalService.getAllProfessionals();
       const active = data.filter((p) => p.professionalState === 'ACTIVE');
-      setProfessionals(active);
+      setActiveProfessionals(active);
       setIsProfessionalsLoaded(true);
     } catch (error) {
       console.error('Error al cargar profesionales:', error);
     }
   }, [isProfessionalsLoaded]);
 
-  const reloadProfessionals = async () => {
+  const reloadActiveProfessionals = async () => {
     try {
       const data = await ProfessionalService.getAllProfessionals();
       const active = data.filter((p) => p.professionalState === 'ACTIVE');
-      setProfessionals(active);
+      setActiveProfessionals(active);
+      setIsProfessionalsLoaded(true);
+    } catch (error) {
+      console.error('Error al recargar profesionales:', error);
+    }
+  };
+
+  const loadAllProfessionals = useCallback(async () => {
+    if (isProfessionalsLoaded) return;
+    try {
+      const data = await ProfessionalService.getAllProfessionals();
+      setAllProfessionals(data); // 📌 Ponemos todos los datos
+      setIsProfessionalsLoaded(true);
+    } catch (error) {
+      console.error('Error al cargar profesionales:', error);
+    }
+  }, [isProfessionalsLoaded]);
+
+  const reloadAllProfessionals = async () => {
+    try {
+      const data = await ProfessionalService.getAllProfessionals();
+      setAllProfessionals(data); // 📌 Ponemos todos los datos
       setIsProfessionalsLoaded(true);
     } catch (error) {
       console.error('Error al recargar profesionales:', error);
@@ -138,18 +165,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <DataContext.Provider
       value={{
         patients,
-        professionals,
+        activeProfessionals,
+        allProfessionals,
         appointments,
         users,
         isDataLoaded,
         setIsDataLoaded,
         loadPatients,
-        loadProfessionals,
+        loadAllProfessionals,
+        loadActiveProfessionals,
         loadUsers,
         loadAppointments,
         reloadUsers,
         reloadPatients,
-        reloadProfessionals,
+        reloadAllProfessionals,
+        reloadActiveProfessionals,
         reloadAppointments,
         clearAppointments,
       }}

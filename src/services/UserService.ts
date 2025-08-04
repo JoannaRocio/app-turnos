@@ -38,6 +38,25 @@ class UserService {
       throw new Error(errorMessage);
     }
   }
+
+  static async backup(): Promise<Blob> {
+    try {
+      // 1) Indicamos a Axios que esperamos un Blob
+      const res = await Api.get<Blob>(`${this.BASE_URL}/backup`, {
+        responseType: 'blob',
+      });
+      return res.data;
+    } catch (error: any) {
+      let errorMessage = 'Error generando backup de la base de datos';
+      const fallback = error.response?.data || error.message;
+      if (typeof fallback === 'string') {
+        errorMessage = fallback;
+      } else if (fallback?.error) {
+        errorMessage = fallback.error;
+      }
+      throw new Error(errorMessage);
+    }
+  }
 }
 
 export default UserService;

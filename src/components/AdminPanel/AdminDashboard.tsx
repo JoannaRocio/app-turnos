@@ -16,7 +16,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
-  const { users, professionals } = useDataContext();
+  const { users, allProfessionals } = useDataContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -109,6 +109,37 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
     return <p className="text-white">No hay usuarios disponibles.</p>;
   }
 
+  const handleBackup = async () => {
+    setIsUpdating(true);
+
+    try {
+      // 1) Llamás al servicio y recibís el blob con el SQL
+      const blob = await UserService.backup();
+
+      // 2) Generás una URL temporal
+      const url = window.URL.createObjectURL(blob);
+
+      // 3) Creás dinámicamente un <a> para forzar la descarga
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backup_${new Date().toISOString().replace(/[:.]/g, '-')}.sql`; // p.e. backup_2025-08-04T14-30-00.sql
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // 4) Liberás la URL
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Backup descargado correctamente.');
+      setIsUpdating(false);
+    } catch (error: any) {
+      setIsUpdating(false);
+
+      console.error(error);
+      toast.error('No se pudo generar el backup.');
+    }
+  };
+
   return (
     <section>
       <div className="d-flex justify-content-between admin-panel">
@@ -119,7 +150,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
             className={`App-buttonTertiary ${activeTab === 'usuarios' ? 'active' : ''}`}
             onClick={() => setActiveTab('usuarios')}
           >
-            Usuarios
+            Administración
           </button>
           <button
             className={`App-buttonTertiary ${activeTab === 'metricas' ? 'active' : ''}`}
@@ -197,7 +228,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
             onClose={() => setModalOpen(false)}
             user={selectedUser}
             onSave={handleSave}
-            professionals={professionals}
+            professionals={allProfessionals}
             isUpdating={isUpdating}
           />
 
@@ -217,6 +248,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
               // setApptToDelete(null);
             }}
           />
+
+          <div className="d-flex justify-content-between">
+            <h3 className="text-white App-secondary-title">Base de datos</h3>
+            <button
+              className="btn App-buttonTertiary"
+              style={{ width: '150px' }}
+              onClick={handleBackup}
+              disabled={isUpdating}
+            >
+              Crear Backup
+            </button>
+          </div>
         </>
       )}
 

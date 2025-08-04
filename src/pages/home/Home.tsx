@@ -26,11 +26,14 @@ const Home: React.FC = () => {
 
   const {
     patients,
-    professionals,
+    activeProfessionals,
+    allProfessionals,
     loadPatients,
-    loadProfessionals,
+    loadAllProfessionals,
+    loadActiveProfessionals,
     loadUsers,
-    reloadProfessionals,
+    reloadAllProfessionals,
+    // reloadActiveProfessionals,
     reloadPatients,
     reloadUsers,
   } = useDataContext();
@@ -44,7 +47,12 @@ const Home: React.FC = () => {
 
       setIsLoading(true);
       try {
-        await Promise.all([loadPatients(), loadProfessionals(), loadUsers()]);
+        await Promise.all([
+          loadPatients(),
+          loadActiveProfessionals(),
+          loadAllProfessionals(),
+          loadUsers(),
+        ]);
         setIsDataLoaded(true);
         hasFetchedData.current = true;
       } catch (err) {
@@ -55,7 +63,7 @@ const Home: React.FC = () => {
     };
 
     fetchInitialData();
-  }, [isDataLoaded, loadPatients, loadProfessionals, loadUsers]);
+  }, [isDataLoaded, loadPatients, loadActiveProfessionals, loadUsers, loadAllProfessionals]);
 
   // Setear profesional por defecto una vez cargados los datos
   // useEffect(() => {
@@ -68,10 +76,10 @@ const Home: React.FC = () => {
   // }, [isDataLoaded, professionals, selectedProfessional]);
 
   useEffect(() => {
-    if (!selectedProfessional && professionals.length > 0) {
-      setSelectedProfessional(professionals[0]);
+    if (!selectedProfessional && activeProfessionals.length > 0) {
+      setSelectedProfessional(activeProfessionals[0]);
     }
-  }, [selectedProfessional, professionals]);
+  }, [selectedProfessional, activeProfessionals]);
 
   // Carga de turnos
   const loadAppointments = useCallback(async (professional: Professional) => {
@@ -105,8 +113,8 @@ const Home: React.FC = () => {
 
       {componenteActivo === 'profesionales' && ['MODERADOR', 'ADMIN'].includes(role) && (
         <ProfessionalsComponent
-          professionals={professionals}
-          reloadProfessional={reloadProfessionals}
+          allProfessionals={allProfessionals}
+          reloadAllProfessionals={reloadAllProfessionals}
         />
       )}
 
@@ -114,7 +122,7 @@ const Home: React.FC = () => {
         <AppointmentsComponent
           patients={patients}
           appointments={appointments}
-          professionals={professionals}
+          activeProfessionals={activeProfessionals}
           onAppointmentsUpdate={(prof) => loadAppointments(prof)}
           reloadPatients={reloadPatients}
         />

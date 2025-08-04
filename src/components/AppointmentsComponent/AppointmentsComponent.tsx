@@ -20,7 +20,7 @@ import { useAuth } from '../../context/ContextAuth';
 
 interface Props {
   patients: Patient[];
-  professionals: Professional[];
+  activeProfessionals: Professional[];
   appointments: Appointment[];
   reloadPatients: () => void;
   onAppointmentsUpdate: (selectedProfessional: any) => void;
@@ -45,7 +45,7 @@ const generateTimeSlots = (): string[] => {
 const AppointmentsComponent: React.FC<Props> = ({
   appointments,
   patients,
-  professionals,
+  activeProfessionals,
   onAppointmentsUpdate,
   reloadPatients,
 }) => {
@@ -93,7 +93,7 @@ const AppointmentsComponent: React.FC<Props> = ({
     return date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
   };
 
-  const filteredProfessionals = professionals.filter((pro) =>
+  const filteredProfessionals = activeProfessionals.filter((pro) =>
     pro.schedules?.some((s) => s.dayOfWeek === getDayOfWeekString(selectedDate))
   );
 
@@ -193,10 +193,10 @@ const AppointmentsComponent: React.FC<Props> = ({
   }, [isModalOpen]);
 
   useEffect(() => {
-    if (!selectedProfessional && professionals.length > 0) {
-      setSelectedProfessional(professionals[0]);
+    if (!selectedProfessional && activeProfessionals.length > 0) {
+      setSelectedProfessional(activeProfessionals[0]);
     }
-  }, [professionals, selectedProfessional]);
+  }, [activeProfessionals, selectedProfessional]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -309,7 +309,8 @@ const AppointmentsComponent: React.FC<Props> = ({
         dateTime,
         reason: newAppointment.reason,
         state: 'PENDIENTE',
-        professionalId: selectedProfessional?.professionalId ?? professionals[0].professionalId,
+        professionalId:
+          selectedProfessional?.professionalId ?? activeProfessionals[0].professionalId,
         note: newAppointment.note,
       };
 
@@ -484,14 +485,14 @@ const AppointmentsComponent: React.FC<Props> = ({
                     <label className="form-check-label ms-2" htmlFor="switchIsNew">
                       ¿Es un paciente nuevo?
                     </label>
-                    <div className="form-check form-switch mb-3 new-patient-switch">
+                    <div className="form-check cursor-pointer form-switch mb-3 new-patient-switch">
                       <span className={`guest-text ${newAppointment.isGuest ? 'yes' : 'no'}`}>
                         {newAppointment.isGuest ? 'Sí' : 'No'}
                       </span>
 
                       {/* Switch */}
                       <input
-                        className="form-check-input"
+                        className="form-check-input cursor-pointer"
                         type="checkbox"
                         id="switchIsNew"
                         checked={newAppointment.isGuest}
@@ -545,7 +546,7 @@ const AppointmentsComponent: React.FC<Props> = ({
                     <select
                       value={selectedProfessional?.professionalId || ''}
                       onChange={(e) => {
-                        const pro = professionals.find(
+                        const pro = activeProfessionals.find(
                           (p) => p.professionalId === Number(e.target.value)
                         );
                         if (pro) setSelectedProfessional(pro);
@@ -621,7 +622,7 @@ const AppointmentsComponent: React.FC<Props> = ({
           <div className="d-flex justify-content-between">
             <h4 className="schedule-title">
               <i className="fas fa-user-md me-2"></i>
-              {selectedProfessional?.professionalName ?? professionals[0]?.professionalName}
+              {selectedProfessional?.professionalName ?? activeProfessionals[0]?.professionalName}
               {' - '}
               {selectedDate.toLocaleDateString('es-AR', {
                 weekday: 'long',
@@ -655,7 +656,7 @@ const AppointmentsComponent: React.FC<Props> = ({
             {/* Panel izquierdo */}
             <div className="col-12 col-md-2">
               <ProfessionalPanel
-                professionals={professionals}
+                activeProfessionals={activeProfessionals}
                 onProfessionalSelect={handleProfessionalSelect}
                 selectedProfessional={selectedProfessional}
               />
@@ -679,72 +680,116 @@ const AppointmentsComponent: React.FC<Props> = ({
                   <tbody>
                     {timeSlots.map((time, index) => {
                       const appt = getAppointmentForTime(time);
-                      const slotDate = new Date(selectedDate);
 
+                      // 1. Fecha y día de la semana
+                      const slotDate = new Date(selectedDate);
                       const [hours, minutes] = time.split(':').map(Number);
                       slotDate.setHours(hours, minutes, 0, 0);
-
                       const isPastSlot = slotDate < new Date();
+
+                      const dayOfWeek = slotDate
+                        .toLocaleDateString('en-US', { weekday: 'long' })
+                        .toUpperCase();
+
+                      // 2. Obtengo los rangos del profesional para ese día
+                      const todaysSchedules =
+                        selectedProfessional?.schedules?.filter((s) => s.dayOfWeek === dayOfWeek) ||
+                        [];
+
+                      // 3. Función para convertir "HH:mm:ss" o "HH:mm" a minutos desde medianoche
+                      const toMinutes = (hms: string) => {
+                        const [h, m] = hms.split(':').map(Number);
+                        return h * 60 + m;
+                      };
+                      const slotMinutes = hours * 60 + minutes;
+
+                      // 4. Compruebo si slot cae dentro de alguna franja
+                      const isWithinWorkHours = todaysSchedules.some((s) => {
+                        const start = toMinutes(s.startTime.slice(0, 5));
+                        const end = toMinutes(s.endTime.slice(0, 5));
+                        return slotMinutes >= start && slotMinutes < end;
+                      });
+
+                      // 5. Decido si es "no-laboral"
+                      const isNonWorkingSlot = !isWithinWorkHours;
+
                       return (
                         <tr
-                          key={index}
+                          key={time}
                           onClick={() => {
-                            if (!isPastSlot && !appt) openModalForTime(time);
+                            // ver citas existentes siempre
+                            if (appt) return openModalForTime(time);
+                            // crear sólo si NO es pasado, NO es no-laboral y hay profesionales
+                            if (!isPastSlot && !isNonWorkingSlot) openModalForTime(time);
                           }}
-                          title={isPastSlot ? 'Horario ya vencido' : (appt?.reason ?? undefined)}
-                          className={isPastSlot ? 'past-slot' : !appt ? 'clickable-row' : ''}
+                          className={clsx({
+                            'past-slot': isPastSlot && !appt,
+                            'clickable-row': !isPastSlot && !appt && !isNonWorkingSlot,
+                            'non-working-slot': isNonWorkingSlot,
+                          })}
                           style={{
-                            cursor: isPastSlot ? 'not-allowed' : !appt ? 'pointer' : 'default',
+                            cursor: appt
+                              ? 'pointer'
+                              : isNonWorkingSlot
+                                ? 'not-allowed'
+                                : isPastSlot
+                                  ? 'not-allowed'
+                                  : 'pointer',
                           }}
+                          title={
+                            isNonWorkingSlot
+                              ? 'Fuera del horario de atención'
+                              : (appt?.reason ?? undefined)
+                          }
                         >
                           <td className="truncate-cell">{time}</td>
-                          <td
-                            className="truncate-cell"
-                            title={`${appt?.patient.fullName}\n${appt?.patient.documentNumber}`}
-                          >
-                            {appt?.patient.fullName ?? '-'}
-                            <br />
-                            {appt?.patient.documentNumber ?? ''}
+                          <td className="truncate-cell">
+                            <span
+                              title={`${appt?.patient.fullName || ''}\n${appt?.patient.documentNumber || ''}`}
+                            >
+                              {appt?.patient.fullName ?? '-'}
+                              <br />
+                              {appt?.patient.documentNumber ?? ''}
+                            </span>
                           </td>
 
-                          <td
-                            className="truncate-cell no-print state-cell"
-                            title={`${appt?.state}`}
-                          >
-                            {appt ? (
-                              <select
-                                className={`
+                          <td className="truncate-cell no-print state-cell">
+                            <span title={`${appt?.state || ''}`}>
+                              {appt ? (
+                                <select
+                                  className={`
                                   form-select
                                   status-${appt.state.toLowerCase()}
                                 `}
-                                onClick={(e) => e.stopPropagation()}
-                                value={appt.state}
-                                onChange={async (e) => {
-                                  const nextState = e.target.value;
-                                  try {
-                                    await AppointmentService.updateAppointmentState(
-                                      appt.id,
-                                      nextState
-                                    );
-                                    toast.success(`Estado actualizado a "${nextState}"`);
-                                    onAppointmentsUpdate(selectedProfessional);
-                                  } catch (err) {
-                                    toast.error('No se pudo cambiar el estado');
-                                    console.error(err);
-                                  }
-                                }}
-                              >
-                                <option value="PENDIENTE">Pendiente</option>
-                                <option value="ATENDIDO">Atendido</option>
-                                <option value="AUSENTE_CON_AVISO">Ausente con aviso</option>
-                                <option value="AUSENTE_SIN_AVISO">Ausente sin aviso</option>
-                                <option value="CANCELADO">Cancelado</option>
-                                <option value="CONFIRMADO">Confirmado</option>
-                                <option value="NINGUNO">Ninguno</option>
-                              </select>
-                            ) : (
-                              '-'
-                            )}
+                                  onClick={(e) => e.stopPropagation()}
+                                  value={appt.state}
+                                  onChange={async (e) => {
+                                    const nextState = e.target.value;
+                                    try {
+                                      await AppointmentService.updateAppointmentState(
+                                        appt.id,
+                                        nextState
+                                      );
+                                      toast.success(`Estado actualizado a "${nextState}"`);
+                                      onAppointmentsUpdate(selectedProfessional);
+                                    } catch (err) {
+                                      toast.error('No se pudo cambiar el estado');
+                                      console.error(err);
+                                    }
+                                  }}
+                                >
+                                  <option value="PENDIENTE">Pendiente</option>
+                                  <option value="ATENDIDO">Atendido</option>
+                                  <option value="AUSENTE_CON_AVISO">Ausente con aviso</option>
+                                  <option value="AUSENTE_SIN_AVISO">Ausente sin aviso</option>
+                                  <option value="CANCELADO">Cancelado</option>
+                                  <option value="CONFIRMADO">Confirmado</option>
+                                  <option value="NINGUNO">Ninguno</option>
+                                </select>
+                              ) : (
+                                '-'
+                              )}
+                            </span>
                           </td>
 
                           <td className="truncate-cell">

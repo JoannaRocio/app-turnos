@@ -7,9 +7,9 @@ import { useAuth } from '../../context/ContextAuth';
 import { toast } from 'react-toastify';
 
 const ProfessionalsComponent: React.FC<{
-  professionals: Professional[];
-  reloadProfessional: () => void;
-}> = ({ professionals, reloadProfessional }) => {
+  allProfessionals: Professional[];
+  reloadAllProfessionals: () => void;
+}> = ({ allProfessionals, reloadAllProfessionals }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional> | null>(
     null
@@ -114,7 +114,7 @@ const ProfessionalsComponent: React.FC<{
         toast.success('Profesional creado con éxito');
       }
 
-      reloadProfessional();
+      reloadAllProfessionals();
       setShowEditModal(false);
       setSelectedProfessional(null);
     } catch (error: any) {
@@ -138,13 +138,32 @@ const ProfessionalsComponent: React.FC<{
     setShowEditModal(true);
   };
 
-  const filteredProfessional = professionals.filter((professional) => {
-    const nameMatch = professional.professionalName
+  const filteredProfessional = allProfessionals.filter((allProfessionals) => {
+    const nameMatch = allProfessionals.professionalName
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const dniMatch = professional.documentNumber?.toString().includes(searchTerm);
+    const dniMatch = allProfessionals.documentNumber?.toString().includes(searchTerm);
     return nameMatch || dniMatch;
   });
+
+  const handleToggleProfessional = async (docNum: string, currentlyActive: boolean) => {
+    setIsUpdating(true);
+    try {
+      if (currentlyActive) {
+        await ProfessionalService.disableByDocument(docNum);
+        toast.success('Profesional deshabilitado.');
+      } else {
+        await ProfessionalService.enableByDocument(docNum);
+        toast.success('Profesional habilitado.');
+      }
+      // refrescá la lista de profesionales aquí, p.ej. llamando a tu carga de datos
+      await reloadAllProfessionals();
+      setIsUpdating(false);
+    } catch (err: any) {
+      setIsUpdating(false);
+      toast.error(err.message || 'Error al cambiar el estado del profesional.');
+    }
+  };
 
   return (
     <section>
@@ -165,7 +184,7 @@ const ProfessionalsComponent: React.FC<{
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {professionals.length === 0 ? (
+      {allProfessionals.length === 0 ? (
         <p className="no-patients-message">No hay profesionales disponibles.</p>
       ) : (
         <div className="table-responsive">
@@ -231,12 +250,39 @@ const ProfessionalsComponent: React.FC<{
                   </td>
 
                   <td>-</td>
-                  <td>
-                    {professional
-                      ? professional.professionalState === 'ACTIVE'
-                        ? 'Activo'
-                        : 'No activo'
-                      : '-'}
+                  <td className="text-center truncate-cell" onClick={(e) => e.stopPropagation()}>
+                    <span title={professional.professionalState === 'ACTIVE' ? 'Si' : 'No'}>
+                      {professional.professionalState == null ? (
+                        '-'
+                      ) : (
+                        <div className="d-flex justify-content-center align-items-center guest-cell">
+                          <span className="guest-text me-2">
+                            {professional.professionalState === 'ACTIVE' ? 'Sí' : 'No'}
+                          </span>
+                          <div className="form-check form-switch guest-switch m-0">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              role="switch"
+                              id={`guestSwitch-${professional.professionalId}`}
+                              checked={professional.professionalState === 'ACTIVE'}
+                              disabled={isUpdating}
+                              onChange={() =>
+                                handleToggleProfessional(
+                                  professional.documentNumber!,
+                                  professional.professionalState === 'ACTIVE'
+                                )
+                              }
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`guestSwitch-${professional.professionalId}`}
+                              aria-label="Habilitar o deshabilitar"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </span>
                   </td>
                 </tr>
               ))}

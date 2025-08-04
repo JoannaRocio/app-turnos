@@ -63,3 +63,66 @@
 .mb-1 {
   margin-bottom: 0.25rem;
 }
+
+// Switch
+
+.professional-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  // Label a la izquierda
+  .form-check-label {
+    margin: 0;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .form-check-input {
+    // Tamaño del track
+    width: 2.5rem;
+    height: 1.25rem;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    appearance: none;
+    background-color: #ccc;
+    border-radius: 1.25rem;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    // Track cuando está ON
+    &:checked {
+      background-color: #5dade2; // pastel azul
+    }
+
+    // El knob
+    &::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 1.1rem;
+      height: 1.1rem;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    // Movimiento del knob
+    &:checked::before {
+      transform: translateX(1.25rem);
+    }
+
+    // Disabled
+    &:disabled {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+
+      &::before {
+        background: #ccc;
+      }
+    }
+  }
+}

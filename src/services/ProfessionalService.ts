@@ -58,6 +58,14 @@ class ProfessionalService {
       throw new Error(`Error actualizando profesional: ${response.data}`);
     }
   }
+
+  static async enableByDocument(documentNumber: string): Promise<void> {
+    await Api.patch(`${this.BASE_URL}/document/${documentNumber}/enable`);
+  }
+
+  static async disableByDocument(documentNumber: string): Promise<void> {
+    await Api.patch(`${this.BASE_URL}/document/${documentNumber}/disable`);
+  }
 }
 
 export default ProfessionalService;
