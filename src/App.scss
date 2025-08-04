@@ -277,17 +277,27 @@ a {
   transition: 0.2s;
 
   &:hover {
+    // Levantamos un poco el botón
+    transform: scale(1.03);
+    // Sombra más marcada al pasar
     box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.1),
+      0 8px 20px rgba(0, 0, 0, 0.12),
       inset 0 0 0 1px var(--color-primary-hover);
-    transform: translateY(-2px);
+    // Le damos un fondo ligeramente distinto
     background-color: var(--color-white-hover);
     color: var(--color-blue);
   }
+
+  &:active {
+    // Cuando clickeas, bajalos un poco
+    transform: scale(0.99);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    box-shadow 0.3s ease;
+    transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 
 .modal {
