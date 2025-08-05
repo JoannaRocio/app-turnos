@@ -221,7 +221,17 @@ const MetricsComponent = () => {
                     {appointmentStats.map((_entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0d6efd'][index % 5]}
+                        fill={
+                          [
+                            '#8884d8',
+                            '#82ca9d',
+                            '#ffc658',
+                            '#ff8042',
+                            '#0d6efd',
+                            '#f4a9f7ff',
+                            '#78c9eeff',
+                          ][index % 7]
+                        }
                       />
                     ))}
                   </Pie>
