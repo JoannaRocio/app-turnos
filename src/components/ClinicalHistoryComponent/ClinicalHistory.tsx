@@ -73,6 +73,13 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
       return;
     }
 
+    // 1) Validar que existan profesionales
+    if (!professionalId) {
+      toast.warn('No hay profesionales creados. Por favor, crea uno antes de continuar.');
+
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');

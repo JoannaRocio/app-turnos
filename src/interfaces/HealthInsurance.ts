@@ -1,6 +1,7 @@
 export interface Plan {
   id: number;
   name: string;
+  healthInsuranceId: number;
 }
 
 export interface HealthInsurance {

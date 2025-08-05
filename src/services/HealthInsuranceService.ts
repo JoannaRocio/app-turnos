@@ -47,6 +47,22 @@ class HealthInsuranceService {
       throw new Error(`Error al activar: ${res.data}`);
     }
   }
+
+  static async update(id: number, insurance: NewHealthInsurance): Promise<HealthInsurance> {
+    try {
+      const res = await Api.put<HealthInsurance>(`${BASE_URL}/${id}`, insurance);
+      return res.data;
+    } catch (error: any) {
+      let errorMessage = 'Error actualizando obra social';
+      const fallback = error.response?.data || error.message;
+      if (typeof fallback === 'string') {
+        errorMessage = fallback;
+      } else if (fallback?.error) {
+        errorMessage = fallback.error;
+      }
+      throw new Error(errorMessage);
+    }
+  }
 }
 
 export default HealthInsuranceService;
