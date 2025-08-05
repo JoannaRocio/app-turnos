@@ -33,7 +33,7 @@ const Home: React.FC = () => {
     loadActiveProfessionals,
     loadUsers,
     reloadAllProfessionals,
-    // reloadActiveProfessionals,
+    reloadActiveProfessionals,
     reloadPatients,
     reloadUsers,
   } = useDataContext();
@@ -115,6 +115,7 @@ const Home: React.FC = () => {
         <ProfessionalsComponent
           allProfessionals={allProfessionals}
           reloadAllProfessionals={reloadAllProfessionals}
+          reloadActiveProfessionals={reloadActiveProfessionals}
         />
       )}
 

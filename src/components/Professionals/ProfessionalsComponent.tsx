@@ -9,7 +9,8 @@ import { toast } from 'react-toastify';
 const ProfessionalsComponent: React.FC<{
   allProfessionals: Professional[];
   reloadAllProfessionals: () => void;
-}> = ({ allProfessionals, reloadAllProfessionals }) => {
+  reloadActiveProfessionals: () => void;
+}> = ({ allProfessionals, reloadAllProfessionals, reloadActiveProfessionals }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfessional, setSelectedProfessional] = useState<Partial<Professional> | null>(
     null
@@ -115,6 +116,7 @@ const ProfessionalsComponent: React.FC<{
       }
 
       reloadAllProfessionals();
+      reloadActiveProfessionals();
       setShowEditModal(false);
       setSelectedProfessional(null);
     } catch (error: any) {
