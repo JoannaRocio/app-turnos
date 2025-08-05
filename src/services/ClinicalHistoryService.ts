@@ -95,7 +95,7 @@ class ClinicalHistoryService {
   /** Reemplazar la lista de procedimientos (añadir o eliminar) */
   static async updateProcedures(entryId: number, procedureIds: number[]): Promise<void> {
     const url = `${BASE_URL}/${entryId}/procedures`;
-    await Api.post<void>(url, { procedureIds });
+    await Api.patch<void>(url, { procedureIds });
   }
 
   /** Eliminar un archivo existente */
