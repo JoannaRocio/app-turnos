@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Login.scss';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import AuthService from '../../services/AuthService';
 import { useAuth } from '../../context/ContextAuth';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { setComponenteActivo } = useComponente();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {

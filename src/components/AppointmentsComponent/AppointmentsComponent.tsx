@@ -213,7 +213,7 @@ const AppointmentsComponent: React.FC<Props> = ({
     }
 
     const apptExists = getAppointmentForTime(time);
-    const patient = patients.find((p) => p.id === apptExists?.patient.id);
+    // const patient = patients.find((p) => p.id === apptExists?.patient.id);
 
     if (apptExists) {
       setIsEditMode(true);

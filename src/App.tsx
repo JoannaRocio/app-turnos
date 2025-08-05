@@ -9,7 +9,6 @@ import PasswordRecovery from './pages/password-recovery/PasswordRecovery';
 import ResetPassword from './pages/password-recovery/reset-password/ResetPassword';
 import ProtectedRoute from './routes/ProtectedRoute';
 import './App.scss';
-import BranchSelector from './pages/branch-selector/BranchSelector';
 import AppointmentConfirmation from './pages/appointment-confirmation/AppointmentConfirmation';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
