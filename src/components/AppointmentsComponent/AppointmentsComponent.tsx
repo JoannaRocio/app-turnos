@@ -120,7 +120,7 @@ const AppointmentsComponent: React.FC<Props> = ({
     documentNumber: '',
     time: '',
     reason: '',
-    note: '',
+    // note: '',
     isGuest: false,
     email: '',
     phone: '',
@@ -229,7 +229,7 @@ const AppointmentsComponent: React.FC<Props> = ({
         documentNumber: apptExists.patient.documentNumber,
         time: time,
         reason: apptExists?.reason ?? '-',
-        note: patient?.note ?? '-',
+        // note: apptExists.patient?.note ?? '-',
         isGuest: !!apptExists.patient.isGuest,
         email: apptExists.patient.email ?? '-',
         phone: apptExists.patient.phone ?? '-',
@@ -243,7 +243,7 @@ const AppointmentsComponent: React.FC<Props> = ({
         documentNumber: '',
         time: time,
         reason: '',
-        note: '',
+        // note: '',
         isGuest: false,
         email: '',
         phone: '',
@@ -280,14 +280,14 @@ const AppointmentsComponent: React.FC<Props> = ({
       let patientId = newAppointment.patientId;
 
       // 1) Si es “paciente nuevo” (isGuest), creamos primero el paciente
-      if (newAppointment.isGuest) {
+      if (newAppointment.isGuest && !isEditMode) {
         const patientPayload = {
-          fullName: nameSearch, // nombre que tipeaste
-          documentType: 'DNI', // o el que uses por defecto
+          fullName: nameSearch,
+          documentType: 'DNI',
           documentNumber: newAppointment.documentNumber,
           phone: newAppointment.phone || null,
           email: newAppointment.email || null,
-          note: null,
+          // note: newAppointment.note || null,
           healthInsuranceId: null,
           insurancePlanId: null,
           affiliateNumber: null,
@@ -311,7 +311,7 @@ const AppointmentsComponent: React.FC<Props> = ({
         state: 'PENDIENTE',
         professionalId:
           selectedProfessional?.professionalId ?? activeProfessionals[0].professionalId,
-        note: newAppointment.note,
+        // note: newAppointment.note,
       };
 
       if (isEditMode) {
@@ -579,10 +579,10 @@ const AppointmentsComponent: React.FC<Props> = ({
                       onChange={handleChange}
                     />
                   </label>
-                  <label className="full-width">
+                  {/* <label className="full-width">
                     Notas:
                     <textarea name="note" value={newAppointment.note} onChange={handleChange} />
-                  </label>
+                  </label> */}
                 </div>
 
                 <div className="d-flex justify-content-center align-items-center">

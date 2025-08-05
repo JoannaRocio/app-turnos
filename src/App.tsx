@@ -41,7 +41,7 @@ function AppRoutes() {
           element={isAuthenticated ? <Navigate to="/Home" /> : <ResetPassword />}
         />
 
-        <Route path="/Sucursales" element={<BranchSelector />} />
+        {/* <Route path="/Sucursales" element={<BranchSelector />} /> */}
 
         {/* Ruta protegida por roles */}
         <Route

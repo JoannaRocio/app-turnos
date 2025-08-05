@@ -24,6 +24,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirmBackup, setShowConfirmBackup] = useState(false);
 
   const handleRowClick = (user: User) => {
     setSelectedUser(user);
@@ -77,11 +78,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
     setShowConfirm(true);
   };
 
+  const handleBackup = () => {
+    setShowConfirmBackup(true);
+    // handleSaveBackup();
+  };
+
   async function handleDeleteConfirmed(selectedUser: any) {
     try {
-      // await UserService.delete(selectedUser?.id);
-      toast.success('Turno eliminado correctamente.');
+      await UserService.deleteUser(selectedUser?.id);
+      reloadUsers();
+      toast.success('Usuario eliminado correctamente.');
       setShowConfirm(false);
+      setShowConfirmBackup(false);
       // setApptToDelete(null);
 
       // if (selectedUser?.documentNumber) {
@@ -89,7 +97,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
       // }
     } catch (error: any) {
       // setCurrentAppointment(null);
-      handleBackendError(error, 'Ocurrió un error al eliminar el turno.');
+      setShowConfirmBackup(false);
+
+      reloadUsers();
+      handleBackendError(error, 'Ocurrió un error al eliminar el usuario.');
     }
   }
 
@@ -109,9 +120,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
     return <p className="text-white">No hay usuarios disponibles.</p>;
   }
 
-  const handleBackup = async () => {
+  const handleSaveBackup = async () => {
     setIsUpdating(true);
-
     try {
       // 1) Llamás al servicio y recibís el blob con el SQL
       const blob = await UserService.backup();
@@ -240,11 +250,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ reloadUsers }) => {
               if (selectedUser) {
                 handleDeleteConfirmed(selectedUser);
               } else {
-                alert('No ha seleccionado ningún turno disponible.');
+                alert('No ha seleccionado ningún usuario.');
               }
             }}
             onCancel={() => {
               setShowConfirm(false);
+              // setApptToDelete(null);
+            }}
+          />
+
+          <ConfirmModal
+            isOpen={showConfirmBackup}
+            title="Confirmar backup"
+            message={`¿Estás segura que deseas crear y descargar el backup?`}
+            onConfirm={async () => {
+              handleSaveBackup();
+            }}
+            onCancel={() => {
+              setShowConfirmBackup(false);
               // setApptToDelete(null);
             }}
           />

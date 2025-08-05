@@ -57,6 +57,21 @@ class UserService {
       throw new Error(errorMessage);
     }
   }
+
+  static async deleteUser(id: number): Promise<void> {
+    try {
+      await Api.delete(`${this.BASE_URL}/${id}`);
+    } catch (error: any) {
+      let errorMessage = 'Error eliminando usuario';
+      const fallback = error.response?.data || error.message;
+      if (typeof fallback === 'string') {
+        errorMessage = fallback;
+      } else if (fallback?.error) {
+        errorMessage = fallback.error;
+      }
+      throw new Error(errorMessage);
+    }
+  }
 }
 
 export default UserService;

@@ -32,7 +32,7 @@ const PasswordRecovery: React.FC = () => {
   return (
     <section className="container container-login ">
       <div className="row justify-content-center">
-        <div className="col-12 col-md-6 container-formLogin">
+        <div className="col-12 container-formLogin">
           <div className="row">
             <div className="col pb-4">
               <h3>Recuperar contraseña</h3>
@@ -40,7 +40,7 @@ const PasswordRecovery: React.FC = () => {
           </div>
 
           <div className="row">
-            <div className="col">
+            <div className="col-12">
               {error && <p className="error-message">{error}</p>}
               {success && <p className="success-message">{success}</p>}
 

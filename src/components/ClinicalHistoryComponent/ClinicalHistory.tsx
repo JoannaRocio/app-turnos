@@ -244,10 +244,7 @@ const ClinicalHistoryComponent: React.FC<Props> = ({ data, onBack, patient, prof
 
   return (
     <div className="container my-4">
-      <button
-        className="btn btn-secondary btn-lg mb-3 btn-guardar-clinicalHistory"
-        onClick={onBack}
-      >
+      <button className="btn btn-secondary btn-lg mb-3 btn-back-clinicalHistory" onClick={onBack}>
         ← Volver
       </button>
 

@@ -33,7 +33,7 @@ const Login: React.FC = () => {
 
       login(); // Actualiza estado de contexto
       setComponenteActivo('agenda-turnos');
-      navigate('/Sucursales');
+      // navigate('/Sucursales');
     } else {
       setError(data.message ?? 'Error de autenticación');
     }

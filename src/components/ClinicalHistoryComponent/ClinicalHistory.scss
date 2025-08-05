@@ -97,8 +97,17 @@
   font-size: 1.5rem !important;
 }
 
-.btn-guardar-clinicalHistory {
+.btn-back-clinicalHistory {
   font-size: 1.5rem !important;
+  width: 130px !important;
+  background-color: var(--color-tertiary-light) !important;
+  color: var(--color-neutral-dark) !important;
+  border: 1px solid var(--color-neutral-dark) !important;
+  &:hover {
+    background-color: var(--color-secondary-dark) !important;
+    color: var(--color-white-light) !important;
+    border: 1px solid var(--color-white-light) !important;
+  }
 }
 
 .form-clinicalHistory {

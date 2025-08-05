@@ -56,7 +56,7 @@ const ResetPassword: React.FC = () => {
           </div>
 
           <div className="row">
-            <div className="col">
+            <div className="col-12">
               {error && <p className="error-message">{error}</p>}
               {success && <p className="success-message">{success}</p>}
 
