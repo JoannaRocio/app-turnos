@@ -115,14 +115,14 @@ const ProfessionalsComponent: React.FC<{
         toast.success('Profesional creado con éxito');
       }
 
-      reloadAllProfessionals();
-      reloadActiveProfessionals();
       setShowEditModal(false);
       setSelectedProfessional(null);
     } catch (error: any) {
       console.error(error);
       toast.error(error.message ?? '❌ Error inesperado al guardar el profesional');
     } finally {
+      reloadActiveProfessionals();
+      reloadAllProfessionals();
       setIsUpdating(false);
     }
   };
@@ -160,6 +160,7 @@ const ProfessionalsComponent: React.FC<{
       }
       // refrescá la lista de profesionales aquí, p.ej. llamando a tu carga de datos
       await reloadAllProfessionals();
+      await reloadActiveProfessionals();
       setIsUpdating(false);
     } catch (err: any) {
       setIsUpdating(false);
