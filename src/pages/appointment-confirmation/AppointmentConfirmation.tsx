@@ -10,25 +10,20 @@ const AppointmentConfirmation: React.FC = () => {
     'loading'
   );
   const [message, setMessage] = useState('');
-  const { id: token } = useParams<{ id: string }>();
+  const { token } = useParams<{ token: string }>();
   const location = useLocation();
 
   useEffect(() => {
     const process = async () => {
-      if (!token) {
-        setStatus('invalid');
-        setMessage('❌ Token inválido.');
-        return;
-      }
       try {
         if (location.pathname.includes('/confirm/')) {
           // Aquí se ejecuta el PATCH a /appointments/confirm/:token
-          await AppointmentService.confirmAppointment(token);
+          await AppointmentService.confirmAppointment(token!);
           setStatus('success');
           setMessage('Turno confirmado con éxito.');
         } else if (location.pathname.includes('/cancel/')) {
           // Aquí se ejecuta el PATCH a /appointments/cancel/:token
-          await AppointmentService.cancelAppointment(token);
+          await AppointmentService.cancelAppointment(token!);
           setStatus('cancel');
           setMessage('Turno cancelado con éxito.');
         } else {

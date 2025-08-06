@@ -21,7 +21,7 @@ function AppRoutes() {
     '/sucursales',
     '/confirmar-turno',
     '/appointments/confirm',
-    '/aappointments/cancel',
+    '/appointments/cancel',
   ];
 
   const isHiddenHeaderRoute = hiddenHeaderPaths.some((prefix) =>
@@ -30,7 +30,7 @@ function AppRoutes() {
 
   return (
     <>
-      {isAuthenticated && !isHiddenHeaderRoute && <HeaderComponent />}
+      {!isAuthenticated || (!isHiddenHeaderRoute && <HeaderComponent />)}
 
       <Routes>
         <Route
