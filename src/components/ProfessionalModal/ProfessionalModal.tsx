@@ -148,6 +148,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                 id="professionalName"
                 type="text"
                 value={form.professionalName}
+                required
                 onChange={(e) => {
                   const onlyLetters = e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '');
                   setForm({ ...form, professionalName: onlyLetters });
@@ -164,6 +165,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
               <div className="form-group">
                 <label htmlFor="documentType">Tipo de documento</label>
                 <select
+                  required
                   id="documentType"
                   value={form.documentType}
                   onChange={(e) => setForm({ ...form, documentType: e.target.value })}
@@ -186,6 +188,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                 <input
                   id="documentNumber"
                   type="text"
+                  required
                   value={form.documentNumber}
                   onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
                   placeholder="Número de documento"
@@ -219,6 +222,7 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
                   inputId="specialties"
                   options={options}
                   isMulti
+                  required
                   closeMenuOnSelect={false}
                   hideSelectedOptions={false}
                   value={options.filter((o) => form.specialtyIds?.includes(o.value))}

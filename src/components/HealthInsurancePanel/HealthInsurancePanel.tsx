@@ -542,18 +542,18 @@ const HealthInsurancePanel: React.FC = () => {
         <hr className="my-5 border-light" />
 
         {/* ---------------------- SERVICIOS ---------------------- */}
-        <div className="row align-items-center mb-4 mt-5">
+        {/* <div className="row align-items-center mb-4 mt-5">
           <div className="col-md-8 col-12">
             <h3 className="text-white">Servicios</h3>
           </div>
-          {/* <div className="col-md-4 col-12 text-md-end mt-2 mt-md-0">
-      <button className="btn btn-light btn-health" onClick={handleNewService}>
-        Nuevo
-      </button>
-    </div> */}
-        </div>
+          <div className="col-md-4 col-12 text-md-end mt-2 mt-md-0">
+            <button className="btn btn-light btn-health" onClick={handleNewService}>
+              Nuevo
+            </button>
+          </div>
+        </div> */}
 
-        <div className="row">
+        {/* <div className="row">
           <div className="col-12">
             <div className="table-responsive">
               <table className="table table-bordered table-hover table-striped bg-white">
@@ -589,9 +589,9 @@ const HealthInsurancePanel: React.FC = () => {
               </table>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="row mt-4 mb-5">
+        {/* <div className="row mt-4 mb-5">
           <div className="col-lg-6 col-md-8 col-sm-12">
             <div className="card">
               <div className="card-body">
@@ -613,19 +613,19 @@ const HealthInsurancePanel: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <hr className="my-5 border-light" />
+        {/* <hr className="my-5 border-light" /> */}
 
         {/* ---------------------- ARANCELES ---------------------- */}
-        <div className="row align-items-center mb-4 mt-5">
+        {/* <div className="row align-items-center mb-4 mt-5">
           <div className="col-md-8 col-12">
             <h3 className="text-white">Aranceles por obra social y servicio</h3>
           </div>
-        </div>
+        </div> */}
 
         {/* Formulario */}
-        <div className="row mb-4">
+        {/* <div className="row mb-4">
           <div className="col-lg-6 col-md-8 col-sm-12">
             <div className="card">
               <div className="card-body">
@@ -670,17 +670,17 @@ const HealthInsurancePanel: React.FC = () => {
                 <button className="btn btn-primary btn-health btn-lg" onClick={handleSaveArancel}>
                   Guardar
                 </button>
-                {/* <button
-      className="btn btn-primary"
-      onClick={handleSaveArancel}
-      disabled={!selectedInsuranceId || !selectedServiceId || amount <= 0}
-    >
-      Guardar
-    </button> */}
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSaveArancel}
+                  disabled={!selectedInsuranceId || !selectedServiceId || amount <= 0}
+                >
+                  Guardar
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Tabla de Aranceles */}
         {/* {aranceles.length > 0 && (

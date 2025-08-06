@@ -201,7 +201,7 @@ const ProfessionalsComponent: React.FC<{
                 {/* <th>Horario de jornada</th> */}
                 <th className="desktop-w">Horario de jornada</th>
                 <th>Especialidades</th>
-                <th>De licencia</th>
+                {/* <th>De licencia</th> */}
                 <th>Activo</th>
               </tr>
             </thead>
@@ -252,7 +252,7 @@ const ProfessionalsComponent: React.FC<{
                     </div>
                   </td>
 
-                  <td>-</td>
+                  {/* <td>-</td> */}
                   <td className="text-center truncate-cell" onClick={(e) => e.stopPropagation()}>
                     <span title={professional.professionalState === 'ACTIVE' ? 'Si' : 'No'}>
                       {professional.professionalState == null ? (

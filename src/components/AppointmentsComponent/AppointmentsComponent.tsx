@@ -17,6 +17,8 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import clsx from 'clsx';
 import PatientService from '../../services/PatientService';
 import { useAuth } from '../../context/ContextAuth';
+import { useLocation } from 'react-router-dom';
+import LoadingSpinner from '../shared/LoadingSpinner/LoadingSpinner';
 
 interface Props {
   patients: Patient[];
@@ -24,6 +26,7 @@ interface Props {
   appointments: Appointment[];
   reloadPatients: () => void;
   onAppointmentsUpdate: (selectedProfessional: any) => void;
+  reloadActiveProfessionals: () => void;
 }
 
 const generateTimeSlots = (): string[] => {
@@ -48,6 +51,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   activeProfessionals,
   onAppointmentsUpdate,
   reloadPatients,
+  reloadActiveProfessionals,
 }) => {
   const timeSlots = generateTimeSlots();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,6 +70,7 @@ const AppointmentsComponent: React.FC<Props> = ({
   const isMobile = useIsMobile();
   const { userRole } = useAuth();
   const role = userRole ?? '';
+  const location = useLocation();
   const [, setApptToDelete] = useState<{
     id: number;
     patientName: string;
@@ -79,10 +84,31 @@ const AppointmentsComponent: React.FC<Props> = ({
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
   };
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleProfessionalSelect = (professional: Professional) => {
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      try {
+        await reloadActiveProfessionals();
+        if (activeProfessionals.length > 0) {
+          onAppointmentsUpdate(activeProfessionals[0]);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  const handleProfessionalSelect = async (professional: Professional) => {
+    setIsLoading(true);
+
     setSelectedProfessional(professional);
-    onAppointmentsUpdate(professional);
+    await onAppointmentsUpdate(professional);
+    setIsLoading(false);
   };
 
   const appointmentsForSelectedDate = appointments.filter((appt) =>
@@ -664,6 +690,11 @@ const AppointmentsComponent: React.FC<Props> = ({
             {/* Tabla central */}
             <div className="col-12 col-md-7 order-2" ref={tableRef}>
               <div className={clsx('App-table-wrapper', { 'table-responsive': isMobile })}>
+                {isLoading && (
+                  <div className="spinner-overlay">
+                    <LoadingSpinner />
+                  </div>
+                )}
                 <table className="App-table">
                   <thead>
                     <tr>
