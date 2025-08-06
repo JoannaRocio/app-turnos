@@ -1,7 +1,7 @@
 // AppointmentConfirmation.tsx
 import React, { useEffect, useState } from 'react';
 import './AppointmentConfirmation.scss';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import AppointmentService from '../../services/AppointmentService';
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from 'react-icons/fa';
 
