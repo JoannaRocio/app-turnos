@@ -17,14 +17,20 @@ function AppRoutes() {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // const isBranchSelectorRoute = location.pathname.toLowerCase().includes('/sucursales');
-  const isHiddenHeaderRoute =
-    location.pathname.toLowerCase().includes('/sucursales') ||
-    location.pathname.toLowerCase().includes('/confirmar-turno');
+  const hiddenHeaderPaths = [
+    '/sucursales',
+    '/confirmar-turno',
+    '/appointments/confirm',
+    '/appointments/cancel',
+  ];
+
+  const isHiddenHeaderRoute = hiddenHeaderPaths.some((prefix) =>
+    location.pathname.toLowerCase().startsWith(prefix)
+  );
 
   return (
     <>
-      {isAuthenticated && !isHiddenHeaderRoute && <HeaderComponent />}
+      {!isAuthenticated || (!isHiddenHeaderRoute && <HeaderComponent />)}
 
       <Routes>
         <Route
@@ -52,7 +58,8 @@ function AppRoutes() {
           }
         />
 
-        <Route path="/confirmar-turno/:id" element={<AppointmentConfirmation />} />
+        <Route path="/appointments/confirm/:token" element={<AppointmentConfirmation />} />
+        <Route path="/appointments/cancel/:token" element={<AppointmentConfirmation />} />
 
         <Route
           path="/no-autorizado"
