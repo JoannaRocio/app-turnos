@@ -29,13 +29,34 @@ class AppointmentService {
     return response.data;
   }
 
-  static async confirmAppointment(id: number): Promise<void> {
-    await Api.post<void>(`/appointments/confirmar/${id}`);
+  /** Confirma un turno vía token */
+  static async confirmAppointment(token: string): Promise<void> {
+    try {
+      await Api.patch<void>(`/appointments/confirm/${token}`);
+    } catch (error: any) {
+      const msg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'Error al confirmar turno';
+      throw new Error(msg);
+    }
   }
 
-  static async cancelAppointment(id: number): Promise<void> {
-    await Api.post<void>(`/appointments/cancelar/${id}`);
+  /** Cancela un turno vía token */
+  static async cancelAppointment(token: string): Promise<void> {
+    try {
+      await Api.patch<void>(`/appointments/cancel/${token}`);
+    } catch (error: any) {
+      const msg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'Error al cancelar turno';
+      throw new Error(msg);
+    }
   }
+
 
   static async updateAppointmentState(appointmentId: number, newState: string): Promise<void> {
     await Api.patch(`/appointments/${appointmentId}/state`, null, { params: { state: newState } });
