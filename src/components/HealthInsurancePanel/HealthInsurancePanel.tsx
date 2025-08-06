@@ -7,23 +7,23 @@ import PlanInsuranceService from '../../services/PlanInsuranceService';
 import { toast } from 'react-toastify';
 import ConfirmModal from '../shared/ConfirmModal/ConfirmModalComponent';
 
-type ArancelEntry = {
-  id: number;
-  insuranceId: number;
-  serviceId: number;
-  amount: number;
-};
+// type ArancelEntry = {
+//   id: number;
+//   insuranceId: number;
+//   serviceId: number;
+//   amount: number;
+// };
 
-interface Service {
-  id: number;
-  name: string;
-}
+// interface Service {
+//   id: number;
+//   name: string;
+// }
 
-const mockServices: Service[] = [
-  { id: 1, name: 'Limpieza de sarro' },
-  { id: 2, name: 'Extracción de muela' },
-  { id: 3, name: 'Tratamiento de conducto' },
-];
+// const mockServices: Service[] = [
+//   { id: 1, name: 'Limpieza de sarro' },
+//   { id: 2, name: 'Extracción de muela' },
+//   { id: 3, name: 'Tratamiento de conducto' },
+// ];
 
 const HealthInsurancePanel: React.FC = () => {
   // Planes
@@ -128,37 +128,37 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   // Aranceles
-  const [aranceles, setAranceles] = useState<ArancelEntry[]>([]);
-  const [selectedInsuranceId, setSelectedInsuranceId] = useState<number | ''>('');
-  const [selectedServiceId, setSelectedServiceId] = useState<number | ''>('');
-  const [amountInput, setAmountInput] = useState<string>('');
+  // const [aranceles, setAranceles] = useState<ArancelEntry[]>([]);
+  // const [selectedInsuranceId, setSelectedInsuranceId] = useState<number | ''>('');
+  // const [selectedServiceId, setSelectedServiceId] = useState<number | ''>('');
+  // const [amountInput, setAmountInput] = useState<string>('');
 
-  const handleSaveArancel = () => {
-    if (
-      selectedInsuranceId === '' ||
-      selectedServiceId === '' ||
-      amountInput.trim() === '' ||
-      isNaN(Number(amountInput))
-    ) {
-      alert('Completa todos los campos correctamente');
-      return;
-    }
+  // const handleSaveArancel = () => {
+  //   if (
+  //     selectedInsuranceId === '' ||
+  //     selectedServiceId === '' ||
+  //     amountInput.trim() === '' ||
+  //     isNaN(Number(amountInput))
+  //   ) {
+  //     alert('Completa todos los campos correctamente');
+  //     return;
+  //   }
 
-    setAranceles([
-      ...aranceles,
-      {
-        id: Date.now(),
-        insuranceId: Number(selectedInsuranceId),
-        serviceId: Number(selectedServiceId),
-        amount: Number(amountInput),
-      },
-    ]);
+  //   setAranceles([
+  //     ...aranceles,
+  //     {
+  //       id: Date.now(),
+  //       insuranceId: Number(selectedInsuranceId),
+  //       serviceId: Number(selectedServiceId),
+  //       amount: Number(amountInput),
+  //     },
+  //   ]);
 
-    // Reset
-    setSelectedInsuranceId('');
-    setSelectedServiceId('');
-    setAmountInput('');
-  };
+  //   // Reset
+  //   setSelectedInsuranceId('');
+  //   setSelectedServiceId('');
+  //   setAmountInput('');
+  // };
 
   // Obras Sociales
   const [insurances, setInsurances] = useState<HealthInsurance[]>([]);
@@ -233,37 +233,37 @@ const HealthInsurancePanel: React.FC = () => {
   };
 
   // Servicios
-  const [services, setServices] = useState<Service[]>(mockServices);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [serviceInput, setServiceInput] = useState('');
+  // const [services, setServices] = useState<Service[]>(mockServices);
+  // const [selectedService, setSelectedService] = useState<Service | null>(null);
+  // const [serviceInput, setServiceInput] = useState('');
 
   // const handleNewService = () => {
   //   setSelectedService(null);
   //   setServiceInput('');
   // };
 
-  const handleEditService = (service: Service) => {
-    setSelectedService(service);
-    setServiceInput(service.name);
-  };
+  // const handleEditService = (service: Service) => {
+  //   setSelectedService(service);
+  //   setServiceInput(service.name);
+  // };
 
-  const handleDeleteService = (id: number) => {
-    setServices(services.filter((s) => s.id !== id));
-  };
+  // const handleDeleteService = (id: number) => {
+  //   setServices(services.filter((s) => s.id !== id));
+  // };
 
-  const handleSaveService = () => {
-    const trimmed = serviceInput.trim();
-    if (trimmed === '') return;
+  // const handleSaveService = () => {
+  //   const trimmed = serviceInput.trim();
+  //   if (trimmed === '') return;
 
-    if (selectedService) {
-      setServices(services.map((s) => (s.id === selectedService.id ? { ...s, name: trimmed } : s)));
-    } else {
-      setServices([...services, { id: Date.now(), name: trimmed }]);
-    }
+  //   if (selectedService) {
+  //     setServices(services.map((s) => (s.id === selectedService.id ? { ...s, name: trimmed } : s)));
+  //   } else {
+  //     setServices([...services, { id: Date.now(), name: trimmed }]);
+  //   }
 
-    setSelectedService(null);
-    setServiceInput('');
-  };
+  //   setSelectedService(null);
+  //   setServiceInput('');
+  // };
 
   const loadInsurancesAndPlans = async () => {
     if (!firstLoadDone.current) {
