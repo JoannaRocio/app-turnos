@@ -30,11 +30,11 @@ interface Props {
 }
 
 const generateTimeSlots = (): string[] => {
-  const start = 9 * 60;
-  const end = 18 * 60 + 30;
+  const start = 8 * 60;
+  const end = 20 * 60;
   const slots: string[] = [];
 
-  for (let time = start; time <= end; time += 30) {
+  for (let time = start; time <= end; time += 15) {
     const hours = Math.floor(time / 60)
       .toString()
       .padStart(2, '0');
