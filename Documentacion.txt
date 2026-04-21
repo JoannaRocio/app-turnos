@@ -1,10 +1,32 @@
+# 📘 Documentación - Frontend - Tecnologías y comandos usados
+
+## 🚀 Tecnologías utilizadas
+
+- React  
+- TypeScript  
+- React Router  
+- React Hook Form  
+- Axios  
+- Sass  
+- React Bootstrap  
+
+---
+
+## 🛠️ Creación del proyecto
+
+```bash
 npx create-react-app turnos-app
 cd turnos-app
+```
+
+---
+
+## 📦 Instalación de dependencias
+
+```bash
 npm install react-router-dom react-hook-form
 npm install typescript @types/react @types/react-dom
 npm install @svgr/webpack
-npm install @types/react @types/react-dom
-npm install typescript@4.9.5
 npm install sass
 npm install react-icons@5.4.0
 npm install react-bootstrap bootstrap
@@ -13,5 +35,7 @@ npm install axios
 npm install --save-dev @types/axios
 npm install bootstrap-icons
 npm install react-select
+npm install --save-dev @types/node
+```
 
-npm install
+---
