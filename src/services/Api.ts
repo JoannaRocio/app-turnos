@@ -9,7 +9,7 @@ Api.interceptors.request.use((config) => {
   const token = AuthService.getToken();
 
   if (!config.headers) {
-    config.headers = {};
+    config.headers = {} as any;
   }
 
   if (token) {
