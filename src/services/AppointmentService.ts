@@ -30,9 +30,10 @@ class AppointmentService {
       const dateA = new Date(`${a.dateTime}T${a.dateTime ?? '00:00:00'}`).getTime();
       const dateB = new Date(`${b.dateTime}T${b.dateTime ?? '00:00:00'}`).getTime();
 
-      return dateA - dateB; // 🔼 viejo → nuevo
+      return dateA - dateB;
     });
   }
+
   static async updateAppointment(id: number, appointment: any): Promise<string> {
     const response = await Api.put<string>(`/appointments/${id}`, appointment);
     return response.data;

@@ -39,14 +39,16 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [show, onClose]);
+  }, [show, onClose, appointments]);
 
   if (!show) return null;
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
 
-    const date = new Date(dateString);
+    const [year, month, day] = dateString.split('-').map(Number);
+
+    const date = new Date(year, month - 1, day);
 
     return date.toLocaleDateString('es-AR', {
       day: '2-digit',
@@ -54,6 +56,13 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({
       year: 'numeric',
     });
   };
+
+  const sortedAppointments = [...appointments].sort((a, b) => {
+    const dateTimeA = `${a.date} ${a.time}`;
+    const dateTimeB = `${b.date} ${b.time}`;
+
+    return dateTimeA.localeCompare(dateTimeB);
+  });
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -85,7 +94,7 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {appointments.map((appt) => (
+                {sortedAppointments.map((appt) => (
                   <tr key={appt.id}>
                     <td>{formatDate(appt.date ?? '-')}</td>
                     <td>{appt.time ?? '-'}</td>
