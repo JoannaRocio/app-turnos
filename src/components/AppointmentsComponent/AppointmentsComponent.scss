@@ -1,23 +1,3 @@
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  overflow: auto;
-  padding: 1rem;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.5rem 0.5rem 0 0.5rem;
-  border: none !important;
-  padding: 1rem;
-}
-
 .custom-modal {
   z-index: 1000;
   display: flex;
@@ -87,10 +67,6 @@
 .btn-delete {
   cursor: pointer;
 }
-
-// select {
-//   height: -webkit-fill-available;
-// }
 
 //alert
 
@@ -354,6 +330,7 @@ button.dropdown-toggle:disabled {
 }
 
 .new-patient-switch {
+  padding-right: 8px;
   display: flex;
   align-items: center;
   cursor: pointer;
