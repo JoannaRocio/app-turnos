@@ -10,6 +10,9 @@ import ClinicalHistoryService from '../../services/ClinicalHistoryService';
 import ClinicalHistoryComponent from '../ClinicalHistoryComponent/ClinicalHistory';
 import { useDataContext } from '../../context/DataContext';
 import { toast } from 'react-toastify';
+import { AppointmentView } from '../../interfaces/AppointmenView';
+import AppointmentService from '../../services/AppointmentService';
+import AppointmentsModal from '../AppointmentsModal/AppointmentsModal';
 
 interface Props {
   professionalId: number;
@@ -30,6 +33,9 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
   const [sortByNameAsc, setSortByNameAsc] = useState(true);
   const [highlightedPatientId, setHighlightedPatientId] = useState<number | null>(null);
   const { patients } = useDataContext();
+  const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
+  const [patientAppointments, setPatientAppointments] = useState<AppointmentView[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
 
   const filteredPatients = patients.filter((p) => {
     const nameMatch = p.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -53,6 +59,39 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
       setPatientData(patient);
     } catch (error) {
       console.error('Error al obtener o crear la historia clínica:', error);
+    }
+  };
+
+  const openAppointmentsModal = async (patient: any) => {
+    setSelectedPatient(patient);
+    setShowAppointmentsModal(true);
+    setLoadingAppointments(true);
+    try {
+      const resp = await AppointmentService.getAllAppointmentsByDni(patient.documentNumber);
+
+      const mapped = (resp || [])
+        .map((appt) => {
+          const [date, time] = appt.dateTime.split('T');
+          return {
+            id: appt.id,
+            date,
+            time: time.slice(0, 5),
+            professionalName: appt.professionalFullName,
+            reason: appt.reason || '-',
+            state: appt.state || '-',
+          };
+        })
+        .sort((a, b) => {
+          const dateA = new Date(`${a.date}T${a.time}`).getTime();
+          const dateB = new Date(`${b.date}T${b.time}`).getTime();
+
+          return dateA - dateB;
+        });
+      setPatientAppointments(mapped);
+    } catch (error) {
+      toast.error('Error al obtener los turnos del paciente');
+    } finally {
+      setLoadingAppointments(false);
     }
   };
 
@@ -167,145 +206,162 @@ const PatientsComponent: React.FC<Props> = ({ professionalId, reloadPatients }) 
   }
 
   return (
-    <section>
-      <div className="d-flex justify-content-between">
-        <h3 className="App-main-title text-white">Listado de pacientes</h3>
-        {role !== 'USUARIO' && (
-          <button className="btn App-buttonTertiary" onClick={handleNewPatient}>
-            Nuevo
-          </button>
-        )}
-      </div>
-
-      <input
-        type="text"
-        className="form-control mb-3 filter-input w-100"
-        placeholder="Buscar por nombre o DNI..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      {sortedPatients.length === 0 ? (
-        <p className="no-patients-message">No hay pacientes disponibles.</p>
-      ) : (
-        <div className="table-responsive">
-          <table className="App-table">
-            <thead>
-              <tr>
-                <th onClick={() => setSortByNameAsc((prev) => !prev)} style={{ cursor: 'pointer' }}>
-                  Paciente {sortByNameAsc ? '▲' : '▼'}
-                </th>
-                <th>Tipo Documento</th>
-                <th>DNI</th>
-                <th>Obra Social y plan</th>
-                <th>Teléfono</th>
-                <th>Notas</th>
-                <th>¿Es nuevo?</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedPatients.map((patient, index) => (
-                <tr
-                  key={patient.id}
-                  ref={(el) => {
-                    if (patient.id != null) {
-                      rowRefs.current[patient.id] = el;
-                    }
-                  }}
-                  className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
-                >
-                  <td className="truncate-cell">
-                    <span className="ellipsis-cell" title={patient.fullName}>
-                      {patient.fullName}
-                    </span>
-                  </td>
-                  <td className="truncate-cell">
-                    <span className="ellipsis-cell" title={patient.documentType || '-'}>
-                      {patient.documentType || '-'}
-                    </span>
-                  </td>
-                  <td className="truncate-cell">
-                    <span className="ellipsis-cell" title={patient.documentNumber || '-'}>
-                      {patient.documentNumber || '-'}
-                    </span>
-                  </td>
-                  <td className="truncate-cell">
-                    <span
-                      className="ellipsis-cell"
-                      title={`${patient.healthInsuranceName || '-'}\n${patient.insurancePlanName || ''}`}
-                    >
-                      {patient.healthInsuranceName || ''}
-                    </span>
-                    <br />
-                    <span className="ellipsis-cell text-muted fst-italic small">
-                      {patient.insurancePlanName || ''}
-                    </span>
-                  </td>
-                  <td className="truncate-cell">
-                    <span className="ellipsis-cell" title={patient.phone || '-'}>
-                      {patient.phone || '-'}
-                    </span>
-                  </td>
-                  <td className="truncate-cell">
-                    <span className="ellipsis-cell" title={patient.note || '-'}>
-                      {patient.note || '-'}
-                    </span>
-                  </td>
-                  <td className="text-center truncate-cell">
-                    <span title={patient.isGuest === true ? 'Si' : 'No'}>
-                      {patient.isGuest == null ? (
-                        '-'
-                      ) : (
-                        <div className="d-flex justify-content-center align-items-center guest-cell">
-                          <span className="guest-text me-2">{patient.isGuest ? 'Sí' : 'No'}</span>
-                          <div className="form-check form-switch guest-switch m-0">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              role="switch"
-                              id={`guestSwitch-${patient.id}`}
-                              checked={patient.isGuest}
-                              disabled={isUpdating}
-                              onChange={() => {
-                                if (isUpdating) return;
-                                handleSave({ ...patient, isGuest: !patient.isGuest });
-                              }}
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor={`guestSwitch-${patient.id}`}
-                              aria-label="Marcar como invitado"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </span>
-                  </td>
-                  <td onClick={handleClick}>
-                    <ActionDropdown
-                      disabled={!patient}
-                      isOpen={activeDropdownIndex === index}
-                      onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
-                      onView={() => openClinicalHistory(patient)}
-                      onEdit={role !== 'USUARIO' ? () => openPatientModal(patient) : undefined}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <>
+      <section>
+        <div className="d-flex justify-content-between">
+          <h3 className="App-main-title text-white">Listado de pacientes</h3>
+          {role !== 'USUARIO' && (
+            <button className="btn App-buttonTertiary" onClick={handleNewPatient}>
+              Nuevo
+            </button>
+          )}
         </div>
-      )}
 
-      <PatientModalComponent
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        patient={selectedPatient}
-        onSave={handleSave}
-        isUpdating={isUpdating}
-      />
-    </section>
+        <input
+          type="text"
+          className="form-control mb-3 filter-input w-100"
+          placeholder="Buscar por nombre o DNI..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        {sortedPatients.length === 0 ? (
+          <p className="no-patients-message">No hay pacientes disponibles.</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="App-table">
+              <thead>
+                <tr>
+                  <th
+                    onClick={() => setSortByNameAsc((prev) => !prev)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Paciente {sortByNameAsc ? '▲' : '▼'}
+                  </th>
+                  <th>Tipo Documento</th>
+                  <th>DNI</th>
+                  <th>Obra Social y plan</th>
+                  <th>Teléfono</th>
+                  <th>Notas</th>
+                  <th>¿Es nuevo?</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedPatients.map((patient, index) => (
+                  <tr
+                    key={patient.id}
+                    ref={(el) => {
+                      if (patient.id != null) {
+                        rowRefs.current[patient.id] = el;
+                      }
+                    }}
+                    className={patient.id === highlightedPatientId ? 'highlighted-row' : ''}
+                  >
+                    <td className="truncate-cell">
+                      <span className="ellipsis-cell" title={patient.fullName}>
+                        {patient.fullName}
+                      </span>
+                    </td>
+                    <td className="truncate-cell">
+                      <span className="ellipsis-cell" title={patient.documentType || '-'}>
+                        {patient.documentType || '-'}
+                      </span>
+                    </td>
+                    <td className="truncate-cell">
+                      <span className="ellipsis-cell" title={patient.documentNumber || '-'}>
+                        {patient.documentNumber || '-'}
+                      </span>
+                    </td>
+                    <td className="truncate-cell">
+                      <span
+                        className="ellipsis-cell"
+                        title={`${patient.healthInsuranceName || '-'}\n${patient.insurancePlanName || ''}`}
+                      >
+                        {patient.healthInsuranceName || ''}
+                      </span>
+                      <br />
+                      <span className="ellipsis-cell text-muted fst-italic small">
+                        {patient.insurancePlanName || ''}
+                      </span>
+                    </td>
+                    <td className="truncate-cell">
+                      <span className="ellipsis-cell" title={patient.phone || '-'}>
+                        {patient.phone || '-'}
+                      </span>
+                    </td>
+                    <td className="truncate-cell">
+                      <span className="ellipsis-cell" title={patient.note || '-'}>
+                        {patient.note || '-'}
+                      </span>
+                    </td>
+                    <td className="text-center truncate-cell">
+                      <span title={patient.isGuest === true ? 'Si' : 'No'}>
+                        {patient.isGuest == null ? (
+                          '-'
+                        ) : (
+                          <div className="d-flex justify-content-center align-items-center guest-cell">
+                            <span className="guest-text me-2">{patient.isGuest ? 'Sí' : 'No'}</span>
+                            <div className="form-check form-switch guest-switch m-0">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id={`guestSwitch-${patient.id}`}
+                                checked={patient.isGuest}
+                                disabled={isUpdating}
+                                onChange={() => {
+                                  if (isUpdating) return;
+                                  handleSave({ ...patient, isGuest: !patient.isGuest });
+                                }}
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor={`guestSwitch-${patient.id}`}
+                                aria-label="Marcar como invitado"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </span>
+                    </td>
+                    <td onClick={handleClick}>
+                      <ActionDropdown
+                        disabled={!patient}
+                        isOpen={activeDropdownIndex === index}
+                        onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                        onView={() => openClinicalHistory(patient)}
+                        onViewAppointments={
+                          patient ? () => openAppointmentsModal(patient) : undefined
+                        }
+                        onEdit={role !== 'USUARIO' ? () => openPatientModal(patient) : undefined}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <PatientModalComponent
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          patient={selectedPatient}
+          onSave={handleSave}
+          isUpdating={isUpdating}
+        />
+
+        <AppointmentsModal
+          show={showAppointmentsModal}
+          onClose={() => setShowAppointmentsModal(false)}
+          patientName={selectedPatient?.fullName}
+          patientDni={selectedPatient?.documentNumber}
+          appointments={patientAppointments}
+          loading={loadingAppointments}
+        />
+      </section>
+    </>
   );
 };
 

@@ -19,6 +19,8 @@ import PatientService from '../../services/PatientService';
 import { useAuth } from '../../context/ContextAuth';
 import { useLocation } from 'react-router-dom';
 import LoadingSpinner from '../shared/LoadingSpinner/LoadingSpinner';
+import AppointmentsModal from '../AppointmentsModal/AppointmentsModal';
+import { AppointmentView } from '../../interfaces/AppointmenView';
 
 interface Props {
   patients: Patient[];
@@ -63,6 +65,10 @@ const AppointmentsComponent: React.FC<Props> = ({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
+  const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
+  const [patientAppointments, setPatientAppointments] = useState<AppointmentView[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
   const [showClinicalHistory, setShowClinicalHistory] = useState(false);
   const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
   const [patientData, setPatientData] = useState<Patient | null>(null);
@@ -278,6 +284,32 @@ const AppointmentsComponent: React.FC<Props> = ({
     setIsModalOpen(true);
   };
 
+  const openAppointmentsModal = async (patient: any) => {
+    setSelectedPatient(patient);
+    setShowAppointmentsModal(true);
+    setLoadingAppointments(true);
+    try {
+      const resp = await AppointmentService.getAllAppointmentsByDni(patient.documentNumber);
+
+      const mapped = (resp || []).map((appt) => {
+        const [date, time] = appt.dateTime.split('T');
+        return {
+          id: appt.id,
+          date,
+          time: time.slice(0, 5),
+          professionalName: appt.professionalFullName,
+          reason: appt.reason || '-',
+          state: appt.state || '-',
+        };
+      });
+      setPatientAppointments(mapped);
+    } catch (error) {
+      toast.error('Error al obtener los turnos del paciente');
+    } finally {
+      setLoadingAppointments(false);
+    }
+  };
+
   const closeModal = () => {
     setIsEditMode(false);
     setIsModalOpen(false);
@@ -440,24 +472,29 @@ const AppointmentsComponent: React.FC<Props> = ({
 
   return (
     <>
+      <AppointmentsModal
+        show={showAppointmentsModal}
+        onClose={() => setShowAppointmentsModal(false)}
+        patientName={selectedPatient?.fullName}
+        patientDni={selectedPatient?.documentNumber}
+        appointments={patientAppointments}
+        loading={loadingAppointments}
+      />
+
       <div className="col-12 col-md-8 order-2">
         {isModalOpen && (
           <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
             <div className={`custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
-              <div className="modal-header d-flex justify-content-end">
+              <div className="modal-header">
+                <h4>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h4>
                 <button
                   type="button"
-                  className="btn-close btn-close-white"
-                  aria-label="Cerrar"
                   onClick={() => setIsModalOpen(false)}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                    borderRadius: '50%',
-                    padding: '0.5rem',
-                  }}
-                />
+                  aria-label="Cerrar modal"
+                >
+                  ✕
+                </button>
               </div>
-              <h2>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h2>
               <form onSubmit={handleSubmit} className="form-turno">
                 <div className="form-grid form-group">
                   {/* Campos del formulario */}
@@ -857,6 +894,9 @@ const AppointmentsComponent: React.FC<Props> = ({
                                 isOpen={activeDropdownIndex === index}
                                 onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
                                 onView={() => openClinicalHistory(appt)}
+                                onViewAppointments={
+                                  appt ? () => openAppointmentsModal(appt.patient) : undefined
+                                }
                                 onEdit={
                                   appt && !isPastSlot && role !== 'USUARIO'
                                     ? () => openModalForTime(time)
