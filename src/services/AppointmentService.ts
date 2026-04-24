@@ -19,6 +19,21 @@ class AppointmentService {
     return response.data;
   }
 
+  static async getAllAppointmentsByDni(documentNumber: string): Promise<Appointment[]> {
+    const response = await Api.get<Appointment[]>(`/appointments/dni/${documentNumber}`);
+
+    return [...response.data].sort((a, b) => {
+      if (!a.dateTime && !b.dateTime) return 0;
+      if (!a.dateTime) return 1;
+      if (!b.dateTime) return -1;
+
+      const dateA = new Date(`${a.dateTime}T${a.dateTime ?? '00:00:00'}`).getTime();
+      const dateB = new Date(`${b.dateTime}T${b.dateTime ?? '00:00:00'}`).getTime();
+
+      return dateA - dateB;
+    });
+  }
+
   static async updateAppointment(id: number, appointment: any): Promise<string> {
     const response = await Api.put<string>(`/appointments/${id}`, appointment);
     return response.data;

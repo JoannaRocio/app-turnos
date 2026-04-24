@@ -123,24 +123,15 @@ const ProfessionalModal: React.FC<ProfessionalModalProps> = ({
   const isDirty = formDirty || availabilityDirty;
   return (
     <section>
-      <div className={`modal-overlay-professionalModal ${form.professionalId ? 'edit-mode' : ''}`}>
-        <div className={`modal modal-patient ${form.professionalId ? 'edit-mode' : ''}`}>
+      <div className={`modal-overlay ${form.professionalId ? 'edit-mode' : ''}`}>
+        <div className={`modal modal-custom  ${form.professionalId ? 'edit-mode' : ''}`}>
           <div className="modal-header">
-            <button
-              type="button"
-              className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
-              aria-label="Cerrar"
-              onClick={onClose}
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                borderRadius: '50%',
-                padding: '0.5rem',
-              }}
-            />
+            <h4>{form.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
+            <button type="button" onClick={onClose} aria-label="Cerrar modal">
+              ✕
+            </button>
           </div>
           <form onSubmit={handleSubmit} className="form-paciente">
-            <h4>{form.professionalId ? 'Editar profesional' : 'Alta de profesional'}</h4>
-
             {/* Nombre */}
             <div className="form-group">
               <label htmlFor="professionalName">Nombre completo</label>
