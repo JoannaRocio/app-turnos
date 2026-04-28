@@ -94,6 +94,7 @@
 
 .dropdown-toggle {
   background-color: var(--color-primary-light) !important;
+  width: 6.5rem !important;
 }
 
 button.dropdown-toggle:disabled {
@@ -271,7 +272,8 @@ button.dropdown-toggle:disabled {
       }
 
       .modal-buttons {
-        font-size: 1.2rem;
+        font-size: 1rem;
+        width: 100%;
       }
     }
   }
@@ -333,26 +335,72 @@ button.dropdown-toggle:disabled {
   pointer-events: none;
 }
 
+.table-appointments {
+  width: 100%;
+  table-layout: fixed;
+}
+
 .col-hora {
-  min-width: 5rem;
+  width: 5rem; // chica
 }
+
 .col-nombre {
-  min-width: 10rem;
+  width: 14rem;
 }
+
 .col-asistencia {
-  min-width: 8rem;
+  width: 12rem;
 }
+
 .col-obraSocial {
-  min-width: 8rem;
+  width: 10rem;
 }
+
 .col-motivo {
-  min-width: 8rem;
+  width: 18rem; // más grande 👈
 }
+
 .col-notas {
-  min-width: 8rem;
+  width: 12rem;
 }
+
 .col-acciones {
-  min-width: 6rem;
+  width: 9rem;
+}
+
+@media (max-width: 768px) {
+  .table-appointments {
+    table-layout: fixed !important;
+    min-width: 420px !important; // para que no colapse demasiado
+  }
+
+  .col-hora {
+    width: 4rem;
+  }
+
+  .col-nombre {
+    width: 10rem;
+  }
+
+  .col-asistencia {
+    width: 8rem;
+  }
+
+  .col-obraSocial {
+    width: 8rem;
+  }
+
+  .col-motivo {
+    width: 14rem; // sigue siendo la más importante
+  }
+
+  .col-notas {
+    width: 10rem;
+  }
+
+  .col-acciones {
+    width: 7rem;
+  }
 }
 
 .custom-container-switch {

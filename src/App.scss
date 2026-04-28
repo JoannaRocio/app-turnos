@@ -55,13 +55,13 @@ html {
 /* pantallas más chicas */
 @media (max-width: 1366px) {
   html {
-    font-size: 8px; /* 90% */
+    font-size: 7.5px; /* 90% */
   }
 }
 
 @media (max-width: 1024px) {
   html {
-    font-size: 7px;
+    font-size: 6.5px;
   }
 }
 
@@ -125,7 +125,7 @@ h6 {
 }
 
 p {
-  font-size: 1.6rem; /* 16px */
+  font-size: 1.3rem; /* 16px */
   line-height: 1.6;
 }
 
@@ -150,29 +150,31 @@ form {
 
 //  btn
 /* pantallas más chicas */
-@media (max-width: 1024px) {
-  .btn {
-    font-size: 1.3rem;
-  }
+// @media (max-width: 1366px) {
+//   .btn {
+//     font-size: 1.5rem;
+//   }
 
-  form {
-    font-size: 1.3rem;
-  }
-}
+//   form {
+//     font-size: 1.5rem;
+//   }
+// }
 
-@media (max-width: 768px) {
-  .btn {
-    font-size: 1.1rem;
-  }
+// @media (max-width: 1024px) {
+//   .btn {
+//     font-size: 1.5rem;
+//   }
 
-  form {
-    font-size: 1.1rem;
-  }
-}
+//   form {
+//     font-size: 1.5rem;
+//   }
+// }
 
 // toast
+
 .Toastify__toast {
   font-size: 1.4rem;
+  width: auto;
 }
 
 .Toastify__toast-body {
@@ -241,11 +243,11 @@ form {
 
   th,
   td {
-    padding: 8px;
+    padding: 0.4rem;
     border: 1px solid #ddd;
     text-align: left;
     font-size: 1.3rem;
-    height: 52px;
+    height: 5rem;
     text-overflow: ellipsis;
   }
 
@@ -400,7 +402,7 @@ form {
 }
 
 .modal-buttons {
-  font-size: 1.9rem !important;
+  font-size: 1.6rem !important;
   transition: 0.5s !important;
   color: var(--color-primary-light);
   border-radius: 1rem;

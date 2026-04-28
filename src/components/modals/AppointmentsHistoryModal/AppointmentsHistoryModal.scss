@@ -5,7 +5,7 @@
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid #eee;
-
+  align-self: center;
   padding: 0.5rem 0.5rem 0 0.5rem;
   border: none !important;
 
@@ -38,10 +38,12 @@
 /* BODY */
 .modal-body {
   padding: 20px;
+  padding-bottom: 2rem !important;
 }
 
 /* TABLA */
 .table-custom {
+  table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
 
@@ -51,7 +53,7 @@
     th {
       text-align: left;
       padding: 10px;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       font-weight: 600;
       color: #555;
     }
@@ -68,7 +70,7 @@
 
     td {
       padding: 10px;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       color: #333;
     }
   }
@@ -85,5 +87,32 @@
   background-color: transparent;
   &:hover {
     background: #fafafa;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-custom {
+    table-layout: fixed;
+  }
+
+  .table-custom th,
+  .table-custom td {
+    font-size: 0.9rem !important;
+    padding: 4px !important;
+  }
+  .col-fecha {
+    width: 20%;
+  }
+  .col-hora {
+    width: 15%;
+  }
+  .col-profesional {
+    width: 25%;
+  }
+  .col-estado {
+    width: 15%;
+  }
+  .col-motivo {
+    width: 25%;
   }
 }

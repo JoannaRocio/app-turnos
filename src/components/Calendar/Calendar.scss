@@ -1,7 +1,6 @@
 .calendar-wrapper {
   max-width: 350px;
   margin: auto;
-  padding: 1rem; // Solo para mobile, controlado abajo
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -31,9 +30,10 @@
     margin: 0 auto;
     border-radius: 10px;
     background-color: #fff;
-    padding: 1rem;
-    width: fit-content;
+    // padding: 1rem;
+    width: stretch;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     font-size: 1.2rem !important;
+    padding: 0.6rem;
   }
 }

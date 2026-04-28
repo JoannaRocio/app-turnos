@@ -726,7 +726,7 @@ const Appointments: React.FC<Props> = ({
                     <LoadingSpinner />
                   </div>
                 )}
-                <table className="App-table">
+                <table className="App-table table-appointments">
                   <thead>
                     <tr>
                       <th className="col-hora">Hora</th>

@@ -89,20 +89,20 @@ const AppointmentsHistoryModal: React.FC<AppointmentsHistoryModalProps> = ({
             <table className="table-custom">
               <thead>
                 <tr>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Profesional</th>
-                  <th>Estado</th>
-                  <th>Motivo</th>
+                  <th className="col-fecha">Fecha</th>
+                  <th className="col-hora">Hora</th>
+                  <th className="col-profesional">Profesional</th>
+                  <th className="col-estado">Estado</th>
+                  <th className="col-motivo">Motivo</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedAppointments.map((appt) => (
                   <tr key={appt.id}>
-                    <td>{formatDate(appt.date ?? '-')}</td>
-                    <td>{appt.time ?? '-'}</td>
-                    <td>{appt.professionalName ?? '-'}</td>
-                    <td>{appt.state ?? '-'}</td>
+                    <td className="truncate-cell">{formatDate(appt.date ?? '-')}</td>
+                    <td className="truncate-cell">{appt.time ?? '-'}</td>
+                    <td className="truncate-cell">{appt.professionalName ?? '-'}</td>
+                    <td className="truncate-cell">{appt.state ?? '-'}</td>
                     <td className="truncate-cell" title={appt.reason ?? '-'}>
                       {appt.reason ?? '-'}
                     </td>

@@ -33,7 +33,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
         <FiMoreVertical size={20} />
       </Dropdown.Toggle>
 
-      <Dropdown.Menu style={{ width: '95%' }}>
+      <Dropdown.Menu>
         {onView && (
           <Dropdown.Item className="item-drop" onClick={onView}>
             Ver ficha
