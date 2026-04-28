@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { FiMoreVertical } from 'react-icons/fi';
+import './ActionDropdown.scss';
 
 interface ActionDropdownProps {
   onView?: () => void;
@@ -22,17 +23,12 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   onToggle,
 }) => {
   return (
-    <Dropdown
-      show={isOpen}
-      onToggle={onToggle}
-      style={{ position: 'absolute', width: 'stretch', alignSelf: 'anchor-center' }}
-    >
+    <Dropdown show={isOpen} onToggle={onToggle} className="action-dropdown">
       <Dropdown.Toggle
         disabled={disabled}
         variant="secondary"
         size="lg"
-        className="no-caret"
-        style={{ width: '95%', display: 'block' }}
+        className="no-caret action-button"
       >
         <FiMoreVertical size={20} />
       </Dropdown.Toggle>
