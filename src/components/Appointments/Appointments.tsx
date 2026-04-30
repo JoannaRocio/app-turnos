@@ -313,6 +313,22 @@ const Appointments: React.FC<Props> = ({
     return appointmentsForSelectedDate.find((appt) => appt.dateTime.includes(`T${time}`));
   };
 
+  const isWithinAvailability = (time: string) => {
+    if (!selectedProfessional || !selectedDate) return false;
+
+    const dayOfWeek = new Date(selectedDate)
+      .toLocaleDateString('en-US', { weekday: 'long' })
+      .toUpperCase(); // MONDAY, TUESDAY, etc.
+
+    const schedules = selectedProfessional.schedules || [];
+
+    return schedules.some((schedule) => {
+      if (schedule.dayOfWeek !== dayOfWeek) return false;
+
+      return time >= schedule.startTime && time < schedule.endTime;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -617,12 +633,21 @@ const Appointments: React.FC<Props> = ({
                       ))}
                     </select>
                   </label>
+                  {/*  */}
                   <label>
                     Hora*
                     <select name="time" value={newAppointment.time} onChange={handleChange}>
                       {timeSlots.map((time) => (
-                        <option key={time} value={time} disabled={!!getAppointmentForTime(time)}>
-                          {time}
+                        <option
+                          key={time}
+                          value={time}
+                          disabled={!!getAppointmentForTime(time) || !isWithinAvailability(time)}
+                        >
+                          {!isWithinAvailability(time)
+                            ? `${time} (fuera de horario)`
+                            : getAppointmentForTime(time)
+                              ? `${time} (ocupado)`
+                              : time}
                         </option>
                       ))}
                     </select>
