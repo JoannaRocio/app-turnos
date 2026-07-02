@@ -1,0 +1,39 @@
+.calendar-wrapper {
+  max-width: 350px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+
+  @media (min-width: 769px) {
+    padding: 0; // Sin padding en desktop
+  }
+
+  .react-calendar {
+    border: none;
+    font-family: inherit;
+    width: 100% !important;
+
+    &__tile--now {
+      background: #e0f7fa;
+      color: #00796b;
+    }
+
+    &__tile--active {
+      background: #00796b;
+      color: white;
+    }
+  }
+
+  .calendar-container {
+    margin: 0 auto;
+    border-radius: 10px;
+    background-color: #fff;
+    // padding: 1rem;
+    width: stretch;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-size: 1.2rem !important;
+    padding: 0.6rem;
+  }
+}

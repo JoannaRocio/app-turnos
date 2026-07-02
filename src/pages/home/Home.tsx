@@ -1,16 +1,14 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import AppointmentsComponent from '../../components/AppointmentsComponent/AppointmentsComponent';
-import PatientsComponent from '../../components/Patients/PatientsPage';
-import ProfessionalsComponent from '../../components/Professionals/ProfessionalsComponent';
-import AdminDashboard from '../../components/AdminPanel/AdminDashboard';
+﻿import React, { useEffect, useState } from 'react';
+import Appointments from '../../components/Appointments/Appointments';
+import Patients from '../../components/Patients/Patients';
+import Professionals from '../../components/Professionals/Professionals';
+import AdminDashboard from '../../components/Admin/AdminDashboard';
 import LoadingSpinner from '../../components/shared/LoadingSpinner/LoadingSpinner';
 
 import { useComponente } from '../../context/ContextComponent';
 import { useAuth } from '../../context/ContextAuth';
 import { useDataContext } from '../../context/DataContext';
 
-import AppointmentService from '../../services/AppointmentService';
-import { Appointment } from '../../interfaces/Appointment';
 import { Professional } from '../../interfaces/Professional';
 
 const Home: React.FC = () => {
@@ -19,42 +17,28 @@ const Home: React.FC = () => {
   const role = userRole ?? '';
   const isAdmin = role === 'ADMIN';
 
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedProfessional, setSelectedProfessional] = useState<Professional>();
   const [isLoading, setIsLoading] = useState(false);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const {
     patients,
+    appointments,
     activeProfessionals,
     allProfessionals,
-    loadPatients,
-    loadAllProfessionals,
-    loadActiveProfessionals,
-    loadUsers,
+    ensureInitialData,
+    loadAppointments,
     reloadAllProfessionals,
     reloadActiveProfessionals,
     reloadPatients,
     reloadUsers,
   } = useDataContext();
 
-  const hasFetchedData = useRef(false);
-
   // Carga inicial (una sola vez)
   useEffect(() => {
     const fetchInitialData = async () => {
-      if (hasFetchedData.current || isDataLoaded) return;
-
       setIsLoading(true);
       try {
-        await Promise.all([
-          loadPatients(),
-          loadActiveProfessionals(),
-          loadAllProfessionals(),
-          loadUsers(),
-        ]);
-        setIsDataLoaded(true);
-        hasFetchedData.current = true;
+        await ensureInitialData();
       } catch (err) {
         console.error('Error al cargar datos:', err);
       } finally {
@@ -63,7 +47,7 @@ const Home: React.FC = () => {
     };
 
     fetchInitialData();
-  }, [isDataLoaded, loadPatients, loadActiveProfessionals, loadUsers, loadAllProfessionals]);
+  }, [ensureInitialData]);
 
   // Setear profesional por defecto una vez cargados los datos
   // useEffect(() => {
@@ -81,38 +65,26 @@ const Home: React.FC = () => {
     }
   }, [selectedProfessional, activeProfessionals]);
 
-  // Carga de turnos
-  const loadAppointments = useCallback(async (professional: Professional) => {
-    if (!professional?.documentNumber) return;
-
-    try {
-      const data = await AppointmentService.getAppointmentByDni(professional.documentNumber);
-      setAppointments(data);
-    } catch (error) {
-      console.error('Error al cargar turnos:', error);
-    }
-  }, []);
-
   // Llamar a loadAppointments solo si está activo el componente de turnos
   useEffect(() => {
     if (componenteActivo === 'agenda-turnos' && selectedProfessional?.documentNumber) {
-      loadAppointments(selectedProfessional);
+      loadAppointments(selectedProfessional.documentNumber);
     }
-  }, [componenteActivo, selectedProfessional, loadAppointments]);
+  }, [componenteActivo, selectedProfessional]);
 
   if (isLoading) return <LoadingSpinner text="Cargando datos..." fullHeight />;
 
   return (
     <section>
       {componenteActivo === 'pacientes' && ['USUARIO', 'MODERADOR', 'ADMIN'].includes(role) && (
-        <PatientsComponent
+        <Patients
           professionalId={selectedProfessional?.professionalId ?? 0}
           reloadPatients={reloadPatients}
         />
       )}
 
       {componenteActivo === 'profesionales' && ['MODERADOR', 'ADMIN'].includes(role) && (
-        <ProfessionalsComponent
+        <Professionals
           allProfessionals={allProfessionals}
           reloadAllProfessionals={reloadAllProfessionals}
           reloadActiveProfessionals={reloadActiveProfessionals}
@@ -120,13 +92,14 @@ const Home: React.FC = () => {
       )}
 
       {componenteActivo === 'agenda-turnos' && ['USUARIO', 'MODERADOR', 'ADMIN'].includes(role) && (
-        <AppointmentsComponent
+        <Appointments
           patients={patients}
           appointments={appointments}
           activeProfessionals={activeProfessionals}
-          onAppointmentsUpdate={(prof) => loadAppointments(prof)}
+          selectedProfessional={selectedProfessional} // 👈 AGREGAR
+          onSelectProfessional={setSelectedProfessional} // 👈 AGREGAR
+          onAppointmentsUpdate={(prof) => loadAppointments(prof?.documentNumber)}
           reloadPatients={reloadPatients}
-          reloadActiveProfessionals={reloadActiveProfessionals}
         />
       )}
 

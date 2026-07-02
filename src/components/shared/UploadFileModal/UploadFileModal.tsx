@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ClinicalHistoryService from '../../../services/ClinicalHistoryService';
 import './UploadFileModal.scss';
+import useLockBodyScroll from '../../../hooks/useLockBodyScroll';
 
 interface Props {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface Props {
 }
 
 const UploadFileModal: React.FC<Props> = ({ isOpen, entryId, onClose, onUploaded }) => {
+  useLockBodyScroll(isOpen);
+
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
 

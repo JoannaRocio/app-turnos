@@ -1,0 +1,305 @@
+﻿import React, { useState, useEffect } from 'react';
+import { Patient } from '../../../interfaces/Patient';
+import './PatientFormModal.scss';
+import HealthInsuranceService from '../../../services/HealthInsuranceService';
+import { HealthInsurance } from '../../../interfaces/HealthInsurance';
+import useLockBodyScroll from '../../../hooks/useLockBodyScroll';
+
+interface PatientFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  patient: Partial<Patient> | null;
+  onSave: (updated: Partial<Patient>) => void;
+  isUpdating: boolean;
+}
+
+const PatientFormModal: React.FC<PatientFormModalProps> = ({
+  isOpen,
+  onClose,
+  patient,
+  onSave,
+  isUpdating,
+}) => {
+  useLockBodyScroll(isOpen);
+
+  const [form, setForm] = useState<{
+    id?: number;
+    fullName: string;
+    documentType: string;
+    documentNumber: string;
+    healthInsuranceId: string;
+    insurancePlanId: string;
+    affiliateNumber?: number;
+    phone: string;
+    email: string;
+    note: string;
+  }>({
+    id: undefined,
+    fullName: '',
+    documentType: '',
+    documentNumber: '',
+    healthInsuranceId: '',
+    insurancePlanId: '',
+    affiliateNumber: 0,
+    phone: '',
+    email: '',
+    note: '',
+  });
+
+  const [healthInsurances, setHealthInsurances] = useState<HealthInsurance[]>([]);
+
+  useEffect(() => {
+    const fetchHealthInsurances = async () => {
+      try {
+        const data = await HealthInsuranceService.getActive();
+        setHealthInsurances(data);
+      } catch (error) {
+        console.error('Error cargando obras sociales', error);
+      }
+    };
+
+    fetchHealthInsurances();
+  }, []);
+
+  useEffect(() => {
+    if (patient) {
+      setForm({
+        id: patient.id || undefined,
+        fullName: patient.fullName || '',
+        documentType: patient.documentType || '',
+        documentNumber: patient.documentNumber || '',
+        healthInsuranceId: patient.healthInsuranceId?.toString() || '',
+        insurancePlanId: patient.insurancePlanId?.toString() || '',
+        affiliateNumber: patient.affiliateNumber || undefined,
+        phone: patient.phone || '',
+        email: patient.email || '',
+        note: patient.note || '',
+      });
+    } else {
+      setForm({
+        id: undefined,
+        fullName: '',
+        documentType: '',
+        documentNumber: '',
+        healthInsuranceId: '',
+        insurancePlanId: '',
+        affiliateNumber: undefined,
+        phone: '',
+        email: '',
+        note: '',
+      });
+    }
+  }, [patient]);
+
+  const hasAnyInsuranceField =
+    form.healthInsuranceId?.trim() ||
+    form.insurancePlanId?.trim() ||
+    form.affiliateNumber !== undefined;
+
+  if (!isOpen || !form) return null;
+
+  return (
+    <section>
+      <div className={`modal-overlay ${patient?.id ? 'edit-mode' : 'new-mode'}`}>
+        <div className={`app-modal modal-custom ${patient?.id ? 'edit-mode' : 'new-mode'}`}>
+          <div className="modal-header">
+            <h4>{patient?.id ? 'Editar paciente' : 'Alta de paciente'}</h4>
+            <button type="button" onClick={onClose} aria-label="Cerrar modal">
+              X
+            </button>
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSave({
+                ...form,
+                healthInsuranceId: Number(form.healthInsuranceId),
+                insurancePlanId: Number(form.insurancePlanId),
+              });
+            }}
+            className="form-paciente"
+          >
+            <div className="form-group">
+              <label htmlFor="documentType">Nombre completo</label>
+              <input
+                id="patientName"
+                type="text"
+                value={form.fullName}
+                onChange={(e) => {
+                  const onlyLetters = e.target.value.replace(/[^a-zA-ZÃÃ‰ÃÃ“ÃšáéíóúÃ‘ñ\s]/g, '');
+                  setForm({ ...form, fullName: onlyLetters });
+                }}
+                placeholder="Nombre completo"
+              />
+              {!form.fullName?.trim() && <span className="field-error">Campo obligatorio</span>}
+            </div>
+
+            <div className="form-row">
+              {/* Tipo y número de documento */}
+
+              <div className="form-group">
+                <label htmlFor="documentType">Tipo de documento</label>
+                <select
+                  id="documentType"
+                  value={form.documentType}
+                  onChange={(e) => setForm({ ...form, documentType: e.target.value })}
+                >
+                  <option value="" disabled hidden>
+                    Tipo de documento
+                  </option>
+                  <option value="DNI">DNI</option>
+                  <option value="Libreta de Enrolamiento">Libreta de Enrolamiento</option>
+                  <option value="Libreta Cívica">Libreta Cívica</option>
+                  <option value="Cédula de Identidad">Cédula de Identidad</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Cédula de Extranjería">Cédula de Extranjería</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                {!form.documentType && <span className="field-error">Campo obligatorio</span>}
+              </div>
+              <div className="form-group">
+                <label>Número documento</label>
+                <input
+                  type="text"
+                  value={form.documentNumber}
+                  onChange={(e) => setForm({ ...form, documentNumber: e.target.value })}
+                  placeholder="Número documento"
+                />
+                {!form.documentNumber?.trim() && (
+                  <span className="field-error">Campo obligatorio</span>
+                )}
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Obra social</label>
+                <select
+                  value={form.healthInsuranceId}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      healthInsuranceId: e.target.value,
+                      insurancePlanId: '',
+                    })
+                  }
+                >
+                  <option value="">Seleccione una obra social</option>
+                  {healthInsurances.map((insurance) => (
+                    <option key={insurance.id} value={insurance.id}>
+                      {insurance.name}
+                    </option>
+                  ))}
+                </select>
+                {hasAnyInsuranceField &&
+                  (!form.healthInsuranceId?.trim() ||
+                    !form.insurancePlanId?.trim() ||
+                    form.affiliateNumber === undefined) && (
+                    <span className="field-error">Debe completar los 3 campos</span>
+                  )}
+              </div>
+              <div className="form-group">
+                <label>Plan</label>
+                <select
+                  value={form.insurancePlanId}
+                  onChange={(e) => setForm({ ...form, insurancePlanId: e.target.value })}
+                  disabled={!form.healthInsuranceId}
+                >
+                  <option value="">Seleccione un plan</option>
+                  {healthInsurances
+                    .find((h) => h.id === Number(form.healthInsuranceId))
+                    ?.plans.map((plan) => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name}
+                      </option>
+                    ))}
+                </select>
+                {hasAnyInsuranceField &&
+                  (!form.healthInsuranceId?.trim() ||
+                    !form.insurancePlanId?.trim() ||
+                    form.affiliateNumber === undefined) && (
+                    <span className="field-error">Debe completar los 3 campos</span>
+                  )}
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Número de afiliado</label>
+                <input
+                  type="number"
+                  value={form.affiliateNumber ?? ''}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      affiliateNumber: e.target.value === '' ? undefined : Number(e.target.value),
+                    })
+                  }
+                  placeholder="Número de afiliado"
+                />
+                {hasAnyInsuranceField &&
+                  (!form.healthInsuranceId?.trim() ||
+                    !form.insurancePlanId?.trim() ||
+                    form.affiliateNumber === undefined) && (
+                    <span className="field-error">Debe completar los 3 campos</span>
+                  )}
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Teléfono</label>
+                <input
+                  type="number"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="Teléfono"
+                />
+              </div>
+              <div className="form-group">
+                <label>Correo electrónico</label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="Correo electrónico"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Notas</label>
+              <input
+                type="text"
+                value={form.note}
+                onChange={(e) => setForm({ ...form, note: e.target.value })}
+                placeholder="Notas"
+              />
+            </div>
+
+            <div className="d-flex justify-content-center align-items-center">
+              <button
+                className="modal-buttons"
+                type="submit"
+                disabled={
+                  !form.fullName ||
+                  !form.documentNumber ||
+                  !form.documentType ||
+                  !form.documentNumber?.trim() ||
+                  isUpdating
+                }
+              >
+                Guardar
+              </button>
+              <button className="modal-buttons" type="button" onClick={onClose}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default PatientFormModal;

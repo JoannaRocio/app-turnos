@@ -1,0 +1,93 @@
+.modal-overlay-action {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex; /* 👈 clave */
+  justify-content: center; /* horizontal */
+  align-items: center; /* vertical */
+  z-index: 9999;
+}
+
+.confirm-modal {
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary-dark));
+  color: var(--color-white-light);
+
+  border-radius: 16px;
+  padding: 2rem;
+
+  width: 100%;
+  max-width: 420px;
+
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+
+  position: relative;
+  animation: modalFadeIn 0.25s ease;
+
+  text-align: -webkit-center;
+  justify-items: center;
+}
+
+/* título */
+.confirm-modal h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* mensaje */
+.confirm-modal p {
+  font-size: 1.8rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+/* contenedor botones */
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-confirm-action {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-confirm-action:hover {
+  background-color: #d9363e;
+}
+
+.btn-cancel-action {
+  background-color: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-cancel-action:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

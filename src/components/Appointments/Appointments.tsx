@@ -1,0 +1,950 @@
+import React, { useEffect, useRef, useState } from 'react';
+import './Appointments.scss';
+import { Appointment } from '../../interfaces/Appointment';
+import ConfirmModal from '../modals/ConfirmActionModal/ConfirmActionModal';
+import AppointmentService from '../../services/AppointmentService';
+import ProfessionalPanel from '../ProfessionalPanel/ProfessionalPanel';
+import CalendarView from '../Calendar/Calendar';
+import { Patient } from '../../interfaces/Patient';
+import { Professional } from '../../interfaces/Professional';
+import ClinicalHistoryComponent from '../ClinicalHistory/ClinicalHistory';
+import { ClinicalHistoryEntry } from '../../interfaces/ClinicalHistoryEntry';
+import ClinicalHistoryService from '../../services/ClinicalHistoryService';
+import ActionDropdown from '../shared/ActionDropdown/ActionDropdown';
+import { toast } from 'react-toastify';
+import { format } from 'date-fns';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import clsx from 'clsx';
+import PatientService from '../../services/PatientService';
+import { useAuth } from '../../context/ContextAuth';
+import LoadingSpinner from '../shared/LoadingSpinner/LoadingSpinner';
+import AppointmentsModal from '../modals/AppointmentsHistoryModal/AppointmentsHistoryModal';
+import { AppointmentView } from '../../interfaces/AppointmenView';
+import useLockBodyScroll from '../../hooks/useLockBodyScroll';
+
+interface Props {
+  patients: Patient[];
+  activeProfessionals: Professional[];
+  appointments: Appointment[];
+  reloadPatients: () => void;
+  onAppointmentsUpdate: (selectedProfessional: any) => Promise<any>;
+
+  selectedProfessional?: Professional; // 👈 NUEVO
+  onSelectProfessional: (p: Professional) => void; // 👈 NUEVO
+}
+
+const generateTimeSlots = (): string[] => {
+  const start = 8 * 60;
+  const end = 20 * 60;
+  const slots: string[] = [];
+
+  for (let time = start; time <= end; time += 15) {
+    const hours = Math.floor(time / 60)
+      .toString()
+      .padStart(2, '0');
+    const minutes = (time % 60).toString().padStart(2, '0');
+    slots.push(`${hours}:${minutes}`);
+  }
+
+  return slots;
+};
+
+const Appointments: React.FC<Props> = ({
+  appointments,
+  patients,
+  activeProfessionals,
+  selectedProfessional,
+  onAppointmentsUpdate,
+  onSelectProfessional,
+  reloadPatients,
+}) => {
+  const timeSlots = generateTimeSlots();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [nameSearch, setNameSearch] = useState('');
+  const [dniSearch, setDniSearch] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(null);
+  const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
+  const [patientAppointments, setPatientAppointments] = useState<AppointmentView[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
+  const [showClinicalHistory, setShowClinicalHistory] = useState(false);
+  const [clinicalHistoryData, setClinicalHistoryData] = useState<ClinicalHistoryEntry[]>([]);
+  const [patientData, setPatientData] = useState<Patient | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const isMobile = useIsMobile();
+  const { userRole } = useAuth();
+  const role = userRole ?? '';
+  useLockBodyScroll(isModalOpen);
+  const [, setApptToDelete] = useState<{
+    id: number;
+    patientName: string;
+    date: string;
+    time: string;
+    isGuest: boolean;
+    mail: string;
+    phone: number;
+  } | null>(null);
+
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedProfessional && activeProfessionals.length > 0) {
+      const firstProfessional = activeProfessionals[0];
+
+      const init = async () => {
+        setIsLoading(true);
+        onSelectProfessional(firstProfessional);
+        await onAppointmentsUpdate(firstProfessional);
+        setIsLoading(false);
+      };
+
+      init();
+    }
+  }, [activeProfessionals, onAppointmentsUpdate, onSelectProfessional, selectedProfessional]);
+
+  const handleProfessionalSelect = async (professional: Professional) => {
+    setIsLoading(true);
+
+    onSelectProfessional(professional);
+    await onAppointmentsUpdate(professional);
+    setIsLoading(false);
+  };
+
+  const appointmentsForSelectedDate = appointments.filter((appt) =>
+    appt.dateTime.startsWith(selectedDate.toISOString().split('T')[0])
+  );
+
+  const getDayOfWeekString = (date: Date): string => {
+    return date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+  };
+
+  const filteredProfessionals = activeProfessionals.filter((pro) =>
+    pro.schedules?.some((s) => s.dayOfWeek === getDayOfWeekString(selectedDate))
+  );
+
+  const confirmDelete = (appt: any) => {
+    setCurrentAppointment(appt);
+    setShowConfirm(true);
+  };
+
+  const openClinicalHistory = async (appt: any) => {
+    try {
+      const data = await ClinicalHistoryService.getOrCreate(appt.patient, appt.professionalId);
+      setShowClinicalHistory(true);
+      setClinicalHistoryData(data);
+      setPatientData(appt.patient);
+    } catch (error) {
+      console.error('Error al obtener o crear la historia clínica:', error);
+    }
+  };
+
+  const [newAppointment, setNewAppointment] = useState({
+    id: 0,
+    patientId: 0,
+    patientName: '',
+    documentNumber: '',
+    time: '',
+    reason: '',
+    // note: '',
+    isGuest: false,
+    email: '',
+    phone: '',
+  });
+
+  useEffect(() => {
+    if (isEditMode && currentAppointment?.patient) {
+      setNameSearch(currentAppointment.patient.fullName ?? '');
+      setDniSearch(currentAppointment.patient.documentNumber ?? '');
+
+      setNewAppointment((prev) => ({
+        ...prev,
+        patientId: currentAppointment?.patient.id ?? 0,
+        documentNumber: currentAppointment?.patient.documentNumber ?? '',
+      }));
+    } else {
+      setNameSearch('');
+      setDniSearch('');
+    }
+  }, [isModalOpen, isEditMode, currentAppointment]);
+
+  useEffect(() => {
+    if (isEditMode) return;
+
+    // 1) Si ni nombre ni DNI coinciden, limpiamos patientId *e isGuest*
+    const matchByName = patients.find((p) => p.fullName === nameSearch);
+    const matchByDni = patients.find((p) => p.documentNumber === dniSearch);
+
+    if (!matchByName && !matchByDni && newAppointment.patientId !== 0) {
+      setNewAppointment((prev) => ({
+        ...prev,
+        patientId: 0,
+        isGuest: false, // â†©ï¸ reseteamos el switch
+      }));
+    }
+
+    // 2) Si ya hay patientId, no volvemos a autocompletar
+    if (newAppointment.patientId !== 0) return;
+
+    // 3) Coincidencia exacta por nombre
+    const exactByName = patients.find((p) => p.fullName === nameSearch);
+    if (exactByName) {
+      setNewAppointment((prev) => ({
+        ...prev,
+        patientId: exactByName.id,
+        documentNumber: exactByName.documentNumber,
+        patientName: exactByName.fullName,
+        isGuest: false, // â†©ï¸ y aquí también
+      }));
+      setDniSearch(exactByName.documentNumber);
+      return;
+    }
+
+    // 4) Coincidencia exacta por DNI
+    const exactByDni = patients.find((p) => p.documentNumber === dniSearch);
+    if (exactByDni) {
+      setNewAppointment((prev) => ({
+        ...prev,
+        patientId: exactByDni.id,
+        documentNumber: exactByDni.documentNumber,
+        patientName: exactByDni.fullName,
+        isGuest: false, // â†©ï¸ y aquí
+      }));
+      setNameSearch(exactByDni.fullName);
+    }
+  }, [nameSearch, dniSearch, patients, isEditMode, newAppointment.patientId]);
+
+  useEffect(() => {
+    document.body.classList.toggle('modal-open', isModalOpen);
+  }, [isModalOpen]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setNewAppointment((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const openModalForTime = (time: string) => {
+    // Evita abrir el modal si no hay profesionales activos
+    if (filteredProfessionals.length === 0) {
+      toast.warning('No hay profesionales activos disponibles para esta fecha.');
+      return;
+    }
+
+    const apptExists = getAppointmentForTime(time);
+    // const patient = patients.find((p) => p.id === apptExists?.patient.id);
+
+    if (apptExists) {
+      setIsEditMode(true);
+      setCurrentAppointment(apptExists);
+
+      setNameSearch(apptExists.patient.fullName ?? '');
+      setDniSearch(apptExists.patient.documentNumber ?? '');
+
+      setNewAppointment({
+        id: apptExists.id,
+        patientId: apptExists.patient.id ?? 0,
+        patientName: apptExists.patient.fullName ?? '-',
+        documentNumber: apptExists.patient.documentNumber,
+        time: time,
+        reason: apptExists?.reason ?? '-',
+        // note: apptExists.patient?.note ?? '-',
+        isGuest: !!apptExists.patient.isGuest,
+        email: apptExists.patient.email ?? '-',
+        phone: apptExists.patient.phone ?? '-',
+      });
+    } else {
+      setIsEditMode(false);
+      setNewAppointment({
+        id: 0,
+        patientId: 0,
+        patientName: '',
+        documentNumber: '',
+        time: time,
+        reason: '',
+        // note: '',
+        isGuest: false,
+        email: '',
+        phone: '',
+      });
+    }
+    setIsModalOpen(true);
+  };
+
+  const openAppointmentsModal = async (patient: any) => {
+    setSelectedPatient(patient);
+    setShowAppointmentsModal(true);
+    setLoadingAppointments(true);
+    try {
+      const resp = await AppointmentService.getAllAppointmentsByDni(patient.documentNumber);
+
+      const mapped = (resp || []).map((appt) => {
+        const [date, time] = appt.dateTime.split('T');
+        return {
+          id: appt.id,
+          date,
+          time: time.slice(0, 5),
+          professionalName: appt.professionalFullName,
+          reason: appt.reason || '-',
+          state: appt.state || '-',
+        };
+      });
+      setPatientAppointments(mapped);
+    } catch (error) {
+      toast.error('Error al obtener los turnos del paciente');
+    } finally {
+      setLoadingAppointments(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsEditMode(false);
+    setIsModalOpen(false);
+  };
+
+  const getAppointmentForTime = (time: string) => {
+    return appointmentsForSelectedDate.find((appt) => appt.dateTime.includes(`T${time}`));
+  };
+
+  const isWithinAvailability = (time: string) => {
+    if (!selectedProfessional || !selectedDate) return false;
+
+    const dayOfWeek = new Date(selectedDate)
+      .toLocaleDateString('en-US', { weekday: 'long' })
+      .toUpperCase(); // MONDAY, TUESDAY, etc.
+
+    const schedules = selectedProfessional.schedules || [];
+
+    return schedules.some((schedule) => {
+      if (schedule.dayOfWeek !== dayOfWeek) return false;
+
+      return time >= schedule.startTime && time < schedule.endTime;
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validación mínima
+    if (!newAppointment.documentNumber) {
+      toast.error('El DNI no existe en la base de datos. Si es nuevo marcar "Es nuevo"');
+      return;
+    }
+    if (!newAppointment.time) {
+      toast.error('Por favor, completá con el campo Hora.');
+      return;
+    }
+
+    setIsUpdating(true);
+
+    try {
+      let patientId = newAppointment.patientId;
+
+      // 1) Si es "paciente nuevo" (isGuest), creamos primero el paciente
+      if (newAppointment.isGuest && !isEditMode) {
+        const patientPayload = {
+          fullName: nameSearch,
+          documentType: 'DNI',
+          documentNumber: newAppointment.documentNumber,
+          phone: newAppointment.phone || null,
+          email: newAppointment.email || null,
+          // note: newAppointment.note || null,
+          healthInsuranceId: null,
+          insurancePlanId: null,
+          affiliateNumber: null,
+          isGuest: true,
+        };
+
+        const createResp = await PatientService.createPatient(patientPayload);
+        patientId = createResp.id;
+        toast.success(createResp.message ?? 'Paciente creado con éxito');
+        await reloadPatients();
+      }
+
+      // 2) Con patientId (nuevo o existente), armamos el turno
+      const dateTime = `${format(selectedDate, 'yyyy-MM-dd')}T${newAppointment.time}:00`;
+      const appointmentToSave = {
+        id: newAppointment.id, // para update usa este id
+        patientId,
+        patientDni: newAppointment.documentNumber,
+        dateTime,
+        reason: newAppointment.reason,
+        state: 'PENDIENTE',
+        professionalId:
+          selectedProfessional?.professionalId ?? activeProfessionals[0].professionalId,
+        // note: newAppointment.note,
+      };
+
+      if (isEditMode) {
+        await AppointmentService.updateAppointment(newAppointment.id, appointmentToSave);
+        toast.success('Turno actualizado correctamente.');
+      } else {
+        await AppointmentService.createAppointment(appointmentToSave);
+        toast.success('Turno creado correctamente.');
+      }
+
+      // 3) Refrescar y cerrar
+      if (selectedProfessional?.professionalId) {
+        await onAppointmentsUpdate(selectedProfessional);
+      }
+      closeModal();
+    } catch (error: any) {
+      handleBackendError(error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  async function handleDeleteConfirmed(currentAppointment: any) {
+    try {
+      await AppointmentService.deleteAppointment(currentAppointment?.id);
+      toast.success('Turno eliminado correctamente.');
+      setShowConfirm(false);
+      setApptToDelete(null);
+
+      if (selectedProfessional?.documentNumber) {
+        await onAppointmentsUpdate(selectedProfessional);
+      }
+    } catch (error: any) {
+      setCurrentAppointment(null);
+      handleBackendError(error, 'Ocurrió un error al eliminar el turno.');
+    }
+  }
+
+  function handleBackendError(error: any, fallbackMessage = 'Ocurrió un error') {
+    const status = error?.response?.status;
+    const data = error?.response?.data;
+
+    if (status === 304 || status === 204) {
+      toast.info('No se realizaron modificaciones.');
+    } else {
+      const message = data?.message || data?.error || fallbackMessage;
+      toast.error(message);
+    }
+  }
+
+  const filteredPatients = patients.filter(
+    (p) =>
+      p?.fullName?.toLowerCase().includes(nameSearch.toLowerCase()) &&
+      p?.documentNumber?.includes(dniSearch)
+  );
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    // Abre una nueva ventana con solo el contenido printable
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+    <html>
+      <head>
+      <title>
+        Turnos – ${selectedProfessional?.professionalName} – 
+        ${selectedDate.toLocaleDateString('es-AR', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        })}
+      </title>
+        <style>
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #ccc; padding: 0.5em; }
+
+          /* Oculta cualquier elemento con .no-print en impresión */
+          @media print {
+            .no-print {
+              display: none !important;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        ${tableRef.current?.innerHTML}
+      </body>
+    </html>
+  `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    // printWindow.close(); // opcional: cerrar tras imprimir
+  };
+
+  return (
+    <>
+      <AppointmentsModal
+        show={showAppointmentsModal}
+        onClose={() => setShowAppointmentsModal(false)}
+        patientName={selectedPatient?.fullName}
+        patientDni={selectedPatient?.documentNumber}
+        appointments={patientAppointments}
+        loading={loadingAppointments}
+      />
+
+      <div className="col-12 col-md-8 order-2">
+        {isModalOpen && (
+          <div className={`modal-overlay ${isEditMode ? 'edit-mode' : ''}`}>
+            <div className={`app-modal custom-modal ${isEditMode ? 'edit-mode' : ''}`}>
+              <div className="modal-header">
+                <h4>{isEditMode ? 'Editar turno' : 'Nuevo Turno'}</h4>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  aria-label="Cerrar modal"
+                >
+                  X
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className="form-turno">
+                <div className="form-grid form-group">
+                  {/* Campos del formulario */}
+                  {/* Paciente */}
+                  <label>
+                    Paciente*
+                    <input
+                      type="text"
+                      value={nameSearch}
+                      onChange={(e) => {
+                        setNameSearch(e.target.value);
+                      }}
+                      list="patientsByName"
+                      placeholder="Escribí el nombre"
+                    />
+                    <datalist id="patientsByName">
+                      {filteredPatients.map((p) => (
+                        <option key={p.id} value={p.fullName} />
+                      ))}
+                    </datalist>
+                  </label>
+
+                  {/* DNI */}
+                  <label>
+                    DNI*
+                    <input
+                      type="text"
+                      value={dniSearch}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setDniSearch(val);
+                        if (newAppointment.isGuest) {
+                          setNewAppointment((prev) => ({
+                            ...prev,
+                            documentNumber: val,
+                          }));
+                        }
+                      }}
+                      list="patientsByDni"
+                      placeholder="Escribí el DNI"
+                    />
+                    <datalist id="patientsByDni">
+                      {filteredPatients.map((p) => (
+                        <option key={p.id} value={p.documentNumber} />
+                      ))}
+                    </datalist>
+                  </label>
+
+                  {/* SWITCH "¿Es un paciente nuevo?" */}
+                  <div className="d-flex full-width gap-3 custom-container-switch">
+                    <label className="form-check-label ms-2" htmlFor="switchIsNew">
+                      ¿Es un paciente nuevo?
+                    </label>
+                    <div className="form-check cursor-pointer form-switch mb-3 new-patient-switch">
+                      <span className={`guest-text ${newAppointment.isGuest ? 'yes' : 'no'}`}>
+                        {newAppointment.isGuest ? 'Sí' : 'No'}
+                      </span>
+
+                      {/* Switch */}
+                      <input
+                        className="form-check-input cursor-pointer"
+                        type="checkbox"
+                        id="switchIsNew"
+                        checked={newAppointment.isGuest}
+                        disabled={newAppointment.patientId !== 0 || isUpdating}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setNewAppointment((prev) => ({
+                            ...prev,
+                            isGuest: checked,
+                            // si paso a "nuevo", vuelco aquí lo que ya tipeaste
+                            documentNumber: checked ? dniSearch : prev.documentNumber,
+                            patientName: checked ? nameSearch : prev.patientName,
+                            // opcional: si quieres, resetea patientId
+                            patientId: checked ? 0 : prev.patientId,
+                          }));
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* ------ Campos sólo para paciente nuevo ------ */}
+                  {newAppointment.isGuest && (
+                    <div className="form-grid mb-3 full-width">
+                      <label className="text-primary">
+                        Teléfono:
+                        <input
+                          type="number"
+                          name="phone"
+                          value={newAppointment.phone}
+                          onChange={handleChange}
+                          placeholder="Teléfono (opcional)"
+                          disabled={isEditMode}
+                        />
+                      </label>
+                      <label className="text-primary">
+                        Email:
+                        <input
+                          type="email"
+                          name="email"
+                          value={newAppointment.email}
+                          onChange={handleChange}
+                          placeholder="Email (opcional)"
+                          disabled={isEditMode}
+                        />
+                      </label>
+                    </div>
+                  )}
+
+                  <label>
+                    Profesional*
+                    <select
+                      value={selectedProfessional?.professionalId || ''}
+                      onChange={(e) => {
+                        const pro = activeProfessionals.find(
+                          (p) => p.professionalId === Number(e.target.value)
+                        );
+                        if (pro) onSelectProfessional(pro);
+                      }}
+                    >
+                      <option value="">Seleccioná un profesional</option>
+                      {filteredProfessionals.map((pro) => (
+                        <option key={pro.professionalId} value={pro.professionalId}>
+                          {pro.professionalName}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {/*  */}
+                  <label>
+                    Hora*
+                    <select name="time" value={newAppointment.time} onChange={handleChange}>
+                      {timeSlots.map((time) => (
+                        <option
+                          key={time}
+                          value={time}
+                          disabled={!!getAppointmentForTime(time) || !isWithinAvailability(time)}
+                        >
+                          {!isWithinAvailability(time)
+                            ? `${time} (fuera de horario)`
+                            : getAppointmentForTime(time)
+                              ? `${time} (ocupado)`
+                              : time}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="full-width">
+                    Motivo:
+                    <input
+                      type="text"
+                      name="reason"
+                      value={newAppointment.reason}
+                      onChange={handleChange}
+                    />
+                  </label>
+                  {/* <label className="full-width">
+                    Notas:
+                    <textarea name="note" value={newAppointment.note} onChange={handleChange} />
+                  </label> */}
+                </div>
+
+                <div className="d-flex justify-content-center align-items-center">
+                  <button className="modal-buttons" type="submit" disabled={isUpdating}>
+                    {isEditMode ? 'Actualizar' : 'Guardar'}
+                  </button>
+                  <button className="modal-buttons" type="button" onClick={closeModal}>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <ConfirmModal
+          isOpen={showConfirm}
+          title="Confirmar eliminación"
+          message={`¿Está seguro/a que deseas eliminar el turno de "${currentAppointment?.patient.fullName}"?`}
+          onConfirm={async () => {
+            if (currentAppointment) {
+              await handleDeleteConfirmed(currentAppointment);
+              setShowConfirm(false); // 👈 solo acá se cierra
+            } else {
+              alert('No ha seleccionado ningún turno disponible.');
+            }
+          }}
+          onCancel={() => {
+            setShowConfirm(false);
+            setApptToDelete(null);
+          }}
+        />
+      </div>
+      <section>
+        <div className="text-md-start px-2">
+          <h3 className="App-main-title text-white">Agenda de turnos</h3>
+          <div className="d-flex justify-content-between">
+            <h4 className="schedule-title">
+              <i className="fas fa-user-md me-2"></i>
+              {selectedProfessional?.professionalName ?? activeProfessionals[0]?.professionalName}
+              {' - '}
+              {selectedDate.toLocaleDateString('es-AR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+            </h4>
+            {!showClinicalHistory && (
+              <button
+                title="Imprimir turnos"
+                className="btn App-buttonTertiary"
+                onClick={handlePrint}
+              >
+                Imprimir
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {showClinicalHistory && patientData && selectedProfessional?.professionalId !== undefined ? (
+        <ClinicalHistoryComponent
+          data={clinicalHistoryData}
+          patient={patientData}
+          professionalId={selectedProfessional?.professionalId}
+          onBack={() => setShowClinicalHistory(false)}
+        />
+      ) : (
+        <section className="container-fluid">
+          <div className="row">
+            {/* Panel izquierdo */}
+            <div className="col-12 col-md-2">
+              <ProfessionalPanel
+                activeProfessionals={activeProfessionals}
+                onProfessionalSelect={handleProfessionalSelect}
+                selectedProfessional={selectedProfessional}
+              />
+            </div>
+            {/* Tabla central */}
+            <div className="col-12 col-md-7 order-2" ref={tableRef}>
+              <div className={clsx('App-table-wrapper', { 'table-responsive': isMobile })}>
+                {isLoading && (
+                  <div className="spinner-overlay">
+                    <LoadingSpinner />
+                  </div>
+                )}
+                <table className="App-table table-appointments">
+                  <thead>
+                    <tr>
+                      <th className="col-hora">Hora</th>
+                      <th className="col-nombre">Paciente</th>
+                      <th className="col-asistencia no-print">Asistencia</th>
+                      <th className="col-obraSocial">Obra Social</th>
+                      <th className="col-motivo">Motivo</th>
+                      <th className="col-notas no-print">Notas</th>
+                      {/* <th className="col-nuevo no-print">¿Es nuevo?</th> */}
+                      <th className="col-acciones no-print">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {timeSlots.map((time, index) => {
+                      const appt = getAppointmentForTime(time);
+
+                      // 1. Fecha y día de la semana
+                      const slotDate = new Date(selectedDate);
+                      const [hours, minutes] = time.split(':').map(Number);
+                      slotDate.setHours(hours, minutes, 0, 0);
+                      const isPastSlot = slotDate < new Date();
+
+                      const dayOfWeek = slotDate
+                        .toLocaleDateString('en-US', { weekday: 'long' })
+                        .toUpperCase();
+
+                      // 2. Obtengo los rangos del profesional para ese día
+                      const todaysSchedules =
+                        selectedProfessional?.schedules?.filter((s) => s.dayOfWeek === dayOfWeek) ||
+                        [];
+
+                      // 3. Función para convertir "HH:mm:ss" o "HH:mm" a minutos desde medianoche
+                      const toMinutes = (hms: string) => {
+                        const [h, m] = hms.split(':').map(Number);
+                        return h * 60 + m;
+                      };
+                      const slotMinutes = hours * 60 + minutes;
+
+                      // 4. Compruebo si slot cae dentro de alguna franja
+                      const isWithinWorkHours = todaysSchedules.some((s) => {
+                        const start = toMinutes(s.startTime.slice(0, 5));
+                        const end = toMinutes(s.endTime.slice(0, 5));
+                        return slotMinutes >= start && slotMinutes < end;
+                      });
+
+                      // 5. Decido si es "no-laboral"
+                      const isNonWorkingSlot = !isWithinWorkHours;
+
+                      return (
+                        <tr
+                          key={time}
+                          onClick={() => {
+                            // ver citas existentes siempre
+                            if (appt) return openModalForTime(time);
+                            // crear sólo si NO es pasado, NO es no-laboral y hay profesionales
+                            if (!isPastSlot && !isNonWorkingSlot) openModalForTime(time);
+                          }}
+                          className={clsx({
+                            'past-slot': isPastSlot && !appt,
+                            'clickable-row': !isPastSlot && !appt && !isNonWorkingSlot,
+                            'non-working-slot': isNonWorkingSlot,
+                          })}
+                          style={{
+                            cursor: appt
+                              ? 'pointer'
+                              : isNonWorkingSlot
+                                ? 'not-allowed'
+                                : isPastSlot
+                                  ? 'not-allowed'
+                                  : 'pointer',
+                          }}
+                          title={
+                            isNonWorkingSlot
+                              ? 'Fuera del horario de atención'
+                              : (appt?.reason ?? undefined)
+                          }
+                        >
+                          <td className="truncate-cell">{time}</td>
+                          <td className="truncate-cell">
+                            <span
+                              title={`${appt?.patient.fullName || ''}\n${appt?.patient.documentNumber || ''}`}
+                            >
+                              {appt?.patient.fullName ?? '-'}
+                              <br />
+                              {appt?.patient.documentNumber ?? ''}
+                            </span>
+                          </td>
+
+                          <td className="truncate-cell no-print state-cell">
+                            <span title={`${appt?.state || ''}`}>
+                              {appt ? (
+                                <select
+                                  className={`
+                                  form-select
+                                  status-${appt.state.toLowerCase()}
+                                `}
+                                  onClick={(e) => e.stopPropagation()}
+                                  value={appt.state}
+                                  onChange={async (e) => {
+                                    const nextState = e.target.value;
+                                    try {
+                                      await AppointmentService.updateAppointmentState(
+                                        appt.id,
+                                        nextState
+                                      );
+                                      toast.success(`Estado actualizado a "${nextState}"`);
+                                      await onAppointmentsUpdate(selectedProfessional);
+                                    } catch (err) {
+                                      toast.error('No se pudo cambiar el estado');
+                                      console.error(err);
+                                    }
+                                  }}
+                                >
+                                  <option value="PENDIENTE">Pendiente</option>
+                                  <option value="ATENDIDO">Atendido</option>
+                                  <option value="AUSENTE_CON_AVISO">Ausente con aviso</option>
+                                  <option value="AUSENTE_SIN_AVISO">Ausente sin aviso</option>
+                                  <option value="CANCELADO">Cancelado</option>
+                                  <option value="CONFIRMADO">Confirmado</option>
+                                  <option value="NINGUNO">Ninguno</option>
+                                </select>
+                              ) : (
+                                '-'
+                              )}
+                            </span>
+                          </td>
+
+                          <td className="truncate-cell">
+                            <span
+                              className="ellipsis-cell"
+                              title={`${appt?.patient.healthInsuranceName || '-'}\n${appt?.patient.insurancePlanName || ''}`}
+                            >
+                              {appt?.patient.healthInsuranceName || ''}
+                            </span>
+                            <br />
+                            <span className="ellipsis-cell text-muted fst-italic small">
+                              {appt?.patient.insurancePlanName || ''}
+                            </span>
+                          </td>
+                          <td className="truncate-cell">{appt?.reason ?? '-'}</td>
+                          <td className="truncate-cell no-print">{appt?.patient.note ?? '-'}</td>
+                          {/* <td className="truncate-cell text-center no-print">
+                            {appt?.patient.isGuest == null ? (
+                              '-'
+                            ) : (
+                              <span
+                                className={`me-2 ${
+                                  appt.patient.isGuest ? 'text-success' : 'text-danger'
+                                }`}
+                              >
+                                {appt.patient.isGuest ? 'Sí' : 'No'}
+                              </span>
+                            )}
+                          </td> */}
+                          <td className="action-cell no-print" onClick={handleClick}>
+                            <div className="dropdown-container">
+                              <ActionDropdown
+                                disabled={!appt}
+                                isOpen={activeDropdownIndex === index}
+                                onToggle={(isOpen) => setActiveDropdownIndex(isOpen ? index : null)}
+                                onView={() => openClinicalHistory(appt)}
+                                onViewAppointments={
+                                  appt ? () => openAppointmentsModal(appt.patient) : undefined
+                                }
+                                onEdit={
+                                  appt && !isPastSlot && role !== 'USUARIO'
+                                    ? () => openModalForTime(time)
+                                    : undefined
+                                }
+                                onDelete={
+                                  appt && !isPastSlot && role !== 'USUARIO'
+                                    ? () => confirmDelete(appt)
+                                    : undefined
+                                }
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {/* Calendario */}
+            <div className="col-12 col-md-3 order-1 order-md-2">
+              <CalendarView onDateSelect={handleDateSelect} />
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  );
+};
+
+export default Appointments;

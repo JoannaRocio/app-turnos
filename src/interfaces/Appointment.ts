@@ -7,6 +7,7 @@ export interface Appointment {
   patientDni: string;
   patientFullName: string;
   dateTime: string;
+  endDateTime: string;
   professionalFullName: string;
   documentNumber: string;
   reason: string;
