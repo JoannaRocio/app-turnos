@@ -36,7 +36,11 @@ const CalendarComponent: React.FC<Props> = ({ onDateSelect }) => {
       ) : (
         generateMonthDates().map((date, index) => (
           <div key={index} className="calendar-container">
-            <Calendar onClickDay={handleChange} value={selectedDate} activeStartDate={date} />
+            <Calendar
+              onClickDay={handleChange}
+              value={selectedDate}
+              defaultActiveStartDate={date}
+            />
           </div>
         ))
       )}
